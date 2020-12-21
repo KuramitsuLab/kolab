@@ -1,5 +1,4 @@
 # userId とprobelmId からデータを抜くスクリプト
-
 from collections import Counter
 import os
 import requests
@@ -43,7 +42,7 @@ def get_judge(judgeId):
   data = json.loads(r.text)
   return data.get('sourceCode', '')
 
-def get_code(userId, problemId, out=None):
+def get_code(userId, problemId):
   code = ''
   url = "https://judgeapi.u-aizu.ac.jp/submission_records/users/" + userId + "/problems/" + problemId + "?size=10"
   r = requests.get(url)
@@ -61,8 +60,8 @@ def get_code(userId, problemId, out=None):
   return code
 
 def download(userId, problemId):
-  os.makedirs(problemId, exist_ok=True)
-  with open(f'{problemId}/{userId}.py', 'w', encoding="utf_8_sig") as f:
+  os.makedirs(f'data/{problemId}', exist_ok=True)
+  with open(f'data/{problemId}/{userId}_{problemId}.py', 'w') as f:
     f.write(get_code(userId, problemId))
 
 if __name__ == '__main__':
