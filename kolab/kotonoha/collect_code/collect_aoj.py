@@ -43,6 +43,7 @@ def get_judge(judgeId):
   return data.get('sourceCode', '')
 
 def get_code(userId, problemId):
+  record = []
   code = ''
   url = "https://judgeapi.u-aizu.ac.jp/submission_records/users/" + userId + "/problems/" + problemId + "?size=10"
   r = requests.get(url)
@@ -51,12 +52,12 @@ def get_code(userId, problemId):
     return ''
   data = json.loads(r.text)
   for entry in data:
-    row = add_record(entry)
-    if row[4] == 'Python3' and row[5] == 'AC':
+    if entry['language'] == 'Python3' and entry['status'] == 4:
+      record = add_record(entry)
+    if record:
+      time.sleep(1)
+      code = get_judge(record[0])
       break
-  if row:
-    time.sleep(1)
-    code = get_judge(row[0])
   return code
 
 def download(userId, problemId):
@@ -66,4 +67,4 @@ def download(userId, problemId):
 
 if __name__ == '__main__':
   for userId in sys.argv[1:]:
-    download(userId, '1600')
+    download(userId, '0004')
