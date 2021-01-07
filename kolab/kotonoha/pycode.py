@@ -11,13 +11,56 @@ RESERVED = {
 }
 
 
+class VocabMap(object):
+    voc: dict
+
+    def __init__(self, env, token_format='{}'):
+        self.token = token_format
+        self.env = env
+        self.voc = {}
+
+    def init(self):
+        self.voc = {}
+
+    def new_name(self, old_name=None):
+        s = self.token.format(chr(ord('A')+(len(self.voc) % 27)))
+        if old_name is not None:
+            self.voc[old_name] = s
+        # s = old_name
+        return s
+
+    def isIndexedName(self, name):
+        if name.endswith('Error'):
+            return False
+        return name not in RESERVED
+
+    def rename(self, name, rename=True):
+        if name.startswith('"'):
+            name = "'" + name[1:-1] + "'"
+        if name in self.env:
+            d = self.env[name]
+            if 0 in d:
+                return d[0] if rename else name
+        if name not in self.voc:
+            if self.isIndexedName(name):
+                return self.new_name(name)
+            return name
+        else:
+            return self.voc[name]
+
+    def index_name(self, name):
+        return self.rename(name, False)
+
+
 class PythonCode(TransCompiler):
+    vocmap: VocabMap
 
     def __init__(self, grammar='../pegtree/puppy2.tpeg'):
         TransCompiler.__init__(self)
         peg = pg.grammar(grammar)
         self.parser = pg.generate(peg)
-        self.rootEnv = {}
+        self.vocmap = None
+        self.isTrimString = False
 
     def load(self, modules, experimental=False):
         pass
@@ -27,23 +70,8 @@ class PythonCode(TransCompiler):
         self.indent = 0
         return self.stringfy(tree, ' ')
 
-    def init(self):
-        self.names = {}
-
-    def isIndexedName(self, name):
-        if name.endswith('Error'):
-            return False
-        return name not in RESERVED
-
-    def index_name(self, name):
-        if self.isIndexedName(name):
-            if name not in self.names:
-                s = chr(ord('A')+(len(self.names) % 27))
-                #self.names[name] = f'[${s}]'
-                self.names[name] = s
-            return self.names[name]
-        else:
-            return name
+    def set_vocmap(self, vocmap):
+        self.vocmap = vocmap
 
     def acceptSeq(self, tree, sep=','):
         for i, e in enumerate(tree.getSubNodes()):
@@ -64,6 +92,25 @@ class PythonCode(TransCompiler):
 
     def acceptDocument(self, tree):
         pass
+
+    def accepterr(self, tree):
+        pass
+        #print('E', str(tree), file=sys.stderr)
+
+    def acceptClassDecl(self, tree):
+        self.push('class')
+        self.visit(tree.name)
+        if tree.has('extends'):
+            self.push('(')
+            self.acceptSeq(tree.extends)
+            self.push(')')
+        self.push(':')
+        self.visit(tree.body)
+
+    def acceptVarTypeDecl(self, tree):
+        self.visit(tree.name)
+        self.push(':')
+        self.push(str(tree.type))
 
     # Statement
 
@@ -163,10 +210,21 @@ class PythonCode(TransCompiler):
         self.push('import')
         name = str(tree.name)
         self.push(name)
+        if tree.has('as'):
+            self.push('as')
+            self.push(str(tree.get('as')))
+
+    def acceptFromDecl(self, tree):
+        self.push('from')
+        self.push(str(tree.name).replace('.', ' . '))
+        self.push('import')
+        self.acceptSeq(tree.names)
+        if tree.has('as'):
+            self.push('as')
+            self.push(str(tree.get('as')))
 
     def acceptVarDecl(self, tree):
-        name = self.index_name(str(tree.get('name')))
-        self.push(name)
+        self.visit(tree.name)
         self.push('=')
         self.visit(tree.expr)
 
@@ -204,10 +262,17 @@ class PythonCode(TransCompiler):
         self.push('(')
         self.acceptSeq(tree.params)
         self.push(')')
+        self.push(':')
         self.visit(tree.body)
 
-    def acceptParamDecl(self, tree):
-        self.push(str(tree.name))
+    def acceptParamDecl(self, param):
+        self.visit(param.name)
+        if param.has('type'):
+            self.push(':')
+            self.push(str(param.type))
+        if param.has('value'):
+            self.push('=')
+            self.push(str(param.value))
 
     def acceptFuncExpr(self, tree):
         self.push('lambda')
@@ -222,14 +287,29 @@ class PythonCode(TransCompiler):
         if tree.has('expr'):
             self.visit(tree.expr)
 
+    def acceptYield(self, tree):
+        self.push('yield')
+        if tree.has('expr'):
+            self.visit(tree.expr)
+
     def acceptRaise(self, tree):
         self.push('raise')
         self.visit(tree.expr)
 
     # Expression
     def acceptName(self, tree):
-        name = self.index_name(str(tree))
+        name = str(tree)
+        if self.vocmap is not None:
+            name = self.vocmap.index_name(name)
         self.push(name)
+
+    def acceptGlobal(self, tree):
+        self.push('global')
+        self.acceptSeq(tree[0])
+
+    def acceptNonLocal(self, tree):
+        self.push('nonlocal')
+        self.acceptSeq(tree[0])
 
     # [#ApplyExpr 'a']
 
@@ -374,15 +454,22 @@ class PythonCode(TransCompiler):
         self.push(str(tree))
 
     def acceptQString(self, tree):
-        key = str(tree)
-        if key.startswith('"'):
-            key = "'" + key[1:-1] + "'"
-        if self.hasenv(key):
-            key = self.getenv(key)[0]
-        self.push(key)
+        s = str(tree)
+        if self.vocmap is not None:
+            s = self.vocmap.index_name(s)
+        if self.isTrimString and ' ' in s:
+            quote = s[0]
+            s = s.split(' ')[0] + quote
+        self.push(s)
 
     def acceptMultiString(self, tree):
-        self.push(self.index_name(str(tree)))
+        s = str(tree)
+        if self.vocmap is not None:
+            s = self.vocmap.index_name(s)
+        if self.isTrimString and ' ' in s:
+            quote = s[0]
+            s = s.split(' ')[0] + quote
+        self.push(s)
 
     def acceptFormat(self, tree):
         self.push(str(tree))
@@ -406,10 +493,68 @@ class PythonCode(TransCompiler):
             self.visit(tree.cond)
         self.push(']')
 
+    def acceptListForExpr(self, tree):
+        self.push('[')
+        self.visit(tree.append)
+        for e in tree.getSubNodes():
+            self.acceptForExprIter(e)
+        self.push(']')
+
+    def acceptForExprIter(self, tree):
+        self.push('for')
+        self.acceptSeq(tree.each)
+        self.push('in')
+        self.visit(tree.list)
+        if tree.has('cond'):
+            self.push('if')
+            self.visit(tree.cond)
+
+
+def main(argv):
+    from tqdm import tqdm
+    transpiler = PythonCode()
+    transpiler.isTrimString = True
+    for filename in tqdm(argv):
+        try:
+            with open(filename) as f:
+                ss = []
+                for line in f.readlines():
+                    if line[0].isspace():
+                        ss.append(line)
+                    else:
+                        s = ''.join(ss)
+                        if len(s) > 0:
+                            compiled = transpiler.compile(s)
+                            print(compiled)
+                        ss = [line]
+                s = ''.join(ss)
+                if len(s) > 0:
+                    compiled = transpiler.compile(s)
+                    print(compiled)
+        except UnicodeDecodeError:
+            pass
+        except AttributeError:
+            print('Parser Error @' + filename, file=sys.stderr)
+            pass
+
+
+def allfiles(path, filelist):
+    import os
+    files = os.listdir(path)
+    for file in files:
+        npath = os.path.join(path, file)
+        if os.path.isdir(npath):
+            allfiles(npath, filelist)
+        if os.path.isfile(npath) and npath.endswith('.py'):
+            if 'test' not in npath:  # and os.path.getsize(npath) < 32_000:
+                filelist.append(npath)
+
 
 if __name__ == '__main__':
-    transpiler = PythonCode()
     if len(sys.argv) > 1:
-        with open(sys.argv[1]) as f:
-            compiled = transpiler.compile(f.read())
-            print(compiled)
+        main(sys.argv[1:])
+    else:
+        filelist = []
+        allfiles('/usr/local/lib/python3.9/site-packages', filelist)
+        print(f'filesize {len(filelist)}', file=sys.stderr)
+        main(filelist)
