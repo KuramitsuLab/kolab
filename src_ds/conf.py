@@ -34,6 +34,7 @@ extensions = [
     'recommonmark',
     'nbsphinx',
     'sphinx.ext.mathjax',
+    'sphinx.ext.githubpages',
 ]
 
 exclude_patterns = ['_build', '**.ipynb_checkpoints']

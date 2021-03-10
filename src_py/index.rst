@@ -3,16 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Pythonプログラミング：講義ノート
-===================================
+Pythonプログラミングとアルゴリズムの基礎
+==================================
 
 本講義ノートは、
-主に日本女子大学で提供しているPythonプログラミングの講義ノートやゼミ資料を加筆・修正してまとめたものです。
-複数の講義の内容が含まれるため、膨大です。
-しかも、全ての内容を扱うわけではありません。
+日本女子大学で提供しているPythonプログラミングの講義ノートを加筆・修正してまとめたものです。
+今までの講義の内容が含まれるため、かなり膨大です。
+自習して理解を深めるための解説もあるため、授業では全ての内容を扱うわけではありません。
 
-発展事項を自習したい学生のための資料として作成されているので、難易度の高い内容も含まれています。
-また，自身の備忘録としてさらに情報科向けの内容を加筆したので，全部読むのは結構大変です.
+Python 言語の文法は、１年次に「**既に習っていること**」を前提にしています。
+だから、文法は軽く復習する程度に留め、Google Colabや AtCoder を使いながら、
+プログラミング技量を高めていくことを目指します。
 
 .. toctree::
    :maxdepth: 2
@@ -24,19 +25,13 @@ Pythonプログラミング：講義ノート
    py03if
    py04forlist
    py05string
-   py06tips
    py07func
+   py06tips
    py08algo
-   py09sort
    py10prime
+   py09sort
    py11dict
    py12dp
    py13search
    py14pil
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
