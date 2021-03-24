@@ -11,6 +11,8 @@
 *.cb
 *.cb2
 .*.lb
+*.html
+*.svg
 
 ## Intermediate documents:
 *.dvi
