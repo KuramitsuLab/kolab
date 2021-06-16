@@ -82,23 +82,32 @@ def emitV1(w, mode):  # 高める
 
 
 def emitVS(w, mode):
+    w = w[:-2] if w.endswith('する') else w
+    if mode & POL == POL:
+        return emitPOL(w+'しま', mode & ~POL)
+    if mode & PAV == PAV:
+        return emitV1(w+'させられ', mode & ~PAV)
+    if mode & LET == LET:
+        return emitV1(w+'させ', mode & ~LET)
+    if mode & CAN == CAN:
+        return emitV1(w+'でき', mode & ~CAN)
     if mode & THEN == THEN:
-        return w[:-2] + 'して'
+        return w + 'して'
     if mode & PAST == PAST:
-        return w[:-2] + 'した'
+        return w + 'した'
     if mode & _N == _N:
-        return w[:-2]
+        return w
     if mode & _I == _I:
-        return w[:-2] + 'し'
+        return w + 'し'
     if mode & _A == _A:
-        return w[:-2] + 'し'  # ない
+        return w + 'し'  # ない
     if mode & _E == _E:
-        return w[:-2] + 'すれ'  # ば
+        return w + 'すれ'  # ば
     if mode & _O == _O:
-        return w[:-2] + 'しよ'  # う
+        return w + 'しよ'  # う
     if mode & CMD == CMD:
-        return w[:-2] + 'せよ'  #
-    return w
+        return w + 'せよ'  #
+    return w + 'する'
 
 
 def emitVZ(lemma, c):  # 論じる
