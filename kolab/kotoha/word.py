@@ -1,8 +1,8 @@
 # suffix
 
-_A = 1 << 0
-_I = 1 << 1
-_U = 1 << 2
+_U = 1 << 0
+_A = 1 << 1
+_I = 1 << 2
 _E = 1 << 3
 _O = 1 << 4
 THEN = 1 << 5
@@ -16,6 +16,13 @@ CAN = 1 << 12
 PAV = 1 << 13
 LET = 1 << 14
 
+# 補助語
+# 行って／くる　　　　　　・話して／いる
+# ・歌って／ほしい　　　　　・遊んで／もらう
+# ・書いて／おく　　　　　　・読んで／みる
+# ・寝て／しまう　　　　　　・置いて／ある
+
+TRY = 1 << 15
 
 # POS タイプ
 VS = 'VS'  # サ変　
@@ -31,16 +38,31 @@ VW5 = 'VW5'  # ワ行五段活用
 VG5 = 'VG5'  # ガ行五段活用
 VB5 = 'VB5'  # バ行五段活用
 ADJ = 'ADJ'  # 形容詞
+NA = 'NA'
+
+
+def PASTTHEN(mode):
+    if mode & CASE == CASE:
+        return 'ら'
+    return '際に' if mode & THEN == THEN else ''
 
 
 def emitADJ(w, mode):  # ない 赤い
     w = w[:-1] if w.endswith('い') else w
+    if mode & CAN == CAN:
+        return emitVR5(w+'くな', mode & ~CAN)
+    if mode & LET == LET:
+        return emitVS(w+'く', mode & ~LET)
     if mode & NOT == NOT and mode & POL == POL:
         return emitPOL(w+'くありま', mode & ~POL)
+    if mode & NOT == NOT:
+        return emitADJ(w+'くな', mode & ~NOT)
+    if mode & PAST == PAST:
+        return w+'かった' + PASTTHEN(mode)
     if mode & THEN == THEN:
         return w+'くて'
-    if mode & PAST == PAST:
-        return w+'かった'
+    if mode & CASE == CASE:
+        return w + 'けば'  #
     if mode & _N == _N:
         return w + 'さ'
     if mode & _I == _I:
@@ -62,10 +84,10 @@ def emitV1(w, mode):  # 高める
         return emitV1(w+'させ', mode & ~LET)
     if mode & NOT == NOT:
         return emitADJ(w+'な', mode & ~NOT)
+    if mode & PAST == PAST:
+        return w+'た' + PASTTHEN(mode)
     if mode & THEN == THEN:
         return w+'て'
-    if mode & PAST == PAST:
-        return w+'た'
     if mode & CASE == CASE:
         return w+'れば'
     if mode & CMD == CMD:
@@ -91,10 +113,14 @@ def emitVS(w, mode):
         return emitV1(w+'させ', mode & ~LET)
     if mode & CAN == CAN:
         return emitV1(w+'でき', mode & ~CAN)
+    if mode & NOT == NOT:
+        return emitADJ(w+'しな', mode & ~NOT)
+    if mode & PAST == PAST:
+        return w + 'した' + PASTTHEN(mode)
     if mode & THEN == THEN:
         return w + 'して'
-    if mode & PAST == PAST:
-        return w + 'した'
+    if mode & CMD == CMD:
+        return w + 'せよ'  #
     if mode & _N == _N:
         return w
     if mode & _I == _I:
@@ -105,8 +131,6 @@ def emitVS(w, mode):
         return w + 'すれ'  # ば
     if mode & _O == _O:
         return w + 'しよ'  # う
-    if mode & CMD == CMD:
-        return w + 'せよ'  #
     return w + 'する'
 
 
@@ -130,12 +154,25 @@ def emitVZ(lemma, c):  # 論じる
     return lemma
 
 
-def emitN(lemma, c):  # 距離
-    return lemma
-    # c = suffix[0]
-    # if c & PAST == PAST and c & _I == _I:
-    #     return lemma
-    # return emitVS(lemma+' を 確認する', suffix)
+def emitNA(w, mode):  # 立派
+    w = w[:-3] if w.endswith('である') else w
+    w = w[:-3] if w.endswith('でない') else w
+    w = w[:-1] if w.endswith('な') else w
+    if mode & POL == POL:
+        if mode & NOT == NOT:
+            return emitPOL(w+'でありま', mode & ~(POL | NOT))
+        return w+'です'
+    if mode & CAN == CAN:
+        return emitVR5(w+'にな', mode & ~CAN)
+    if mode & NOT == NOT:
+        return emitADJ(w+'でな', mode & ~NOT)
+    if mode & PAST == PAST:
+        return w + 'であった' + PASTTHEN(mode)
+    if mode & THEN == THEN:
+        return w+'で'
+    if mode & _I == _I or mode & _N == _N:
+        return w
+    return w + 'な'
 
 
 def emitPOL(w, mode):  # 書きま
@@ -143,9 +180,9 @@ def emitPOL(w, mode):  # 書きま
     if mode & THEN == THEN:
         return w+'して'
     if mode & NOT == NOT:
-        return w+'せんでした' if mode & PAST == PAST else w + 'せん'
+        return w+'せんでした' + PASTTHEN(mode) if mode & PAST == PAST else w + 'せん'
     if mode & PAST == PAST:
-        return w+'した'
+        return w+'した' + PASTTHEN(mode)
     return 'ます'
 
 
@@ -159,10 +196,14 @@ def emitVK5(w, mode):  # 書く
         return emitV1(w+'かれ', mode & ~PAV)
     if mode & LET == LET:
         return emitV1(w+'かせ', mode & ~LET)
+    if mode & NOT == NOT:
+        return emitADJ(w+'かな', mode & ~NOT)
+    if mode & PAST == PAST:
+        return w + 'いた' + PASTTHEN(mode)
     if mode & THEN == THEN:
         return w+'いて'
-    if mode & PAST == PAST:
-        return w+'いた'
+    if mode & CASE == CASE:
+        return w + 'けば'  #
     if mode & _I == _I or mode & _N == _N:
         return w + 'き'
     if mode & _A == _A:
@@ -171,27 +212,36 @@ def emitVK5(w, mode):  # 書く
         return w + 'け'  # ば
     if mode & _O == _O:
         return w + 'こ'  # う
-    if mode & CMD == CMD:
-        return w + 'け'  #
     return w + 'く'
 
 
-def emitVS5(lemma, c):  # 探す
-    if c & THEN == THEN:
-        return lemma[:-1]+'して'
-    if c & PAST == PAST:
-        return lemma[:-1]+'した'
-    if c & _I == _I or c & _N == _N:
-        return lemma[:-1] + 'し'
-    if c & _A == _A:
-        return lemma[:-1] + 'さ'  # ない
-    if c & _E == _E:
-        return lemma[:-1]+'せ'  # ば
-    if c & _O == _O:
-        return lemma[:-1]+'そ'  # う
-    if c & CMD == CMD:
-        return lemma[:-1]+'せ'  #
-    return lemma
+def emitVS5(w, mode):  # 探す
+    w = w[:-1] if w.endswith('す') else w
+    if mode & POL == POL:
+        return emitPOL(w+'しま', mode & ~POL)
+    if mode & CAN == CAN:
+        return emitV1(w+'せ', mode & ~CAN)
+    if mode & PAV == PAV:
+        return emitV1(w+'され', mode & ~PAV)
+    if mode & LET == LET:
+        return emitV1(w+'させ', mode & ~LET)
+    if mode & NOT == NOT:
+        return emitADJ(w+'さな', mode & ~NOT)
+    if mode & PAST == PAST:
+        return w+'した' + PASTTHEN(mode)
+    if mode & THEN == THEN:
+        return w+'して'
+    if mode & CASE == CASE:
+        return w + 'せば'  #
+    if mode & _I == _I or mode & _N == _N:
+        return w + 'し'
+    if mode & _A == _A:
+        return w + 'さ'  # ない
+    if mode & _E == _E:
+        return w + 'せ'  # ば
+    if mode & _O == _O:
+        return w + 'そ'  # う
+    return w + 'す'
 
 
 def emitVT5(lemma, c):  # 勝つ
@@ -248,22 +298,33 @@ def emitVM5(lemma, c):  # 読む
     return lemma
 
 
-def emitVR5(lemma, c):  # 切る
-    if c & THEN == THEN:
-        return lemma[:-1]+'って'
-    if c & PAST == PAST:
-        return lemma[:-1]+'った'
-    if c & _I == _I or c & _N == _N:
-        return lemma[:-1] + 'り'
-    if c & _A == _A:
-        return lemma[:-1] + 'ら'  # ない
-    if c & _E == _E:
-        return lemma[:-1]+'れ'  # ば
-    if c & _O == _O:
-        return lemma[:-1]+'ろ'  # う
-    if c & CMD == CMD:
-        return lemma[:-1]+'れ'  #
-    return lemma
+def emitVR5(w, mode):  # 切る, なる
+    w = w[:-1] if w.endswith('る') else w
+    if mode & POL == POL:
+        return emitPOL(w+'りま', mode & ~POL)
+    if mode & CAN == CAN:
+        return emitV1(w+'れ', mode & ~CAN)
+    if mode & PAV == PAV:
+        return emitV1(w+'られ', mode & ~PAV)
+    if mode & LET == LET:
+        return emitV1(w+'らせ', mode & ~LET)
+    if mode & NOT == NOT:
+        return emitADJ(w+'らな', mode & ~NOT)
+    if mode & PAST == PAST:
+        return w+'った' + PASTTHEN(mode)
+    if mode & THEN == THEN:
+        return w+'って'
+    if mode & CASE == CASE:
+        return w + 'れば'  #
+    if mode & _I == _I or mode & _N == _N:
+        return w + 'り'
+    if mode & _A == _A:
+        return w + 'ら'  # ない
+    if mode & _E == _E:
+        return w + 'れ'  # ば
+    if mode & _O == _O:
+        return w + 'ろ'  # う
+    return w + 'る'
 
 
 def emitVW5(lemma, c):  # 笑う
@@ -337,14 +398,48 @@ verb_lemma_suffix = {
 # HVERB1c = [れみへひねにでてせきえうい] CK_VERB1
 
 
-def guess_verb_pos(verb):
-    if verb.endswith('する'):
-        return VS  # 　さ変
-    if verb.endswith('ずる'):
-        return VZ  # ざ変 論ずる
-    if verb.endswith('る') and len(verb) > 2 and verb[-2] in 'きべえげりえれけせめびてじぎい':
-        return 'V1'
-    return verb_lemma_suffix.get(verb[-1], 'N')
+def guess_vpos(verb):
+    if verb.endswith('る'):
+        if verb.endswith('である'):
+            return NA  # 　
+        if verb.endswith('する'):
+            return VS  # 　さ変
+        if verb.endswith('ずる'):
+            return VZ  # ざ変 論ずる
+        if verb.endswith('る') and len(verb) > 2 and verb[-2] in 'きべえげりえれけせめびてじぎい':
+            return V1
+    return verb_lemma_suffix.get(verb[-1], NA)
+
+
+def emit(w, mode=_U, pos=None):
+    if pos is None:
+        pos = guess_vpos(w)
+    return globals()[f'emit{pos}'](w, mode)
+
+
+def conjugate(w, mode=_U, pos=None):
+    if pos is None:
+        pos = guess_vpos(w)
+    if mode & TRY == TRY:
+        if pos == ADJ:
+            return emit(w, LET | THEN, pos) + emitV1('み', mode & ~ TRY)
+        return emit(w, THEN, pos) + emitV1('み', mode & ~ TRY)
+    return emit(w, mode, pos)
+
+
+def test(w):
+    pos = guess_vpos(w)
+    print(conjugate(w, _U, pos),
+          conjugate(w, THEN, pos), conjugate(w, PAST | TRY | POL, pos),
+          conjugate(w, NOT, pos), conjugate(w, NOT | CASE, pos),
+          conjugate(w, LET, pos), conjugate(w, CAN, pos),
+          conjugate(w, CAN | PAST | CASE, pos), conjugate(w, NOT | POL, pos))
+
+
+test('書く')
+test('使用する')
+test('赤い')
+test('立派である')
 
 ####
 
@@ -600,17 +695,17 @@ def pj(s):
     return Verb(s, pos)
 
 
-print(pj('等しい#not#case'))
-print(pj('等しい#then'))
-print(pj('等しい#and'))
-print(pj('書く#past'))
-print(pj('書く#past#not'))
-print(pj('書く#not#past#case'))
+# print(pj('等しい#not#case'))
+# print(pj('等しい#then'))
+# print(pj('等しい#and'))
+# print(pj('書く#past'))
+# print(pj('書く#past#not'))
+# print(pj('書く#not#past#case'))
 
-print(pj('書く#can'), pj('書く#can#not'))
-print(pj('高める#can'), pj('高める#can#not'))
-print(pj('検索する#can'), pj('検索する#can#not'))
+# print(pj('書く#can'), pj('書く#can#not'))
+# print(pj('高める#can'), pj('高める#can#not'))
+# print(pj('検索する#can'), pj('検索する#can#not'))
 
-print(pj('書く#passive#past'), pj('書く#passive#not#past'))
-print(pj('高める#passive'), pj('高める#passive#not'))
-print(pj('検索する#passive'), pj('検索する#passive#not'))
+# print(pj('書く#passive#past'), pj('書く#passive#not#past'))
+# print(pj('高める#passive'), pj('高める#passive#not'))
+# print(pj('検索する#passive'), pj('検索する#passive#not'))
