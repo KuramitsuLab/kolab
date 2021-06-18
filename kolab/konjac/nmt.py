@@ -87,6 +87,7 @@ def data_process_sentence(filepaths):
 #   src_batch = pad_sequence(src_batch, padding_value=PAD_IDX)
 #   tgt_batch = pad_sequence(tgt_batch, padding_value=PAD_IDX)
 #   return src_batch, tgt_batch
+
 class Seq2SeqTransformer(nn.Module):
     def __init__(self, num_encoder_layers: int, num_decoder_layers: int,
                  emb_size: int, nhead: int, src_vocab_size: int, tgt_vocab_size: int,
