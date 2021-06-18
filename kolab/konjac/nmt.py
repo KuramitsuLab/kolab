@@ -79,8 +79,6 @@ def data_process_sentence(filepaths):
     data.append((src_, tgt_))
   return data
 
-
-
 # def generate_batch(data_batch):
 #   src_batch, tgt_batch = [], []
 #   for (src_item, tgt_item) in data_batch:
@@ -89,19 +87,15 @@ def data_process_sentence(filepaths):
 #   src_batch = pad_sequence(src_batch, padding_value=PAD_IDX)
 #   tgt_batch = pad_sequence(tgt_batch, padding_value=PAD_IDX)
 #   return src_batch, tgt_batch
-
-
-
-
 class Seq2SeqTransformer(nn.Module):
     def __init__(self, num_encoder_layers: int, num_decoder_layers: int,
-                 emb_size: int, src_vocab_size: int, tgt_vocab_size: int,
+                 emb_size: int, nhead: int, src_vocab_size: int, tgt_vocab_size: int,
                  dim_feedforward:int = 512, dropout:float = 0.1):
         super(Seq2SeqTransformer, self).__init__()
-        encoder_layer = TransformerEncoderLayer(d_model=emb_size, nhead=NHEAD,
+        encoder_layer = TransformerEncoderLayer(d_model=emb_size, nhead=nhead,
                                                 dim_feedforward=dim_feedforward)
         self.transformer_encoder = TransformerEncoder(encoder_layer, num_layers=num_encoder_layers)
-        decoder_layer = TransformerDecoderLayer(d_model=emb_size, nhead=NHEAD,
+        decoder_layer = TransformerDecoderLayer(d_model=emb_size, nhead=nhead,
                                                 dim_feedforward=dim_feedforward)
         self.transformer_decoder = TransformerDecoder(decoder_layer, num_layers=num_decoder_layers)
                 
