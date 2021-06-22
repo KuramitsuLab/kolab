@@ -1,3 +1,4 @@
+from janome.tokenizer import Tokenizer
 
 # VPOS タイプ
 
@@ -15,7 +16,7 @@ VW5 = 'VW5'  # ワ行五段活用
 VG5 = 'VG5'  # ガ行五段活用
 VB5 = 'VB5'  # バ行五段活用
 ADJ = 'ADJ'  # 形容詞
-NA = 'NA' # 形容動詞 立派だ
+NA = 'NA'  # 形容動詞 立派だ
 
 # mode
 
@@ -53,17 +54,16 @@ EXIST = 1 << 20
 IRU = 1 << 21
 ING = 1 << 21
 
-
-
 MODES = {
-    'not': NOT,
-    'then': NOT,
     'pol': POL,
     'can': CAN,
     'pav': PAV,
     'let': LET,
     'case': CASE,
     'cmd': CMD,
+    'past': PAST,
+    'not': NOT,
+    'then': THEN,
     'noun': _N,
     'try': TRY,
     'want': WANT,
@@ -72,10 +72,21 @@ MODES = {
     'getit': OKU,
 }
 
+
+def modes(mode):
+    ss = []
+    for key in MODES:
+        m = MODES[key]
+        if mode & m == m:
+            ss.append(f'#{key}')
+    return ' '.join(ss)
+
+
 def _PAST(mode):
     if mode & CASE == CASE:
         return 'ら'
     return '際に' if mode & THEN == THEN else ''
+
 
 def emitADJ(w, mode):  # ない 赤い
     w = w[:-1] if w.endswith('い') else w
@@ -230,6 +241,7 @@ def emitPOL(w, mode):  # 書きま
         return w+'した' + _PAST(mode)
     return 'ます'
 
+
 def emitVK(w, mode):  # くる
     w = w[:-2] if w.endswith('くる') else w
     if mode & POL == POL:
@@ -344,7 +356,6 @@ def emitVT5(w, mode):  # 勝つ
     if mode & _O == _O:
         return w + 'と'  # う
     return w + 'つ'
-
 
 
 def emitVN5(w, mode):  # 死ぬ
@@ -547,7 +558,7 @@ def guess_vpos(verb):
         if verb.endswith('ずる'):
             return VZ  # ざ変 論ずる
         if verb.endswith('くる') or verb.endswith('来る'):
-            return VK  
+            return VK
         if verb.endswith('る') and len(verb) > 2 and verb[-2] in 'きべえげりえれけせめびてじぎい':
             return V1
     return verb_lemma_suffix.get(verb[-1], NA)
@@ -566,6 +577,9 @@ def conjugate(w, mode=_U, pos=None):
         if pos == ADJ:
             return emit(w, LET | THEN, pos) + emitV1('み', mode & ~ TRY)
         return emit(w, THEN, pos) + emitV1('み', mode & ~ TRY)
+    if mode & ING == ING:
+        if pos != ADJ:
+            return emit(w, THEN, pos) + emitV1('い', mode & ~ ING)
     return emit(w, mode, pos)
 
 
@@ -578,10 +592,10 @@ def test(w):
           conjugate(w, CAN | PAST | CASE, pos), conjugate(w, NOT | POL, pos))
 
 
-#test('書く')
-#test('使用する')
-#test('赤い')
-#test('立派である')
+# test('書く')
+# test('使用する')
+# test('赤い')
+# test('立派である')
 
 
 # 遊ぶ #polite #not #past
@@ -598,10 +612,104 @@ def lemma_mode(s):
             mode |= MODES.get(m, 0)
     return lemma, mode
 
+
 def pj(s):
     lemma, mode = lemma_mode(s)
     return conjugate(lemma, mode)
 
-#print(pj('等しい#not#case'))
+# print(pj('等しい#not#case'))
 
 
+janome = Tokenizer()
+
+Mecab = {
+    '一段': V1,
+    'サ変・スル': VS,
+    '五段・カ行イ音便': VK5,
+    '五段・サ行': VS5,
+    '五段・タ行': VT5,
+    '五段・ナ行': VN5,
+    '五段・ワ行': VW5,
+    '五段・ワ行促音便': VW5,
+    '五段・マ行': VM5,
+    '五段・ラ行': VR5,
+    '五段・ガ行': VG5,
+    '五段・バ行': VB5,
+    'サ変・−ズル': VZ,
+
+}
+
+
+def parse(s):
+    mode = 0
+    toks = [tok for tok in janome.tokenize(s)]
+    tok = toks[0]
+    start = 1
+    w = tok.base_form
+    pos = tok.part_of_speech
+    if pos.startswith('形容詞'):
+        vpos = ADJ
+    elif pos.startswith('名詞'):
+        vpos = NA
+    else:
+        vpos = Mecab.get(tok.infl_type, tok.infl_type)
+    for tok in toks[start:]:
+        w2 = str(tok)
+        if '特殊・ナイ' in w2 or ',ん,' in w2:
+            mode |= NOT
+        elif '特殊・タ' in w2:
+            mode |= PAST
+        elif 'サ変・スル' in w2 and vpos == NA:
+            w += 'する'
+            vpos = VS
+        elif '助詞' in w2 and ('て' in w2 or 'で' in w2):
+            mode |= THEN
+        elif '助詞' in w2 and (',ば,' in w2):
+            mode |= CASE
+        elif '特殊・マス' in w2 or '特殊・デス' in w2:
+            mode |= POL
+        elif '名詞,' in w2 and vpos == NA:
+            w += tok.base_form
+        elif '五段・ラ行アル' in w2:
+            pass
+        elif '連用タ接続,ない' in w2:
+            mode |= (NOT | PAST | ING)
+        elif '連用テ接続,ない' in w2:
+            mode |= (NOT | ING)
+        elif '動詞,非自立' in w2 and mode & THEN == THEN:
+            if 'みる' in w2:
+                mode = (mode & ~THEN) | TRY
+            elif 'いる' in w2:
+                mode = (mode & ~THEN) | ING
+            else:
+                #print('TODO(て): ', tok)
+                pass
+        elif '形容詞,非自立' in w2 and mode & THEN == THEN:
+            if 'ホシイ' in w2:
+                mode = (mode & ~THEN) | WANT
+        else:
+            pass
+            print('TODO: ', tok)
+    #print(w, vpos, mode)
+    if vpos == NA:
+        return s, vpos, mode
+    return w, vpos, mode
+
+
+def parse_test(s):
+    w, vpos, mode = parse(s)
+    print(s, w, vpos, modes(mode), mode, conjugate(w, mode, vpos))
+
+
+'''
+parse_test('置換する')
+parse_test('真である')
+parse_test('読みましたら')
+parse_test('読みません')
+parse_test('読みませんでした')
+parse_test('読まなかったとき')
+parse_test('読んでなかった')
+parse_test('読んでいなかった')
+parse_test('読んだら')
+parse_test('読めば')
+'''
