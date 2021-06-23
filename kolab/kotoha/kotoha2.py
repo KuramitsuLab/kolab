@@ -128,7 +128,7 @@ class CExpr(object):  # Code Expression
     def unmatched(self, model) -> NExpr:
         logger.debug('undefined? ' + str(type(self)) + ' ' + str(self))
         # print('unmatched? ' + str(type(self)) + ' ' + str(self))
-        return NPiece(str(self))
+        return str(self)
 
 
 class CMetaVar(CExpr):
@@ -163,7 +163,7 @@ class CValue(CExpr):
         return repr(self)
 
     def match(self, model) -> NExpr:
-        return NLiteral(str(self))
+        return tokibi.NLiteral(str(self))
 
 
 def stem_name(name: str):
@@ -187,8 +187,8 @@ class CVar(CExpr):
         name = str(self.name)
         ret = stem_name(name)
         if ret in model.names:
-            return NLiteral(name, ret)
-        return NLiteral(name)
+            return tokibi.NLiteral(name, ret)
+        return tokibi.NLiteral(name)
 
 
 class CBinary(CExpr):
@@ -259,13 +259,13 @@ class COption(CExpr):
         return f'{self.name} = {{}}'
 
     def unmatched(self, model) -> NExpr:
-        name = alt(model.names[self.name]
-                   ) if self.name in model.names else self.name
+        name = tokibi.alt(model.names[self.name]
+                          ) if self.name in model.names else self.name
         value = self.params[0].match(model)
-        if OPTION['MultipleSentence']:
-            return NPhrase(name, 'は', value, 'に', NPred(EMPTY, 'する', '', ''))
+        if tokibi.OPTION['MultipleSentence']:
+            return tokibi.NPhrase(name, 'は', value, 'に', tokibi.NPred('する', 'VS'))
         else:
-            return NPhrase(value, 'を', name, 'と', NPred(EMPTY, 'する', '', ''))
+            return tokibi.NPhrase(value, 'を', name, 'と', tokibi.NPred('する', 'VS'))
 
 
 class CApp(CExpr):
@@ -644,76 +644,76 @@ class Reader(ParseTreeVisitor):
         s = str(tree)
         return CValue(s)
 
-    def acceptNChunk(self, tree):
-        ss = []
-        for t in tree[:-1]:
-            ss.append(self.visit(t))
-        suffix = str(tree[-1])
-        return NChunk(suffix, *ss)
+    # def acceptNChunk(self, tree):
+    #     ss = []
+    #     for t in tree[:-1]:
+    #         ss.append(self.visit(t))
+    #     suffix = str(tree[-1])
+    #     return NChunk(suffix, *ss)
 
-    def acceptNPred(self, tree):
-        ret = ''
-        typefix = ''
-        prefix = EMPTY
-        if tree[-1] == 'NType':
-            ntype = tree[-1][0]
-            if ntype == 'NSymbol':
-                ret = str(ntype)
-            else:
-                ret = str(ntype[0])
-                typefix = str(ntype[1])
-            pred = str(tree[-2])
-            if len(tree) > 2:
-                prefix = tuple(self.visit(t) for t in tree[:-2])
-        else:
-            pred = str(tree[-1])
-            ret = 'bool' if pred.endswith('かどうか') else ''
-            prefix = tuple(self.visit(t) for t in tree[:-1])
-        if typefix == '':
-            typefix = self.names.get(ret, '結果')
-        pred = self.synonyms.get(pred, pred)
-        return NPred(prefix, pred, ret, typefix)
+    # def acceptNPred(self, tree):
+    #     ret = ''
+    #     typefix = ''
+    #     prefix = EMPTY
+    #     if tree[-1] == 'NType':
+    #         ntype = tree[-1][0]
+    #         if ntype == 'NSymbol':
+    #             ret = str(ntype)
+    #         else:
+    #             ret = str(ntype[0])
+    #             typefix = str(ntype[1])
+    #         pred = str(tree[-2])
+    #         if len(tree) > 2:
+    #             prefix = tuple(self.visit(t) for t in tree[:-2])
+    #     else:
+    #         pred = str(tree[-1])
+    #         ret = 'bool' if pred.endswith('かどうか') else ''
+    #         prefix = tuple(self.visit(t) for t in tree[:-1])
+    #     if typefix == '':
+    #         typefix = self.names.get(ret, '結果')
+    #     pred = self.synonyms.get(pred, pred)
+    #     return NPred(prefix, pred, ret, typefix)
 
-    def acceptNSymbol(self, tree):
-        s = str(tree)
-        if s in self.indexes:
-            p = NParam(s, self.indexes[s])
-            if s[-1].isdigit():
-                s = s[:-1]
-            if s in self.names:
-                p.typefix = self.names[s]
-            return p
-        return NPiece(s)
+    # def acceptNSymbol(self, tree):
+    #     s = str(tree)
+    #     if s in self.indexes:
+    #         p = NParam(s, self.indexes[s])
+    #         if s[-1].isdigit():
+    #             s = s[:-1]
+    #         if s in self.names:
+    #             p.typefix = self.names[s]
+    #         return p
+    #     return NPiece(s)
 
-    def acceptNParam(self, tree):
-        piece = self.visit(tree[0])
-        typefix = str(tree[1])
-        if isinstance(piece, NParam):
-            piece.typefix = typefix
-            return piece
-        return piece
+    # def acceptNParam(self, tree):
+    #     piece = self.visit(tree[0])
+    #     typefix = str(tree[1])
+    #     if isinstance(piece, NParam):
+    #         piece.typefix = typefix
+    #         return piece
+    #     return piece
 
-    def acceptNSynonym(self, tree):
-        ss = [str(t) for t in tree]
-        if len(ss) == 1:
-            if ss[0] in self.synonyms:
-                return NPiece(self.synonyms[ss[0]])
-            return NPiece(ss[0]+'|')
-        return NPiece('|'.join(ss))
+    # def acceptNSynonym(self, tree):
+    #     ss = [str(t) for t in tree]
+    #     if len(ss) == 1:
+    #         if ss[0] in self.synonyms:
+    #             return NPiece(self.synonyms[ss[0]])
+    #         return NPiece(ss[0]+'|')
+    #     return NPiece('|'.join(ss))
 
-    def acceptNTuple(self, tree):
-        ss = [str(t) for t in tree]
-        return NTuple(*[NPiece(str(t)) for t in ss])
+    # def acceptNTuple(self, tree):
+    #     ss = [str(t) for t in tree]
+    #     return NTuple(*[NPiece(str(t)) for t in ss])
 
-    def acceptNLiteral(self, tree):
-        symbol = str(tree)
-        return NLiteral(symbol)
+    # def acceptNLiteral(self, tree):
+    #     symbol = str(tree)
+    #     return NLiteral(symbol)
 
-    def acceptNPiece(self, tree):
-        s = str(tree)
-        if s in self.synonyms:
-            return NPiece(s)
-        return NPiece(s)
+    # def acceptNPiece(self, tree):
+    #     s = str(tree)
+    #     if s in self.synonyms:
+    #         return NPiece(s)
+    #     return NPiece(s)
 
     def accepterr(self, tree):
         print(repr(tree))
@@ -743,20 +743,20 @@ class KotohaModel(object):
         self.names = self.reader.names
 
     def translate(self, expression, suffix=''):
-        randomize()
+        tokibi.randomize()
         try:
             tree = snipet_parser(expression)
             # print(repr(tree))
             code = self.reader.visit(tree)
             # print(type(code), code)
             pred = code.match(self)
-            if OPTION['MultipleSentence']:
+            if tokibi.OPTION['MultipleSentence']:
                 buffer = []
-                main = pred.emit(suffix, buffer)
+                main = tokibi.emit(pred, 0, '', buffer)
                 if len(buffer) > 0:
                     main += 'その際、' + (' '.join(buffer))
                 return code, main
-            return code, pred.emit(suffix)
+            return code, tokibi.emit(pred)+suffix
         except InterruptedError:
             return expression, 'err'
 
@@ -769,7 +769,7 @@ class KotohaModel(object):
                         continue
                     if '\t' in line:
                         line = line.split('\t')[0]
-                    code, doc = self.translate(line, suffix=EOS)
+                    code, doc = self.translate(line)
                     print(code, '\t', doc, file=w)
 
 
@@ -789,14 +789,14 @@ if __name__ == '__main__':
             tsvfile = open(s, 'w')
         if s.endswith('=True'):
             key, _ = s.split('=')
-            if key in OPTION:
-                OPTION[key] = True
+            if key in tokibi.OPTION:
+                tokibi.OPTION[key] = True
             else:
                 logger.warning(f'unknown option: {key}')
         if s.endswith('=False'):
             key, _ = s.split('=')
-            if key in OPTION:
-                OPTION[key] = False
+            if key in tokibi.OPTION:
+                tokibi.OPTION[key] = False
             else:
                 logger.warning(f'unknown option: {key}')
     model.load(*rule_files)

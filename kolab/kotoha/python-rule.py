@@ -79,20 +79,20 @@ ord(c)  # cの/コードポイント
 _大きな方 = '大きな値|大きな方|最大値'
 _小さな方 = '小さな値|小さな方|最小値'
 
-min(x)  # 数列xの/最大値 -> int
-max(x, y)  # xと yの/大きな方 -> int
-max(x, y, z)  # x, y, zの/最大値 -> int
+min(x)  # 数列xの最大値 -> int
+max(x, y)  # xと yの大きな方 -> int
+max(x, y, z)  # x, y, zの最大値 -> int
 
-min(x)  # 数列xの/最小値 -> int
-min(x, y)  # xとyの/小さな方 -> int
-min(x, y, z)  # x, y, zの/最小値 -> int
+min(x)  # 数列xの最小値 -> int
+min(x, y)  # xとyの小さな方 -> int
+min(x, y, z)  # x, y, zの最小値 -> int
 
 pow(x, y)  # xのy乗 -> int
 pow(x, y, z)  # xのy乗を/zで/剰余する -> int
 
 _丸める = '四捨五入する|丸める'
-round(x)  # xの丸める -> int
-round(x, n)  # xの少数部を/n桁[まで|]で丸める -> int
+round(x)  # xを丸める -> int
+round(x, n)  # xの少数部を/n桁[まで|]で/丸める -> int
 math.trunc(x)  # xの少数部を/切り捨てる -> int
 math.floor(x)  # x以下の最大の整数 -> int
 math.ceil(x)  # x以上の最小の整数 -> int

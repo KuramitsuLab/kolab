@@ -13,11 +13,10 @@ EMPTY = tuple()
 OPTION = {
     'Simple': False,  # シンプルな表現を優先する
     'Block': False,  # Expressionに <e> </e> ブロックをつける
-    'ReversePolish': True,  # 膠着語の場合はTrue
     'EnglishFirst': False,  # 英訳の精度を優先する
     'ShuffleSynonym': True,  # 同音異議語をシャッフルする
     'MultipleSentence': True,  # 複数行モード
-    'ShuffleOrder': True,  # もし可能なら順序も入れ替える
+    'ShuffleOrder': True,  # 順序も入れ替える
     'Verbose': True,  # デバッグ出力あり
 }
 
@@ -57,7 +56,8 @@ def conjugate(w, mode=0, vpos=None):
         mode = (mode & ~verb.CASE) | verb.NOUN
         suffix = alt('とき、|場合、|際、')
     if mode & verb.THEN == verb.THEN:
-        mode = (mode & ~verb.THEN) | verb._I
+        if RandomIndex % 2 != 0:
+            mode = (mode & ~verb.THEN) | verb._I
         suffix = '、'
     return verb.conjugate(w, mode, vpos) + suffix
 
@@ -75,9 +75,9 @@ def apply_nparam(w, mapped):
     return w
 
 
-def emit(w, mode=verb._U, suffix='', buffer=None):
+def emit(w, mode=0, alias='', buffer=None):
     if isinstance(w, NExpr):
-        return w.emit(mode, suffix, buffer)
+        return w.emit(mode, alias, buffer)
     return alt(str(w))
 
 
@@ -101,11 +101,8 @@ class NLiteral(NExpr):
     def __str__(self):
         return self.value
 
-    def getret(self):
-        return self.ret
-
-    def emit(self, mode, alias, buffer=None):
-        if alias in ['結果', '値']:
+    def emit(self, mode=0, alias='', buffer=None):
+        if alias in ['', '結果', '値']:
             return self.value
         return f'{alias} {self.value}'
 
@@ -115,9 +112,9 @@ class NPred(NExpr):
     mode: int
     cat: str
 
-    def __init__(self, verb, mode=0, cat=''):
+    def __init__(self, verb, vpos=None, mode=0, cat=''):
         self.verb = verb
-        self.vpos = None
+        self.vpos = vpos
         self.mode = mode
         self.cat = cat
 
@@ -125,9 +122,9 @@ class NPred(NExpr):
         self.cat = cat
         return self
 
-    def __str__(self):
+    def __repr__(self):
         if self.cat == '':
-            return str(self.verb)
+            return f'{{{str(self.verb)}}}'
         return f'({self.verb} -> {self.cat})'
 
     def emit(self, mode=0, alias='', buffer=None):
@@ -155,7 +152,7 @@ class NChunk(NExpr):
         pieces = [apply_nparam(e, mapped) for e in self.pieces]
         return NChunk(*pieces)
 
-    def __str__(self):
+    def __repr__(self):
         ss = []
         for p in self.pieces:
             ss.append(str(p))
@@ -235,8 +232,8 @@ class NTuple(NExpr):
     def __str__(self):
         return '(' + ','.join(map(str, self.elements)) + ')'
 
-    def emit(self, typefix, buffer=None):
-        return '(' + ','.join(map(lambda e: e.emit(typefix, buffer), self.elements)) + ')'
+    def emit(self, mode=0, alias='', buffer=None):
+        return '(' + ','.join(map(lambda e: emit(e, 0, '', None), self.elements)) + ')'
 
 
 class NChoice(NExpr):
@@ -294,29 +291,28 @@ class NPhrase(NExpr):
 
     def emit(self, mode=0, alias='', buffer=None):
         ss = []
-        if OPTION['Block']:
-            ss.append('<e>')
-        if len(self.options) > 2 and OPTION['ShuffleOrder']:
-            os = list(self.options)
-            random.shuffle(os)
-            self.options = tuple(os)
+        options = self.options
+        params = self.pieces[:-1]
+        if OPTION['ShuffleOrder']:
+            if len(options) >= 2:
+                options = list(options)
+                random.shuffle(options)
+            if len(params) >= 2:
+                params = list(params)
+                random.shuffle(params)
 
-        for p in self.options:
+        for p in options:
             if buffer is None:
                 ss.append(emit(p, verb.THEN))
             else:
                 buffer.append(emit(p))
 
         alias = longer(alias, alt(self.cat))
-        for p in self.pieces[:-1]:
+        for p in params:
             ss.append(emit(p))
+        #print(type(self.pieces[-1]), self.pieces)
         ss.append(emit(self.pieces[-1], mode, alias, buffer))
 
-        if OPTION['Block']:
-            if buffer is not None:
-                ss.extend(buffer)
-                buffer.clear()
-            ss.append('</e>')
         return ' '.join(ss)
 
 
@@ -361,8 +357,8 @@ class TokibiReader(ParseTreeVisitor):
                 vpos = None
             if cat == '':
                 cat = self.synonyms.get(ret, '')
-            ss[-1] = pred = NPred(w, mode, cat)
-            pred.vpos = vpos
+            ss[-1] = pred = NPred(w, vpos, mode, cat)
+        #print('@@@', ss)
         ne = NPhrase(*ss)
         ne.ret = ret
         return ne
@@ -437,4 +433,9 @@ if __name__ == '__main__':
     print(e.emit())
 
     parse('Aと/B(子犬)を/順に/1つずつ/表示する | Aを/Bに/表示する ->x(結果)')
-    parse('"A"の/円周率')
+    parse('{xの各要素に/functionを/適用して}フィルタする -> list')
+    # parse('dictの/key(エントリ) -> x')
+    # parse('{xのyから/始まる}順序数列')
+    # parse('望遠鏡で/{泳ぐ}子犬を/見た')
+    # parse('{望遠鏡で/{泳ぐ}子犬を/見たとき}、{少し/{新しい}ことを/考えた}')
+    # parse('x, y, zの各要素のタプル列 -> int')

@@ -11,11 +11,12 @@ NPhrase = {
 } 
 
 NChunk = {
-    ( !"/" ( NExpr / NLiteral / NPiece) )+
+    ( !"/" ( NExpr / NLiteral / NPiece / _) )+
     #NChunk
 }
 
 NExpr = 
+  / '{' NPhrase '}'
   / { "[" Noun ( "|" Noun )* "]" #NAlt }
   / { "(" Noun ( "," Noun )* ")" #NTuple }
   / NVar _NMode?
@@ -35,8 +36,8 @@ ESC = '\\' .
 
 NPiece = 
     / '`' { (ESC / !'`' .)*  #NPiece } '`' _
-    / { (![A-Za-z0-9_ "'`\[()/|] !'->' . )+ #NPiece }
+    / { (![A-Za-z0-9_ "'`\[(){}/|] !'->' . )+ #NPiece }
 
 example NChoice Aと/B(子犬)を/順に/1つずつ/表示する | Aを/Bに/表示する ->x(結果)
 example NChoice 猫が/x(動物)を用いる/等しくないかどうか -> bool(かどうか)
-example NChoice Aと/Bを/順に/表示する
+example NChoice x, y, zの各要素のタプル列 -> int
