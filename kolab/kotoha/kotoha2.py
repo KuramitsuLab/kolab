@@ -654,7 +654,7 @@ class KotohaModel(object):
                 self.rules[key] = sorted(d)
         self.names = self.reader.names
 
-    def translate(self, expression, suffix=''):
+    def translate(self, expression, suffix='。'):
         tokibi.randomize()
         try:
             tree = snipet_parser(expression)
@@ -664,9 +664,9 @@ class KotohaModel(object):
             pred = code.match(self)
             if tokibi.OPTION['MultipleSentence']:
                 buffer = []
-                main = tokibi.emit(pred, 0, '', buffer)
+                main = tokibi.emit(pred, 0, '。', buffer)
                 if len(buffer) > 0:
-                    main += 'その際、' + (' '.join(buffer))
+                    main += tokibi.alt('その際、|そこで、') + (' '.join(buffer))
                 return code, main
             return code, tokibi.emit(pred)+suffix
         except InterruptedError:
