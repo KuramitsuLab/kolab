@@ -636,7 +636,6 @@ Mecab = {
     '五段・ガ行': VG5,
     '五段・バ行': VB5,
     'サ変・−ズル': VZ,
-
 }
 
 
@@ -689,7 +688,7 @@ def parse(s):
                 mode = (mode & ~THEN) | WANT
         else:
             pass
-            print('TODO: ', tok)
+            #print('TODO: ', tok)
     #print(w, vpos, mode)
     if vpos == NA:
         return s, vpos, mode
@@ -700,6 +699,10 @@ def parse_test(s):
     w, vpos, mode = parse(s)
     print(s, w, vpos, modes(mode), mode, conjugate(w, mode, vpos))
 
+
+if __name__ == '__main__':
+    print(parse('食べたら'))
+    print(conjugate('食事する', CAN|NOT))
 
 '''
 parse_test('置換する')

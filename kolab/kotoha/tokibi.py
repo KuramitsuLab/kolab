@@ -185,7 +185,7 @@ class NContext(NExpr):
         self.mode = mode
         self.alias = alias
 
-    def __str__(self):
+    def __repr__(self):
         if self.alias == '':
             return str(self.inner)
         return f'{self.inner}({self.alias})'
@@ -195,12 +195,14 @@ class NContext(NExpr):
 
 
 class NParam(NExpr):
+    symbol: str
     index: int
     ret: str
     cat: str
 
     def __init__(self, index, ret):
         self.index = index
+        self.symbol = ret
         self.ret = retype(ret)
         self.cat = ''
 
@@ -210,7 +212,7 @@ class NParam(NExpr):
             return NContext(bound, verb.NOUN, self.cat)
         return self
 
-    def __str__(self):
+    def __repr__(self):
         return ALPHA[self.index]
 
     def emit(self, mode=0, suffix='', buffer=None):
@@ -229,7 +231,7 @@ class NTuple(NExpr):
     def apply(self, mapped):
         return NTuple(*[apply_nparam(c, mapped) for c in self.elements])
 
-    def __str__(self):
+    def __repr__(self):
         return '(' + ','.join(map(str, self.elements)) + ')'
 
     def emit(self, mode=0, alias='', buffer=None):
@@ -253,7 +255,7 @@ class NChoice(NExpr):
     def apply(self, mapped):
         return NChoice(*[apply_nparam(c, mapped) for c in self.elements])
 
-    def __str__(self):
+    def __repr__(self):
         return ' | '.join(map(str, self.elements))
 
     def emit(self, mode=0, suffix='', buffer=None):
@@ -283,7 +285,7 @@ class NPhrase(NExpr):
         pred.options = mapped.get('options', EMPTY)
         return pred.asType(self.ret, self.cat)
 
-    def __str__(self):
+    def __repr__(self):
         ss = []
         for p in self.pieces:
             ss.append(str(p))
@@ -332,7 +334,7 @@ class TokibiReader(ParseTreeVisitor):
         tree = tokibi_parser(s)
         self.indexes = {}
         nexpr = self.visit(tree)
-        return nexpr
+        return nexpr, self.indexes
 
     def acceptNChoice(self, tree):
         ss = [self.visit(t) for t in tree]
@@ -422,18 +424,18 @@ tokibi_reader = TokibiReader()
 def parse(s):
     randomize()
     nexpr = tokibi_reader.parse(s)
-    print(nexpr, nexpr.emit())
+    #print(nexpr, nexpr.emit())
     return nexpr
 
 
 if __name__ == '__main__':
     e = parse('Aを/調べる')
-    e2 = parse('[猫|ねこ]が/x(動物)を用いて/等しくないかどうか')
+    e2 = parse('[猫|ねこ]が/[虎|トラ]と/等しくないかどうか')
     e = e.apply({0: e2})
     print(e.emit())
 
-    parse('Aと/B(子犬)を/順に/1つずつ/表示する | Aを/Bに/表示する ->x(結果)')
-    parse('{xの各要素に/functionを/適用して}フィルタする -> list')
+    #parse('Aと/B(子犬)を/順に/1つずつ/表示する | Aを/Bに/表示する ->x(結果)')
+    #parse('{xの各要素に/functionを/適用して}フィルタする -> list')
     # parse('dictの/key(エントリ) -> x')
     # parse('{xのyから/始まる}順序数列')
     # parse('望遠鏡で/{泳ぐ}子犬を/見た')

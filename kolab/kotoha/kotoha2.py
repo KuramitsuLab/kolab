@@ -428,18 +428,6 @@ peg = pg.grammar('kotoha.tpeg')
 parser = pg.generate(peg)
 snipet_parser = pg.generate(peg, start='Snipet')
 
-
-def traverse_symbols(tree, ss):
-    for _, child in tree.subs():
-        tag = child.getTag()
-        if tag == 'NSymbol':
-            ss.append(str(child))
-        if tag == 'NParam':
-            ss.append(str(child[0]))
-        if tag == 'NChunk':
-            traverse_symbols(child, ss)
-
-
 class Reader(ParseTreeVisitor):
     rules: dict
     indexes: dict
@@ -475,12 +463,9 @@ class Reader(ParseTreeVisitor):
         return self.symbols is not EMPTY
 
     def acceptNRule(self, tree):
-        self.symbols = []
-        traverse_symbols(tree[1], self.symbols)
-        self.indexes = {}
-        cpat = self.visit(tree[0])
         nexpr = self.visit(tree[1])
-        self.add_rule(cpat, len(self.indexes), nexpr)
+        cpat = self.visit(tree[0])
+        self.add_rule(cpat, len(self.symbols), nexpr)
         self.symbols = EMPTY
 
     def add_rule(self, cpat: CExpr, size, pred: NExpr):
@@ -501,12 +486,12 @@ class Reader(ParseTreeVisitor):
                     return
         if name not in self.rules:
             self.rules[name] = []
-        # print('adding', name, (size, cpat, pred))
+        #print('adding', name, (size, cpat, pred))
         self.rules[name].append((size, cpat, pred))
 
     def acceptNDocument(self, tree):
         s = str(tree)
-        nexpr = tokibi.parse(s)
+        nexpr, self.symbols = tokibi.parse(s)
         return nexpr
 
     def acceptSource(self, tree):
@@ -593,9 +578,7 @@ class Reader(ParseTreeVisitor):
         s = str(tree)
         if self.isRuleMode():
             if s in self.symbols:
-                if s not in self.indexes:
-                    self.indexes[s] = len(self.indexes)
-                return CMetaVar(self.indexes[s], s)
+                return CMetaVar(self.symbols[s], s)
         return CVar(s)
 
     def acceptString(self, tree):
@@ -643,77 +626,6 @@ class Reader(ParseTreeVisitor):
         logger.warning(f'@undefined {repr(tree)}')
         s = str(tree)
         return CValue(s)
-
-    # def acceptNChunk(self, tree):
-    #     ss = []
-    #     for t in tree[:-1]:
-    #         ss.append(self.visit(t))
-    #     suffix = str(tree[-1])
-    #     return NChunk(suffix, *ss)
-
-    # def acceptNPred(self, tree):
-    #     ret = ''
-    #     typefix = ''
-    #     prefix = EMPTY
-    #     if tree[-1] == 'NType':
-    #         ntype = tree[-1][0]
-    #         if ntype == 'NSymbol':
-    #             ret = str(ntype)
-    #         else:
-    #             ret = str(ntype[0])
-    #             typefix = str(ntype[1])
-    #         pred = str(tree[-2])
-    #         if len(tree) > 2:
-    #             prefix = tuple(self.visit(t) for t in tree[:-2])
-    #     else:
-    #         pred = str(tree[-1])
-    #         ret = 'bool' if pred.endswith('かどうか') else ''
-    #         prefix = tuple(self.visit(t) for t in tree[:-1])
-    #     if typefix == '':
-    #         typefix = self.names.get(ret, '結果')
-    #     pred = self.synonyms.get(pred, pred)
-    #     return NPred(prefix, pred, ret, typefix)
-
-    # def acceptNSymbol(self, tree):
-    #     s = str(tree)
-    #     if s in self.indexes:
-    #         p = NParam(s, self.indexes[s])
-    #         if s[-1].isdigit():
-    #             s = s[:-1]
-    #         if s in self.names:
-    #             p.typefix = self.names[s]
-    #         return p
-    #     return NPiece(s)
-
-    # def acceptNParam(self, tree):
-    #     piece = self.visit(tree[0])
-    #     typefix = str(tree[1])
-    #     if isinstance(piece, NParam):
-    #         piece.typefix = typefix
-    #         return piece
-    #     return piece
-
-    # def acceptNSynonym(self, tree):
-    #     ss = [str(t) for t in tree]
-    #     if len(ss) == 1:
-    #         if ss[0] in self.synonyms:
-    #             return NPiece(self.synonyms[ss[0]])
-    #         return NPiece(ss[0]+'|')
-    #     return NPiece('|'.join(ss))
-
-    # def acceptNTuple(self, tree):
-    #     ss = [str(t) for t in tree]
-    #     return NTuple(*[NPiece(str(t)) for t in ss])
-
-    # def acceptNLiteral(self, tree):
-    #     symbol = str(tree)
-    #     return NLiteral(symbol)
-
-    # def acceptNPiece(self, tree):
-    #     s = str(tree)
-    #     if s in self.synonyms:
-    #         return NPiece(s)
-    #     return NPiece(s)
 
     def accepterr(self, tree):
         print(repr(tree))
@@ -810,7 +722,7 @@ if __name__ == '__main__':
                 if line == '':
                     print('Bye')
                     sys.exit(0)
-                code, doc = model.translate(line, suffix=EOS)
+                code, doc = model.translate(line, suffix='。')
                 print(code, '\t#', doc)
         except EOFError:
             print('Bye')
