@@ -1,6 +1,7 @@
 import sys
 from pegtree.visitor import ParseTreeVisitor
 import pegtree as pg
+import verb
 import tokibi
 from tokibi import NExpr
 
@@ -259,13 +260,12 @@ class COption(CExpr):
         return f'{self.name} = {{}}'
 
     def unmatched(self, model) -> NExpr:
-        name = tokibi.alt(model.names[self.name]
-                          ) if self.name in model.names else self.name
+        name = tokibi.alt(model.names[self.name]) if self.name in model.names else self.name
         value = self.params[0].match(model)
         if tokibi.OPTION['MultipleSentence']:
-            return tokibi.NPhrase(name, 'は', value, 'に', tokibi.NPred('する', 'VS'))
+            return tokibi.NPhrase((name, 'は'), (value, 'に'), tokibi.NPred('する', 'VS'))
         else:
-            return tokibi.NPhrase(value, 'を', name, 'と', tokibi.NPred('する', 'VS'))
+            return tokibi.NPhrase((name, 'を'), (value, 'に'), tokibi.NPred('する', 'VS', mode=verb.THEN))
 
 
 class CApp(CExpr):
@@ -664,9 +664,9 @@ class KotohaModel(object):
             pred = code.match(self)
             if tokibi.OPTION['MultipleSentence']:
                 buffer = []
-                main = tokibi.emit(pred, 0, '。', buffer)
+                main = tokibi.emit(pred, 0, '', buffer)+suffix
                 if len(buffer) > 0:
-                    main += tokibi.alt('その際、|そこで、') + (' '.join(buffer))
+                    main += tokibi.alt('その際、|そこで、|') + (suffix.join(buffer))+suffix
                 return code, main
             return code, tokibi.emit(pred)+suffix
         except InterruptedError:

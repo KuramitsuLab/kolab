@@ -15,7 +15,7 @@ OPTION = {
     'Block': False,  # Expressionに <e> </e> ブロックをつける
     'EnglishFirst': False,  # 英訳の精度を優先する
     'ShuffleSynonym': True,  # 同音異議語をシャッフルする
-    'MultipleSentence': True,  # 複数行モード
+    'MultipleSentence': False,  # 複数行モード
     'ShuffleOrder': True,  # 順序も入れ替える
     'Verbose': True,  # デバッグ出力あり
 }
@@ -269,7 +269,7 @@ class NPhrase(NExpr):
     cat: str
 
     def __init__(self, *pieces):
-        self.pieces = pieces
+        self.pieces = tuple(NChunk(*c) if isinstance(c, tuple) else c for c in pieces) 
         self.options = EMPTY
         self.ret = ''
         self.cat = ''

@@ -446,7 +446,7 @@ def emitVR5(w, mode):  # 切る, なる
 
 
 def emitVW5(w, mode):  # 笑う
-    w = w[:-1] if w.endswith('つ') else w
+    w = w[:-1] if w.endswith('う') else w
     if mode & POL == POL:
         return emitPOL(w+'いま', mode & ~POL)
     if mode & CAN == CAN:
@@ -650,8 +650,13 @@ def parse(s):
         vpos = ADJ
     elif pos.startswith('名詞'):
         vpos = NA
+    elif pos.startswith('動詞'):
+        if s.startswith('する'):  #「する」は擦るではない
+            vpos = VS
+        else:
+            vpos = Mecab.get(tok.infl_type, tok.infl_type)
     else:
-        vpos = Mecab.get(tok.infl_type, tok.infl_type)
+        print('TODO:', s, tok)
     for tok in toks[start:]:
         w2 = str(tok)
         if '特殊・ナイ' in w2 or ',ん,' in w2:
@@ -701,8 +706,9 @@ def parse_test(s):
 
 
 if __name__ == '__main__':
-    print(parse('食べたら'))
-    print(conjugate('食事する', CAN|NOT))
+    print(parse('する'))
+    print(conjugate('食事する', THEN))
+    print(conjugate('する', THEN))
 
 '''
 parse_test('置換する')

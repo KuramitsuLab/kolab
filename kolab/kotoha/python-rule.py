@@ -204,10 +204,10 @@ codepoint = 'コードポイント|文字コード'
 
 bytearray(x)  # xのバイト配列 -> bytes
 bytes(x)  # xのバイト列 -> bytes
-errors = errors  # errorsに/したがう
+errors = errors  # エラー処理を/errors(ポリシ)に/する
 encoding = 'utf-8'  # UTF8を/用いる
-errors = 'strict'  # エラー処理は/厳密にする
-errors = 'ignore'  # エラー処理は/しない
+errors = 'strict'  # エラー処理を/厳密に/する
+#errors = 'ignore'  # エラー処理を/しない
 
 prompt = 'プロンプト'
 input()  # 入力された 文字列 -> str
