@@ -1,3 +1,4 @@
+from pandas.core.algorithms import isin
 import pegtree as pg
 from pegtree.visitor import ParseTreeVisitor
 import random
@@ -23,7 +24,6 @@ OPTION = {
 # randomize
 
 RandomIndex = 0
-
 
 def randomize():
     global RandomIndex
@@ -53,8 +53,11 @@ def choice(ss: list):
 def conjugate(w, mode=0, vpos=None):
     suffix = ''
     if mode & verb.CASE == verb.CASE:
-        mode = (mode & ~verb.CASE) | verb.NOUN
-        suffix = alt('とき、|場合、|際、')
+        if RandomIndex % 2 != 0:
+            mode = (mode & ~verb.CASE) | verb.NOUN
+            suffix = alt('とき、|場合、|際、')
+        else:
+            suffix = '、'
     if mode & verb.THEN == verb.THEN:
         if RandomIndex % 2 != 0:
             mode = (mode & ~verb.THEN) | verb._I
@@ -63,9 +66,17 @@ def conjugate(w, mode=0, vpos=None):
 
 # NExpr
 
-
 class NExpr(object):
     def apply(self, mapped):
+        return self
+
+    def modeNot(self):
+        return self
+
+    def modeCase(self):
+        return self
+
+    def asMode(self, mode=0, suffix=''):
         return self
 
 
@@ -84,8 +95,21 @@ def emit(w, mode=0, alias='', buffer=None):
 def longer(s, s2):
     return s if len(s) > len(s2) else s2
 
+class NExpression(NExpr):
+    value: str
+    ret: str
 
-class NLiteral(NExpr):
+    def __init__(self, value: str, ret=None):
+        self.value = value
+        self.ret = ret
+
+    def __str__(self):
+        return self.value
+
+    def emit(self, mode=0, alias='', buffer=None):
+        return f'{self.value}'
+
+class NLiteral(NExpression):
     value: str
     ret: str
 
@@ -107,8 +131,10 @@ class NLiteral(NExpr):
         return f'{alias} {self.value}'
 
 
+
 class NPred(NExpr):
     verb: str
+    vpos: str
     mode: int
     cat: str
 
@@ -127,16 +153,31 @@ class NPred(NExpr):
             return f'{{{str(self.verb)}}}'
         return f'({self.verb} -> {self.cat})'
 
+    def modeNot(self):
+        if self.mode & verb.NOT == verb.NOT:
+            mode = self.mode & ~verb.NOT
+        else:
+            mode = self.mode | verb.NOT
+        return NPred(self.verb, self.vpos, mode, self.cat)
+
+    def modeCase(self):
+        return NPred(self.verb, self.vpos, self.mode|verb.CASE, self.cat)
+
+    def asMode(self, mode=0, suffix=''):
+        return NPred(self.verb, self.vpos, mode, suffix)
+
     def emit(self, mode=0, alias='', buffer=None):
         ss = []
         tok = alt(self.verb)
         mode |= self.mode
-        if mode & verb.NOUN == verb.NOUN:
+        if mode & verb.NOUN == verb.NOUN and self.vpos != verb.NA:
             alias = longer(alias, alt(self.cat))
             if alias == '':
                 alias = '結果'
         else:
             alias = ''
+        if alias == '':
+            mode = mode & ~verb.NOUN
         #print(tok, mode, '@', suffix)
         ss.append(conjugate(tok, mode, self.vpos)+alias)
         return ''.join(ss)
@@ -190,8 +231,13 @@ class NContext(NExpr):
             return str(self.inner)
         return f'{self.inner}({self.alias})'
 
+    def asMode(self, mode=0, suffix=''):
+        self.mode = mode
+        self.alias = suffix
+        return self
+
     def emit(self, mode=0, alias='', buffer=None):
-        return self.inner.emit(self.mode | mode, longer(alias, self.alias), buffer)
+        return emit(self.inner, self.mode | mode, longer(alias, self.alias), buffer)
 
 
 class NParam(NExpr):
@@ -258,6 +304,15 @@ class NChoice(NExpr):
     def __repr__(self):
         return ' | '.join(map(str, self.elements))
 
+    def modeNot(self):
+        return NChoice(*tuple(e.modeNot() for e in self.elements)).asType(self.ret, self.cat)
+
+    def modeCase(self):
+        return NChoice(*tuple(e.modeCase() for e in self.elements)).asType(self.ret, self.cat)
+
+    def asMode(self, mode=0, suffix=''):
+        return NChoice(*tuple(e.asMode(mode, suffix) for e in self.elements)).asType(self.ret, self.cat)
+
     def emit(self, mode=0, suffix='', buffer=None):
         return choice(self.elements).emit(mode, suffix, buffer)
 
@@ -275,7 +330,8 @@ class NPhrase(NExpr):
         self.cat = ''
 
     def asType(self, ret, cat):
-        self.pieces[-1].asType(ret, cat)
+        if isinstance(self.pieces[-1],NPred):
+            self.pieces[-1].asType(ret, cat)
         self.ret = ret
         self.cat = cat
         return self
@@ -290,6 +346,19 @@ class NPhrase(NExpr):
         for p in self.pieces:
             ss.append(str(p))
         return ' '.join(ss)
+
+    def modeNot(self):
+        self.pieces = tuple(e.modeNot() for e in self.pieces)
+        return self
+
+    def modeCase(self):
+        self.pieces = tuple(e.modeCase() for e in self.pieces)
+        return self
+
+    def asMode(self, mode=0, suffix=''):
+        self.pieces = self.pieces[0:-1] + (self.pieces[-1].asMode(mode, suffix),)
+        return self
+
 
     def emit(self, mode=0, alias='', buffer=None):
         ss = []
@@ -347,7 +416,7 @@ class TokibiReader(ParseTreeVisitor):
         ret = ''
         cat = ''
         if isinstance(ss[-1], str):
-            pred = ss[-1]
+            pred = ss[-1].strip()
             if pred.endswith('かどうか'):
                 pred = pred[:-4]
                 ret = 'bool'
@@ -356,6 +425,7 @@ class TokibiReader(ParseTreeVisitor):
             #print(w, vpos, mode)
             if w in self.synonyms:
                 w = self.synonyms[w]
+                #print('@synonym', w)
                 vpos = None
             if cat == '':
                 cat = self.synonyms.get(ret, '')
@@ -363,6 +433,7 @@ class TokibiReader(ParseTreeVisitor):
         #print('@@@', ss)
         ne = NPhrase(*ss)
         ne.ret = ret
+        ne.cat = cat
         return ne
 
     def acceptNType(self, tree):
@@ -421,16 +492,16 @@ class TokibiReader(ParseTreeVisitor):
 tokibi_reader = TokibiReader()
 
 
-def parse(s):
+def parse(s, synonyms=None):
     randomize()
-    nexpr = tokibi_reader.parse(s)
-    #print(nexpr, nexpr.emit())
-    return nexpr
-
+    if synonyms is not None:
+        tokibi_reader.synonyms = synonyms
+    return tokibi_reader.parse(s)
 
 if __name__ == '__main__':
-    e = parse('Aを/調べる')
-    e2 = parse('[猫|ねこ]が/[虎|トラ]と/等しくないかどうか')
+    e, _ = parse('strが/prefixで/始まるかどうか')
+    e, _ = parse('Aを/調べる')
+    e2, _ = parse('[猫|ねこ]が/[虎|トラ]と/等しくないかどうか')
     e = e.apply({0: e2})
     print(e.emit())
 

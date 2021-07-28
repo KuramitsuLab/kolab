@@ -49,6 +49,7 @@ Snipet = Statement EOF
 
 Statement =
     / IfStatement
+    / WhileStatement
     / Assignment
     / SelfAssignment
     / Expression
@@ -56,6 +57,11 @@ Statement =
 IfStatement = {
     "if" Expression ":"
     #If
+}
+
+WhileStatement = {
+    "while" Expression ":"
+    #While
 }
 
 Assignment = {

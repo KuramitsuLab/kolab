@@ -9,14 +9,21 @@ open('file.txt')
 open('file.txt', 'w')
 open('file.txt', encoding='sjis', mode='r', errors='strict', errors='ignore')
 
-file = open('file.txt')
-
 # print('file.txt')
 #print(x+1, end=x)
 #print(math.pi, sep='\n')
 #print(a % 2 == 0, sep=':', end='a')
 #print(max(a, len(b)), sep=':', end='a')
 
-# math.pi
-# st.startswith('a')
-# 'a'.replace('s', '')
+math.pi
+not math.pi
+not found
+not a > 1
+print(st.startswith('a'))
+print(not st.startswith('a'))
+print(s.startswith('a') or s.endswith('a'))
+if s.startswith('a') and s.endswith('a'): 
+while s.startswith('a') and s.endswith('a'): 
+while a > 1: 
+while notfound:
+'a'.replace('s', '')

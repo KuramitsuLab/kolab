@@ -228,7 +228,7 @@ def emitNA(w, mode):  # 立派
         return w
     if mode & NOUN == NOUN:
         return w + 'な'
-    return w + 'である'
+    return w
 
 
 def emitPOL(w, mode):  # 書きま
@@ -656,7 +656,8 @@ def parse(s):
         else:
             vpos = Mecab.get(tok.infl_type, tok.infl_type)
     else:
-        print('TODO:', s, tok)
+        vpos = VS if s.endswith('する') else NA
+        #print('TODO:', s, tok)
     for tok in toks[start:]:
         w2 = str(tok)
         if '特殊・ナイ' in w2 or ',ん,' in w2:
