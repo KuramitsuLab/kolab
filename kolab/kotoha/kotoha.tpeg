@@ -64,6 +64,27 @@ WhileStatement = {
     #While
 }
 
+ForStatement = {
+    "for" 
+    each: Names 
+    "in" 
+    list: Expression {":"} 
+    #For
+}
+
+
+RaiseStatement = {
+    { "return" } 
+    Expression ":"
+    #Statement
+}
+
+ReturnStatement = {
+    { "return" } 
+    Expression ":"
+    #Statement
+}
+
 Assignment = {
     left: LeftHand
     ":"? "=" 
