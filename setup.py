@@ -13,7 +13,7 @@ twine upload --repository pypi dist/*
 
 setup(
     name='kolab',
-    version='0.0.8',
+    version='0.0.9',
     url='https://github.com/KuramitsuLab/kolab.git',
     license='MIT',
     author='Kimio Kuramitsu',
