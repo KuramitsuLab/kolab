@@ -480,7 +480,7 @@ class CSlice(CExpr):
 
 
 ##
-peg = pg.grammar('kotoha.tpeg')
+peg = pg.grammar('kotoha.pegtree')
 parser = pg.generate(peg)
 snipet_parser = pg.generate(peg, start='Snipet')
 
@@ -647,16 +647,25 @@ class Reader(ParseTreeVisitor):
 
     def acceptInt(self, tree):
         s = str(tree)
-        return CValue(int(s))
+        if s.startswith('0b') or s.startswith('0B'):
+            n = int(s[2:],2)
+        elif s.startswith('0x') or s.startswith('0X'):
+            n = int(s[2:],16)
+        else:
+            n = int(s)
+        return CValue(n)
 
     def acceptDouble(self, tree):
-        s = str(tree)
-        return CValue(float(s))
+        try:
+            s = str(tree).replace(' ', '')
+            return CValue(float(s))
+        except ValueError:
+            return CValue(0.0)
 
-    def acceptTrueExpr(self, tree):
+    def acceptTrue(self, tree):
         return CValue(True)
 
-    def acceptFalseExpr(self, tree):
+    def acceptFalse(self, tree):
         return CValue(False)
 
     def acceptNull(self, tree):
@@ -688,7 +697,7 @@ class Reader(ParseTreeVisitor):
         return CValue(s)
 
     def accepterr(self, tree):
-        print(repr(tree))
+        # print(repr(tree))
         raise InterruptedError
 
 def EOS(s):
@@ -732,7 +741,7 @@ class KotohaModel(object):
                 return code, main
             return code, EOS(tokibi.emit(pred))
         except InterruptedError:
-            return expression, 'err'
+            return expression, None
 
     def generate(self, w, *files):
         for file in files:
@@ -744,7 +753,8 @@ class KotohaModel(object):
                     if '\t' in line:
                         line = line.split('\t')[0]
                     code, doc = self.translate(line)
-                    print(code, '\t', doc, file=w)
+                    if doc is not None:
+                        print(code, '\t', doc, file=w)
 
 
 if __name__ == '__main__':

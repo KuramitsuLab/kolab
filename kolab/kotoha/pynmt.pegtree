@@ -405,14 +405,14 @@ Primary =
     / Name
 
 GroupExpr = 
-    / { "(" Expression ("," __ Expression)*  ","? __ ")" #Tuple }
+    / { "(" Expression ("," __ Expression)*  ","? __ ")" #Literal }
     / { "(" Expression ")" #Group }
 
-ListExpr = { "[" (Expression ("," __ Expression)* )? ","?  __ "]" #List }
+ListExpr = { "[" (Expression ("," __ Expression)* )? ","?  __ "]" #Literal }
 
 DataExpr = 
-    / { "{" (KeyValue ("," __ KeyValue)*)? ","? __ "}" #Data }
-    / { "{" (Expression ("," __ Expression)* )? ","?  __ "}" #Set }
+    / { "{" (KeyValue ("," __ KeyValue)*)? ","? __ "}" #Literal }
+    / { "{" (Expression ("," __ Expression)* )? ","?  __ "}" #Literal }
 
 DELIM = [.:+\-*/%<>=!(){}[\],\n]
 
@@ -450,7 +450,7 @@ NAME = [A-Za-z_] W*
 
 Identifier = {
     NAME
-    #Name
+    #Literal
 } _
 
 W = [A-Za-z0-9_]
@@ -470,10 +470,10 @@ Constant =
 example Expression f'{a}+{1}'
 
 FormatString = [Ff] (
-    '\'\'\'' { FormatContent3* #Format } '\'\'\''
-    / '\'' { FormatContent1* #Format } '\''
-    / '"""' { FormatContent3D* #Format } '"""'
-    / '"' { FormatContent1D* #Format } '"' ) _
+    '\'\'\'' { FormatContent3* #Literal } '\'\'\''
+    / '\'' { FormatContent1* #Literal } '\''
+    / '"""' { FormatContent3D* #Literal } '"""'
+    / '"' { FormatContent1D* #Literal } '"' ) _
 
 FormatContent3 =
     '{' Expression FORMAT_OPTION? '}' / { (!'\'\'\'' !'{' .)* #StringPart }
@@ -490,16 +490,14 @@ FormatContent1D =
 FORMAT_OPTION = ':' (!'}' .)*
 
 LongString = 
-    '\'\'' { '\'' ( ESCAPE / ![\\'] . / !'\'\'\'' '\'' )* '\'' #MultiString } '\'\'' _
-    / '""' { '"' ( ESCAPE / ![\\"] . / !'"""' '"' )* '"' #MultiString } '""' _
+    '\'\'' { '\'' ( ESCAPE / ![\\'] . / !'\'\'\'' '\'' )* '\'' #Literal } '\'\'' _
+    / '""' { '"' ( ESCAPE / ![\\"] . / !'"""' '"' )* '"' #Literal } '""' _
 
 StringExpr = 
-    / { '"' STRING* '"' #QString } _
-    / DQ { ZSTRING* #ZString } DQ _
+    / { '"' STRING* '"' #Literal } _
 
 CharExpr = 
-    / { '\'' CHAR* '\'' #QString } _
-    / SQ {  ZCHAR* #ZChar } SQ _
+    / { '\'' CHAR* '\'' #Literal } _
 
 SQ = ['’‘＇]
 DQ = ["”“＂]
@@ -522,7 +520,7 @@ Number = FloatExpr / IntExpr
 
 IntExpr = {
 	(HEXADECIMAL / BINARY / DECIMAL )
-	#Int
+	#Literal
 } _
 
 DECIMAL = !'_' DIGIT ( DIGIT )*
@@ -533,7 +531,7 @@ HEX = [a-fA-F0-9]
 LONG_SUFFIX = [lL]
 
 FloatExpr = {
-	FLOAT #Double
+	FLOAT #Literal
 } _
 
 FLOAT = !'_' (
@@ -549,9 +547,9 @@ EXPONENT =
 
 /* Const */
 
-TrueExpr  = { [Tt] 'rue' #True } _
-FalseExpr = { [Ff] 'alse' #False } _
-NullExpr  = { ('None' / 'null') #Null } _
+TrueExpr  = { [Tt] 'rue' #Literal } _
+FalseExpr = { [Ff] 'alse' #Literal } _
+NullExpr  = { ('None' / 'null') #Literal } _
 
 /* Character */
 

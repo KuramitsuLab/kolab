@@ -701,6 +701,9 @@ def parse(s):
     return w, vpos, mode
 
 
+
+
+
 def parse_test(s):
     w, vpos, mode = parse(s)
     print(s, w, vpos, modes(mode), mode, conjugate(w, mode, vpos))

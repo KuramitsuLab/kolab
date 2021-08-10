@@ -16,14 +16,17 @@ def fix(tree):
 
 def readfile(filename, head=None):
     isTSV = filename.endswith('.tsv')
+    isTXT = filename.endswith('.txt')
     with open(filename, 'r') as f:
         for i, line in enumerate(f.readlines()):
             if isTSV: line = line.split('\t')[0]
             tree = parser(line)
             if len(tree) > 0:
                 for t in tree:
-                    if t.tag_ != 'Name':
-                        print(fix(t))
+                    if t.tag_ != 'Literal' and t.tag_ != 'Infix':
+                        s = str(fix(t))
+                        if not isTXT or '(' in s :
+                            print(s)
                     #print(repr(fix(t)))
             if i == head:
                 break

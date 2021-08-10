@@ -1,4 +1,3 @@
-from pandas.core.algorithms import isin
 import pegtree as pg
 from pegtree.visitor import ParseTreeVisitor
 import random
