@@ -31,20 +31,20 @@ x == y     # xが/yに等しいかどうか
 x != y     # xが/yに等しくないかどうか
 
 _同一 = '同じ|同一'
-x is y     # xが/yと/同一かどうか
-x is not y     # xが/yと/同一でないかどうか
+x is y     # xが/yと 同一かどうか
+x is not y     # xが/yと 同一でないかどうか
 
 _含まれる = '含まれる|ある'
 _含まれない = '含まれない|ない'
 _内 = '内|の中|中'
 
-x in y     # xが/y内に/含まれるかどうか
+x in y     # xが/y内に 含まれるかどうか
 x not in y     # xが/y内に/含まれないかどうか
 
-x ** y  # xのy乗 -> int
-x | y  # xとyの/論理和 -> int
-x ^ y  # xとyの/排他的論理和 -> int
-x & y  # xとyの/論理積 -> int
+x ** y  # xの y乗 -> int
+x | y  # xと yの 論理和 -> int
+x ^ y  # xと yの 排他的論理和 -> int
+x & y  # xと yの 論理積 -> int
 x << n  # xの/nビット左シフト -> int
 x >> n  # xの/nビット右シフト -> int
 ~x  # xの/ビット反転 -> int
@@ -62,15 +62,15 @@ str * x   # strを/x個、/連結する -> str
 _増やす = '増やす|多くする|増加させる'
 _減らす = '減らす|少なくする|減少させる'
 
-x += y # xを/y[だけ|]増やす
-x += 1 # xを/1つ 増やす
-x -= y # xを/y[だけ|]減らす
-x -= 1 # xを/1つ 減らす
-x *= y # xを/y倍にする
-x /= y # xを/y分の1にする
-x //= y # xを/y分の1にする
-x /= 2 # xを/半分にする
-x //= 2 # xを/半分にする
+x += y # xを y[だけ|]増やす
+x += 1 # xを 1つ 増やす
+x -= y # xを y[だけ|]減らす
+x -= 1 # xを 1つ 減らす
+x *= y # xを y倍にする
+x /= y # xを y分の1にする
+x //= y # xを y分の1にする
+x /= 2 # xを 半分にする
+x //= 2 # xを 半分にする
 x **= y # xをy乗にする
 x %= y # xをyで割った/余りにする | xをyの徐算の/余りにする
 x |= y # xをyとの/論理和にする
@@ -136,8 +136,8 @@ str(x)  # xの/文字列 -> str
 
 x[y]  # x [ y ]
 
-all(iterable)  # iterableの全ての要素が/真かどうか -> bool
-any(iterable)  # iterableのいずれかの要素が/真かどうか -> bool
+all(iterable)  # iterableの 全てが 真かどうか -> bool
+any(iterable)  # iterableの いずれかが 真かどうか -> bool
 
 enumerate(x)  # xの/順序数列 -> list
 enumerate(x, y)  # xのyから始まる/順序数列 -> list
@@ -425,8 +425,8 @@ str.replace(sub, '')  # str内のsubを/全て/取り除く -> str
 
 _スプリットする = '分割する|分ける|スプリットする'
 
-str.split(sep)  # strを/sepで/スプリットする -> list
-str.rsplit(sep)  # strを/sepで/スプリットする -> list
+str.split(sep)  # strを/sepで スプリットする -> list
+str.rsplit(sep)  # strを/sepで スプリットする -> list
 maxsplit = '最大分割回数'
 
 convtable = '変換表'
