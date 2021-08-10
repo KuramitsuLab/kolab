@@ -19,6 +19,18 @@ OPTION = {
     'Verbose': True,  # デバッグ出力あり
 }
 
+# {心が折れた|やる気が失せた}フリをする
+# 現状:[猫|ネコ] -> ランダム
+# 将来: 猫 -> 異音同義語(synonyms) -> ランダム (自動的) これをどう作るか？
+# 順番を入れ替える -> NSuffix(「に」のように助詞)
+# [ネコ|ネコ|] -> 省略可能
+# 雑音を入れる <- BERT
+
+# Aに Bを 足す  「Aに」を取り除く -> Bを 足す  -> Aがありませんよ。
+
+
+
+
 # randomize
 
 RandomIndex = 0
@@ -50,19 +62,19 @@ def choice(ss: list):
     return ss[random_index(len(ss), 17)]
 
 
-def conjugate(w, mode=0, vpos=None):
-    suffix = ''
-    if mode & verb.CASE == verb.CASE:
-        if RandomIndex % 2 != 0:
-            mode = (mode & ~verb.CASE) | verb.NOUN
-            suffix = alt('とき、|場合、|際、')
-        else:
-            suffix = '、'
-    if mode & verb.THEN == verb.THEN:
-        if RandomIndex % 2 != 0:
-            mode = (mode & ~verb.THEN) | verb._I
-        suffix = '、'
-    return verb.conjugate(w, mode, vpos) + suffix
+# def conjugate(w, mode=0, vpos=None):
+#     suffix = ''
+#     if mode & verb.CASE == verb.CASE:
+#         if RandomIndex % 2 != 0:
+#             mode = (mode & ~verb.CASE) | verb.NOUN
+#             suffix = alt('とき、|場合、|際、')
+#         else:
+#             suffix = '、'
+#     if mode & verb.THEN == verb.THEN:
+#         if RandomIndex % 2 != 0:
+#             mode = (mode & ~verb.THEN) | verb._I
+#         suffix = '、'
+#     return verb.conjugate(w, mode, vpos) + suffix
 
 # NExpr
 
@@ -82,7 +94,7 @@ class NExpr(object):
     def generate(self):
         ss = []
         c = 0
-        while c < 3:
+        while c < 5:
             randomize()
             buffers = []
             self.emit(buffers)
@@ -134,7 +146,7 @@ class NVerb(NExpr):
         return self
 
     def emit(self, buffers):
-        buffers.append(verb.conjugate(self.w, self.mode, self.vpos))
+        buffers.append(verb.conjugate(self.w, self.mode|verb.POL, self.vpos))
 
 
 class NChoice(NExpr):
@@ -197,7 +209,7 @@ class NOrdered(NExpr):
             p.emit(buffers)
 
 
-class NClause(NExpr):
+class NClause(NExpr):  # 名詞節　〜する(verb)＋名詞(noun)
 
     def __init__(self, verb, noun):
         NExpr.__init__(self, (verb,noun))
@@ -233,6 +245,20 @@ class NSuffix(NExpr):
     def emit(self, buffers):
         self.subs[0].emit(buffers)
         buffers.append(self.suffix)
+
+neko = NWord('猫|ねこ|ネコ')
+print('@', neko, neko.generate())
+
+wo = NSuffix(neko, 'を')
+print('@', wo, wo.generate())
+
+ni = NSuffix(neko, 'に')
+print('@', ni, ni.generate())
+
+ageru = NVerb('あげる', 'V1', 0)
+
+e = NPhrase(NOrdered(ni, wo), ageru)
+print('@', e, e.generate())
 
 class NLiteral(NExpr):
     w: str
@@ -278,10 +304,11 @@ class NSymbol(NExpr):
         buffers.append(self.w)
 
 
-##
+## ここから下は気にしなくていいです。
+## テキストを NExpr (構文木)に変換しています。
+
 peg = pg.grammar('tokibi.pegtree')
 tokibi_parser = pg.generate(peg)
-
 
 class TokibiReader(ParseTreeVisitor):
 
@@ -368,18 +395,24 @@ def read_tsv(filename):
                 e = parse(line)
                 print(e, e.generate())
 
+# t = parse('{心が折れた|やる気が失せた}気がする')
+# print(t, t.generate())
 
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        read_tsv(sys.argv[1])
-    else:
-        e = parse('望遠鏡で/{[子犬|Puppy]が泳ぐ}[様子|の]を見る')
-        print(e, e.generate())
-        e2 = parse('[猫|ねこ]が/[虎|トラ]と等しくないかどうか')
-        #e2, _ = parse('{Aと/B(子犬)を/順に/[ひとつずつ]表示した}結果')
-        e = parse('Aを調べる')
-        e = e.apply({0: e2})
-        print(e, e.generate())
-        e = parse('A(事実)を調べる')
-        e = e.apply({0: e2})
-        print(e, e.generate())
+
+# t = parse('望遠鏡で{子犬が泳ぐ}のを見る')
+# print(t)
+
+# if __name__ == '__main__':
+#     if len(sys.argv) > 1:
+#         read_tsv(sys.argv[1])
+#     else:
+#         e = parse('望遠鏡で/{[子犬|Puppy]が泳ぐ}[様子|の]を見る')
+#         print(e, e.generate())
+#         e2 = parse('[猫|ねこ]が/[虎|トラ]と等しくないかどうか')
+#         #e2, _ = parse('{Aと/B(子犬)を/順に/[ひとつずつ]表示した}結果')
+#         e = parse('Aを調べる')
+#         e = e.apply({0: e2})
+#         print(e, e.generate())
+#         e = parse('A(事実)を調べる')
+#         e = e.apply({0: e2})
+#         print(e, e.generate())
