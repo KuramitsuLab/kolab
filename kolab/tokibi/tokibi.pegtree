@@ -1,0 +1,49 @@
+
+
+NStatement = NPhrase _NPhrase?
+_NPhrase = {^ (_ "|" NPhrase)+ #NChoice } 
+
+NPhrase = { NChunk+ #NPhrase } 
+NChunk = NTerm _NSuffix? _NOrdered?
+
+_NSuffix = {^ { SUFFIX } #NSuffix }
+SUFFIX = 'を' / 'で' / 'に' / 'が' / 'は' / 'も' / 'と' / 'から'
+
+_NOrdered = {^ _ '/' _  NChunk #NOrdered }
+
+example NPhrase 望遠鏡で子犬が泳ぐ様子を見る
+example NPhrase 望遠鏡で/{子犬が泳ぐ}様子を見る
+example NPhrase {望遠鏡を用いて}/{子犬が泳ぐ}様子を見る
+
+NTerm = 
+  / '{' NPhrase '}' {^  NWord #NClause }?
+  / NSymbol _PClause?
+  / NLiteral
+  / ![ }/|] NWord
+  / ![ }/|] NPiece
+
+NSymbol = { [A-Za-z_] [A-Za-z_0-9]* #NSymbol }
+_PClause = "(" {^ { (!")" . )+ #NWord } #NClause } ")"
+
+NLiteral = 
+  / {'"' (ESC / !'"' .)* '"' #NLiteral } _
+  / {'\'' (ESC / !'\'' .)* '\'' #NLiteral } _
+  / {'-'? [0-9]+ ('.' [0-9]+)* #NLiteral } _
+
+ESC = '\\' .
+
+NWord = 
+  / "[" { (!']' .)+  #NWord } "]"
+  / { NOUN #NWord }
+  / { (!SUFFIX ![ /|[{}`] .)+ #NWord }
+
+NOUN =
+  / 'とき' / 'ところ' / 'こと'
+
+NPiece = 
+    / '`' { (ESC / !'`' .)*  #NPiece } '`' _
+    / { (![A-Za-z0-9_ "'`\[(){}/|] !'->' . )+ #NPiece }
+
+HIRA = [ぁ-ん]
+KATA = [ァ-ヶー・]
+KANJI = [㐀-䶵一-龠々〇〻]
