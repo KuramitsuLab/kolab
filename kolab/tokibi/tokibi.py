@@ -4,6 +4,34 @@ from pegtree.visitor import ParseTreeVisitor
 import random
 # from . import verb
 import verb
+import gzip
+import shutil
+import sqlite3
+import pandas as pd
+import random
+from math import ceil
+
+#!wget "http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz" 
+
+with gzip.open('wnjpn.db.gz', 'rb') as f_in:
+    with open('wnjpn.db', 'wb') as f_out:
+        shutil.copyfileobj(f_in, f_out)
+
+
+conn = sqlite3.connect("wnjpn.db")
+q = 'SELECT synset,lemma FROM sense,word USING (wordid) WHERE sense.lang="jpn"'
+sense_word = pd.read_sql(q, conn)
+
+
+def get_synonyms(word):
+    synsets = sense_word.loc[sense_word.lemma == word, "synset"]
+    synset_words = set(sense_word.loc[sense_word.synset.isin(synsets), "lemma"])
+
+    if word in synset_words:
+        synset_words.remove(word)
+
+    return list(synset_words)
+
 
 EMPTY = tuple()
 
@@ -110,7 +138,8 @@ class NWord(NExpr):
 
     def __init__(self, w):
         NExpr.__init__(self)
-        self.w = str(w)
+        self.w = '|'.join(get_synonyms(str(w)))
+        #self.w = str(w)
 
     def __repr__(self):
         if '|' in self.w:
@@ -146,7 +175,7 @@ class NVerb(NExpr):
         return self
 
     def emit(self, buffers):
-        buffers.append(verb.conjugate(self.w, self.mode|verb.POL, self.vpos))
+        buffers.append(verb.conjugate(self.w, self.mode, self.vpos))
 
 
 class NChoice(NExpr):
@@ -246,19 +275,19 @@ class NSuffix(NExpr):
         self.subs[0].emit(buffers)
         buffers.append(self.suffix)
 
-neko = NWord('猫|ねこ|ネコ')
-print('@', neko, neko.generate())
+# neko = NWord('猫|ねこ|ネコ')
+# print('@', neko, neko.generate())
 
-wo = NSuffix(neko, 'を')
-print('@', wo, wo.generate())
+# wo = NSuffix(neko, 'を')
+# print('@', wo, wo.generate())
 
-ni = NSuffix(neko, 'に')
-print('@', ni, ni.generate())
+# ni = NSuffix(neko, 'に')
+# print('@', ni, ni.generate())
 
-ageru = NVerb('あげる', 'V1', 0)
+# ageru = NVerb('あげる', 'V1', 0)
 
-e = NPhrase(NOrdered(ni, wo), ageru)
-print('@', e, e.generate())
+# e = NPhrase(NOrdered(ni, wo), ageru)
+# print('@', e, e.generate())
 
 class NLiteral(NExpr):
     w: str
@@ -394,6 +423,9 @@ def read_tsv(filename):
                 line = line.split('#')[1].strip()
                 e = parse(line)
                 print(e, e.generate())
+
+t = parse('猫におやつをあげる')
+print(t, t.generate())
 
 # t = parse('{心が折れた|やる気が失せた}気がする')
 # print(t, t.generate())
