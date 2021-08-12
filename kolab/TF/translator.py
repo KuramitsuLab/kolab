@@ -128,3 +128,27 @@ def greedy_decode(model, src, src_mask, max_len, beamsize, start_symbol):
         if next_word == EOS_IDX:
             break
     return ys
+
+#greedy_decodeのトークン候補確率を出力するバージョン
+def greedy_decode_output(model, src, src_mask, max_len, beamsize, start_symbol):
+    memory = model.encode(src, src_mask)   # encode の出力 (コンテキストベクトル)
+
+    ys = torch.ones(1, 1).fill_(start_symbol).type(torch.long)
+
+    for i in range(max_len-1):
+        tgt_mask = (generate_square_subsequent_mask(ys.size(0)).type(torch.bool))
+        out = model.decode(ys, memory, tgt_mask)
+        out = out.transpose(0, 1)
+        prob = model.generator(out[:, -1])
+        next_prob, next_word = prob.topk(k=beamsize, dim=1)
+        print(f'次に来るトークン候補 : {next_word}')
+        print(f'その確率 : {next_prob}')
+
+        next_word = next_word[:, 0]
+        next_word = next_word.item()
+
+        ys = torch.cat([ys,
+                        torch.ones(1, 1).type_as(src.data).fill_(next_word)], dim=0)
+        if next_word == EOS_IDX:
+            break
+    return ys
