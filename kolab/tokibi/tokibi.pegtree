@@ -4,26 +4,42 @@ NStatement = NPhrase _NPhrase?
 _NPhrase = {^ (_ "|" NPhrase)+ #NChoice } 
 
 NPhrase = { NChunk+ #NPhrase } 
-NChunk = NTerm _NSuffix? _NOrdered?
+NChunk = (NSuffix _NOrdered? / NTerm) _
+_NOrdered = {^ (_ '/' _  NSuffix)+ #NOrdered }
 
-_NSuffix = {^ { SUFFIX } #NSuffix }
-SUFFIX = 'を' / 'で' / 'に' / 'が' / 'は' / 'も' / 'と' / 'から'
+NSuffix = 
+  / &THEN '{' NStatement '}'
+  / { NTerm (!SUFFIX NTerm)* { SUFFIX _VER? } #NSuffix }
 
-_NOrdered = {^ _ '/' _  NChunk #NOrdered }
+THEN = '{' (BRACE / !(. '}') .)+ [でて、] '}'
+BRACE = '{' (BRACE / !'}' .)* '}' 
+//NOUN = BRACE SUFFIX
+
+SUFFIX = 
+  / 'として' _OF
+  / 'を' / 'で' _OF / 'に' / 'が' / 'は' / 'も' / 'の'
+  / 'と' _OF / 'から' _OF / 'まで' _OF / '、'
+
+_OF = 'の'?
+_VER = '@' [A-Za-z0-9]+
 
 example NPhrase 望遠鏡で子犬が泳ぐ様子を見る
 example NPhrase 望遠鏡で/{子犬が泳ぐ}様子を見る
 example NPhrase {望遠鏡を用いて}/{子犬が泳ぐ}様子を見る
+example NPhrase {心が折れた|やる気が失せた}かも知れない
+example NPhrase {xを{functionを適用して}フィルタした}リスト
+example NPhrase {{それぞれのx}を/{functionに適用して}フィルタした}リスト
+example NPhrase {それぞれのx|xのそれぞれ}をフィルタする
 
 NTerm = 
-  / '{' NPhrase '}' {^  NWord #NClause }?
-  / NSymbol _PClause?
+  / '{' NStatement '}' {^ NWord #NClause }?
+  / NSymbol _NParam?
   / NLiteral
   / ![ }/|] NWord
   / ![ }/|] NPiece
 
 NSymbol = { [A-Za-z_] [A-Za-z_0-9]* #NSymbol }
-_PClause = "(" {^ { (!")" . )+ #NWord } #NClause } ")"
+_NParam = "(" {^ { (!")" . )+ #NWord } #NParam } ")"
 
 NLiteral = 
   / {'"' (ESC / !'"' .)* '"' #NLiteral } _
@@ -34,11 +50,11 @@ ESC = '\\' .
 
 NWord = 
   / "[" { (!']' .)+  #NWord } "]"
-  / { NOUN #NWord }
+  / { RESERVED_NOUN #NWord }
   / { (!SUFFIX ![ /|[{}`] .)+ #NWord }
 
-NOUN =
-  / 'とき' / 'ところ' / 'こと'
+RESERVED_NOUN =
+  / 'とき' / 'ところ' / 'こと' / 'よう'
 
 NPiece = 
     / '`' { (ESC / !'`' .)*  #NPiece } '`' _

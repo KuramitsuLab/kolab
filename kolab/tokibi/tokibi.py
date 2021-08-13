@@ -5,7 +5,21 @@ import random
 # from . import verb
 import verb
 
+def verb_emit(base, vpos=None, mode=0):
+    if vpos is None:
+        base, vpos, mode = verb_parse(base)
+    return verb.emit_impl(base, vpos, mode)
+
+def verb_parse(s):
+    vpos, base, prefix = verb.detect_vpos(s)
+    if vpos is not None:
+        mode = verb.detect_mode(s[len(prefix):])
+        print(s, '=>', verb_emit(prefix+base, vpos, mode))
+        return prefix+base, vpos, mode
+    return s, None, None
+
 EMPTY = tuple()
+DEBUG = False
 
 # オプション
 
@@ -18,20 +32,6 @@ OPTION = {
     'ShuffleOrder': True,  # 順序も入れ替える
     'Verbose': True,  # デバッグ出力あり
 }
-
-# {心が折れた|やる気が失せた}フリをする
-# 現状:[猫|ネコ] -> ランダム
-# 将来: 猫 -> 異音同義語(synonyms) -> ランダム (自動的) これをどう作るか？
-# 順番を入れ替える -> NSuffix(「に」のように助詞)
-# [ネコ|ネコ|] -> 省略可能
-# 雑音を入れる <- BERT
-
-# Aに Bを 足す  「Aに」を取り除く -> Bを 足す  -> Aがありませんよ。
-
-
-
-
-# randomize
 
 RandomIndex = 0
 
@@ -57,24 +57,9 @@ def alt(s: str):
         return ss[random_index(len(ss), len(s))]
     return s
 
-
 def choice(ss: list):
     return ss[random_index(len(ss), 17)]
 
-
-# def conjugate(w, mode=0, vpos=None):
-#     suffix = ''
-#     if mode & verb.CASE == verb.CASE:
-#         if RandomIndex % 2 != 0:
-#             mode = (mode & ~verb.CASE) | verb.NOUN
-#             suffix = alt('とき、|場合、|際、')
-#         else:
-#             suffix = '、'
-#     if mode & verb.THEN == verb.THEN:
-#         if RandomIndex % 2 != 0:
-#             mode = (mode & ~verb.THEN) | verb._I
-#         suffix = '、'
-#     return verb.conjugate(w, mode, vpos) + suffix
 
 # NExpr
 
@@ -90,7 +75,19 @@ class NExpr(object):
         if len(self.subs) > 0:
             (e.apply(dict_or_func) for e in self.subs)
         return self
-    
+
+    def src(self):
+        '''
+        Tokibi形式で再出力する
+        '''
+        buffers = []
+        self.emit_src(buffers)
+        s = ''.join(buffers)
+        return s
+
+    def emit_src(self, buffers):
+        buffers.append(str(self))
+
     def generate(self):
         ss = []
         c = 0
@@ -113,10 +110,12 @@ class NWord(NExpr):
         self.w = str(w)
 
     def __repr__(self):
+        # if DEBUG:
+        #     return f'NWord({self.w})'
         if '|' in self.w:
             return '[' + self.w + ']'
         return self.w
-    
+
     def apply(self, dict_or_func=identity):
         if not isinstance(dict_or_func, dict):
             return dict_or_func(self)
@@ -125,28 +124,38 @@ class NWord(NExpr):
     def emit(self, buffers):
         buffers.append(alt(self.w))
 
-
 class NVerb(NExpr):
     w: str
     vpos: str
     mode: int
+    synonym: str
 
-    def __init__(self, w, vpos, mode=0):
+    def __init__(self, w, mode=0, synonym=None):
         NExpr.__init__(self)
         self.w = str(w)
-        self.vpos = vpos
         self.mode = mode
+        self.synonym = synonym
 
     def __repr__(self):
-        return verb.conjugate(self.w, self.mode, self.vpos)
-    
+        if DEBUG:
+            return f'NVerb({self.w},{self.mode})'
+        mode = self.mode
+        if self.synonym is not None:
+            w = '|'.join([verb_emit(w, mode) for w in self.synonym.split('|')])
+            return f'[{w}]'
+        return verb_emit(self.w, mode)
+
     def apply(self, dict_or_func=identity):
         if not isinstance(dict_or_func, dict):
             return dict_or_func(self)
         return self
 
     def emit(self, buffers):
-        buffers.append(verb.conjugate(self.w, self.mode|verb.POL, self.vpos))
+        w = self.w
+        mode = self.mode
+        if self.synonym is not None:
+            w = alt(self.synonym)
+        buffers.append(verb_emit(w, self.mode))
 
 
 class NChoice(NExpr):
@@ -154,10 +163,12 @@ class NChoice(NExpr):
         NExpr.__init__(self, subs)
 
     def __repr__(self):
+        if DEBUG:
+            return f'NChoice{repr(self.subs)}'
         ss = []
         for p in self.subs:
             ss.append(repr(p))
-        return ' | '.join(ss)
+        return '{' + '|'.join(ss) + '}'
 
     def apply(self, dict_or_func=identity):
         return NChoice(*(e.apply(dict_or_func) for e in self.subs))
@@ -165,18 +176,21 @@ class NChoice(NExpr):
     def emit(self, buffers):
         choice(self.subs).emit(buffers)
 
-
 class NPhrase(NExpr):
     def __init__(self, *subs):
         NExpr.__init__(self, subs)
 
     def __repr__(self):
+        if DEBUG:
+            return f'NPhrase{repr(self.subs)}'
         ss = []
         for p in self.subs:
             ss.append(grouping(p))
         return ' '.join(ss)
 
     def apply(self, dict_or_func=identity):
+        if isinstance(dict_or_func, dict):
+            print('@debug', dict_or_func)
         return NPhrase(*(e.apply(dict_or_func) for e in self.subs))
 
     def emit(self, buffers):
@@ -193,6 +207,8 @@ class NOrdered(NExpr):
         NExpr.__init__(self, subs)
 
     def __repr__(self):
+        if DEBUG:
+            return f'NOrdered{repr(self.subs)}'
         ss = []
         for p in self.subs:
             ss.append(grouping(p))
@@ -215,6 +231,8 @@ class NClause(NExpr):  # 名詞節　〜する(verb)＋名詞(noun)
         NExpr.__init__(self, (verb,noun))
 
     def __repr__(self):
+        if DEBUG:
+            return f'NClause{repr(self.subs)}'
         return grouping(self.subs[0]) + grouping(self.subs[1])
 
     def apply(self, dict_or_func=identity):
@@ -223,42 +241,48 @@ class NClause(NExpr):  # 名詞節　〜する(verb)＋名詞(noun)
     def emit(self, buffers):
         verb = self.subs[0]
         noun = self.subs[1]
-        if isinstance(verb, NClause):
-            verb.subs[0].emit(buffers)
-        else:
-            verb.emit(buffers)
+        verb.emit(buffers)
         noun.emit(buffers)
+
+class NParam(NExpr):
+    unit: str
+    def __init__(self, x, unit):
+        NExpr.__init__(self, (x,))
+        self.unit = unit
+
+    def __repr__(self):
+        if DEBUG:
+            return f'NParam({repr(self.subs[0])},{repr(self.unit)})'
+        return grouping(self.subs[0]) + f'({self.unit})'
+
+    def apply(self, dict_or_func=identity):
+        return NParam(self.subs[0].apply(dict_or_func), self.unit)
+
+    def emit(self, buffers):
+        inner = self.subs[0]
+        inner.emit(buffers)
+        if not isinstance(inner, NClause):
+            buffers.append(alt(self.unit))
 
 class NSuffix(NExpr):
     suffix: str
 
-    def __init__(self, e, suffix):
-        NExpr.__init__(self, (e,))
-        self.suffix = suffix
+    def __init__(self, *ws):
+        NExpr.__init__(self, ws[:-1])
+        self.suffix = str(ws[-1])
 
     def __repr__(self):
-        return grouping(self.subs[0]) + self.suffix
+        if DEBUG:
+            return f'NSuffix({repr(self.subs[-1])},{repr(self.suffix)})'
+        return ''.join(grouping(t) for t in self.subs) + self.suffix
 
     def apply(self, dict_or_func=identity):
-        return NSuffix(self.subs[0].apply(dict_or_func), self.suffix)
+        return NSuffix(*(e.apply(dict_or_func) for e in self.subs), self.suffix)
 
     def emit(self, buffers):
-        self.subs[0].emit(buffers)
+        for p in self.subs:
+            p.emit(buffers)
         buffers.append(self.suffix)
-
-neko = NWord('猫|ねこ|ネコ')
-print('@', neko, neko.generate())
-
-wo = NSuffix(neko, 'を')
-print('@', wo, wo.generate())
-
-ni = NSuffix(neko, 'に')
-print('@', ni, ni.generate())
-
-ageru = NVerb('あげる', 'V1', 0)
-
-e = NPhrase(NOrdered(ni, wo), ageru)
-print('@', e, e.generate())
 
 class NLiteral(NExpr):
     w: str
@@ -268,6 +292,8 @@ class NLiteral(NExpr):
         self.w = str(w)
 
     def __repr__(self):
+        if DEBUG:
+            return f'NLiteral({repr(self.w)})'
         return self.w
 
     def apply(self, dict_or_func=identity):
@@ -286,10 +312,12 @@ class NSymbol(NExpr):
         NExpr.__init__(self)
         self.index = index
         self.w = str(w)
-
-    def __repr__(self):
-        return self.w
     
+    def __repr__(self):
+        if DEBUG:
+            return f'NSymbol({self.w})'
+        return self.w
+
     def apply(self, dict_or_func=identity):
         if isinstance(dict_or_func, dict):
             if self.index in dict_or_func:
@@ -302,10 +330,6 @@ class NSymbol(NExpr):
 
     def emit(self, buffers):
         buffers.append(self.w)
-
-
-## ここから下は気にしなくていいです。
-## テキストを NExpr (構文木)に変換しています。
 
 peg = pg.grammar('tokibi.pegtree')
 tokibi_parser = pg.generate(peg)
@@ -321,7 +345,7 @@ class TokibiReader(ParseTreeVisitor):
         tree = tokibi_parser(s)
         self.indexes = {}
         nexpr = self.visit(tree)
-        return nexpr #, self.indexes
+        return nexpr, self.indexes
 
 # [#NPhrase [#NOrdered [#NSuffix [#NSymbol 'str'][# 'が']][#NSuffix [#NSymbol 'prefix'][# 'で']]][#NWord '始まるかどうか']]
 
@@ -337,6 +361,10 @@ class TokibiReader(ParseTreeVisitor):
 
     def acceptNClause(self, tree):
         ne = NClause(self.visit(tree[0]), self.visit(tree[1]))
+        return ne
+
+    def acceptNParam(self, tree):
+        ne = NParam(self.visit(tree[0]), str(tree[1]))
         return ne
 
     def acceptNOrdered(self, tree):
@@ -360,29 +388,32 @@ class TokibiReader(ParseTreeVisitor):
 
     def acceptNWord(self, tree):
         s = str(tree)
-        w, vpos, mode = verb.parse(s.split('|')[0])
-        if vpos.startswith('V') or vpos == 'ADJ':
-            return NVerb(w, vpos, mode)
+        if '|' in s:
+            return NWord(s)
+        if s in self.synonyms:
+            return NWord(self.synonyms[s])
         return NWord(s)
 
     def acceptNPiece(self, tree):
         s = str(tree)
         return NWord(s)
 
-
 tokibi_reader = TokibiReader()
 
-def parse(s, synonyms=None):
+def parse2(s, synonyms=None):
     if synonyms is not None:
         tokibi_reader.synonyms = synonyms
     if s.endswith('かどうか'):
         s = s[:-4]
-        e = tokibi_reader.parse(s)
+        e, d = tokibi_reader.parse(s)
         e = NClause(e, NWord('かどうか'))
     else:
-        e = tokibi_reader.parse(s)
+        e, d = tokibi_reader.parse(s)
     #print(grouping(e[0]))
-    return e
+    return e, d
+
+def parse(s, synonyms=None):
+    return parse2(s, synonyms=synonyms)[0]
 
 def read_tsv(filename):
     with open(filename) as f:
@@ -395,24 +426,13 @@ def read_tsv(filename):
                 e = parse(line)
                 print(e, e.generate())
 
-# t = parse('{心が折れた|やる気が失せた}気がする')
-# print(t, t.generate())
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        read_tsv(sys.argv[1])
+    else:
+        e = parse('{xを/{functionを 適用して}フィルタした}リスト')
+        print(e.src())
+        e = parse('{心が折れた|気持ちが和らぐ}かも知れない')
+        print(e.src())
+        
 
-
-# t = parse('望遠鏡で{子犬が泳ぐ}のを見る')
-# print(t)
-
-# if __name__ == '__main__':
-#     if len(sys.argv) > 1:
-#         read_tsv(sys.argv[1])
-#     else:
-#         e = parse('望遠鏡で/{[子犬|Puppy]が泳ぐ}[様子|の]を見る')
-#         print(e, e.generate())
-#         e2 = parse('[猫|ねこ]が/[虎|トラ]と等しくないかどうか')
-#         #e2, _ = parse('{Aと/B(子犬)を/順に/[ひとつずつ]表示した}結果')
-#         e = parse('Aを調べる')
-#         e = e.apply({0: e2})
-#         print(e, e.generate())
-#         e = parse('A(事実)を調べる')
-#         e = e.apply({0: e2})
-#         print(e, e.generate())
