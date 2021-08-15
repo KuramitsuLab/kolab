@@ -1,4 +1,5 @@
 import sys
+import collections
 import pegtree as pg
 from pegtree.visitor import ParseTreeVisitor
 import random
@@ -17,6 +18,8 @@ def verb_parse(s):
         print(s, '=>', verb_emit(prefix+base, vpos, mode))
         return prefix+base, vpos, mode
     return s, None, None
+
+
 
 EMPTY = tuple()
 DEBUG = False
@@ -54,12 +57,43 @@ def alt(s: str):
         ss = s.split('|')
         if OPTION['EnglishFirst']:
             return ss[-1]  # 最後が英語
-        return ss[random_index(len(ss), len(s))]
+        return filter_synonym_annotation(ss[random_index(len(ss), len(s))])
     return s
 
 def choice(ss: list):
     return ss[random_index(len(ss), 17)]
 
+# 異音同義語
+
+def filter_synonym_annotation(s):
+        return s.split('@')[0] if '@' in s else s
+
+def decode_synonyms(value):
+    values = []
+    for s in value.split('|'):
+        if '@' in s:
+            s, n = s.split('@')
+            for i in range(int(n)):
+                values.append(s)
+        else:
+            values.append(s)
+    return values
+
+def encode_synonyms(values):
+    count = collections.Counter(values)
+    a=[]
+    for key in count.keys():
+        a.append(f'{key}@{count[key]}')
+    return '|'.join(a)
+
+def update_synonyms(synonyms, key, value):
+    values = decode_synonyms(value) 
+    if key in synonyms:
+        values.extend(decode_synonyms(synonyms[key]))
+    key2 = filter_synonym_annotation(key)
+    if key2 not in values:
+        values.append(key2)
+    synonyms[key] = encode_synonyms(values)
 
 # NExpr
 
@@ -189,8 +223,8 @@ class NPhrase(NExpr):
         return ' '.join(ss)
 
     def apply(self, dict_or_func=identity):
-        if isinstance(dict_or_func, dict):
-            print('@debug', dict_or_func)
+        # if isinstance(dict_or_func, dict):
+        #     print('@debug', dict_or_func)
         return NPhrase(*(e.apply(dict_or_func) for e in self.subs))
 
     def emit(self, buffers):
@@ -346,6 +380,10 @@ class TokibiReader(ParseTreeVisitor):
         self.indexes = {}
         nexpr = self.visit(tree)
         return nexpr, self.indexes
+
+    def accepterr(self, tree):
+        print(str(tree), file=sys.stderr)
+        raise RuntimeError()
 
 # [#NPhrase [#NOrdered [#NSuffix [#NSymbol 'str'][# 'が']][#NSuffix [#NSymbol 'prefix'][# 'で']]][#NWord '始まるかどうか']]
 

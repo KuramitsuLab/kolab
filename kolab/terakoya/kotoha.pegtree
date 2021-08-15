@@ -1,0 +1,393 @@
+/* File */
+
+File = __ { (Rule __)* #Source} EOF
+
+/* Rule */
+
+Rule =
+    / COMMENT / Import
+    / { Option Document #NRule}
+    / SymbolDef
+    / { Statement Document #NRule }
+    / { Statement (!LF .)* #NExample }
+
+// MetaData = 
+//     / '"""' __ { (!'"""' . )*  #MetaData } '"""'
+//     / "'''" __ { (!"'''" . )*  #MetaData } "'''"
+
+COMMENT = '#' (!'\n' .)* (__ / EOF)
+
+Import = {
+    "import" NSName ("as" Name)? #NImport
+}
+
+Option = {
+    ('_' Noun / NSName _IGNORE_MULTI_VARIABLE ) "=" (Constant / Name) 
+    #Option
+}
+
+Noun =  { (![|,\]) =] .)* #Noun } _           
+
+
+SymbolDef = {
+    ('_' Noun / NSName _IGNORE_MULTI_VARIABLE ) "=" Constant 
+    #NSymbolDef
+}
+
+_IGNORE_MULTI_VARIABLE = [,A-Za-z0-9_ ]*
+
+/* Document */
+
+Document = __ '#' _ {
+  (!'\n' .)* LF
+  #NDocument
+}
+
+/* Programming */
+
+Snipet = Statement EOF
+
+Statement =
+    / IfStatement / WhileStatement / ForStatement
+    / Assignment / MultiAssignment / SelfAssignment
+    / ReturnStatement / RaiseStatement
+    / Expression
+
+IfStatement = {
+    "if" Expression ":"
+    #If
+}
+
+WhileStatement = {
+    "while" Expression ":"
+    #While
+}
+
+ForStatement = {
+    "for" Names "in" Expression ":" 
+    #For
+}
+
+RaiseStatement = {
+    { "raise" } Expression
+    #Statement
+}
+
+ReturnStatement = {
+    { "return" } / { "yield" } 
+    Expression?
+    #Statement
+}
+
+Assignment = {
+    left: LeftHand
+    ":"? "=" 
+    right: Expression
+    #Assignment
+}
+
+LeftHand = Name (
+        { recv:^ "." name: Name #GetExpr }
+        / { recv:^ "[" index: Expression "]" #IndexExpr }
+    )*
+
+LeftHands = { LeftHand ("," LeftHand )+ #Tuple }
+Expressions = { Expression ("," Expression )+ #Tuple }
+
+MultiAssignment = LeftHands "=" (_MultiAssignment / _DestructAssignment)
+
+_MultiAssignment = {
+    left:^
+    right: Expressions
+    #MultiAssignment
+}
+
+_DestructAssignment = {
+    left:^
+    right: Expression
+    #DestructAssignment
+}
+
+SelfAssignment = {
+    left: LeftHand
+    name: SelfAssignOp
+    right: Expression
+    #SelfAssignment
+}
+
+SelfAssignOp = {
+    ('<<' / '>>' / '**' / '//' / '-' / [+*/%&|^＋＝＊／％＆｜＾×÷]) '='
+} _
+
+
+/* Expression */
+
+Expression = Operator _IfExpr? _ForExpr*
+
+_IfExpr = {
+    then:^  
+    "if" cond: Expression 
+    "else" else: Expression 
+    #IfExpr 
+}
+
+_ForExpr = {
+    append:^  
+    "for" each: Expression 
+    "in" iter: Expression 
+    ("if" cond: Expression )?
+    #ForExpr 
+}
+
+Operator = OrExpr
+
+OrExpr =
+	AndExpr ( {left:^ OR _ right: AndExpr #Or })*
+
+OR = 'or' !W / '||'
+
+AndExpr =
+	NotExpr ( {left:^ AND _ right: NotExpr #And })*
+
+AND = 'and' !W / '&&'
+
+NotExpr =
+	{ NOT _ NotExpr #Not } / EqExpr
+
+NOT = 'not' !W / '!' / '！'
+
+EqExpr =
+    / { SumExpr Eq SumExpr (Eq SumExpr )+ #PyCompr }
+	/ SumExpr {left:^  name: Eq right: SumExpr #Infix }*
+
+Eq = { EQ #Name } _
+
+EQ =
+	/ '==' '='? / '＝＝' 
+	/ '!=' '='? / '！＝' / '≠'
+	/ '<=' !'=' / '＜＝' / '≦'
+	/ '>=' !'=' / '＞＝' / '≧'
+	/ '<'  !'<' / '＜' !'＜'
+	/ '>'  !'>' / '＞' !'＞'
+    / '=' !'='  / '＝' !'＝'
+    / ':=' !'='
+    / ('not' !W _)? 'in' !W
+    / 'is' !W (_ 'not' !W)?
+
+SumExpr =
+	ProdExpr (left:^ { name: { SUM #Name } _ right: ProdExpr #Infix })*
+
+SUM = [+\-|＋ー｜]
+
+ProdExpr =
+	PowExpr (left:^ { name: { PROD #Name } _ right: PowExpr #Infix })*
+
+PROD =
+    / '//' / '<<' / '>>' / '／／' / '＜＜' / '＞＞'
+	/ [*/%^&＊・／％＾＆×÷]
+
+PowExpr = UnaryExpr (left:^ { name: { '**' #Name } _ right: UnaryExpr #Infix })*
+
+UnaryExpr
+	= { name: {PRE #Name } _ expr: UnaryExpr #Unary }
+    / SuffixExpr
+
+PRE = [+\-~＋ー〜]
+
+SuffixExpr =
+	Primary (
+	    recv:^ { "." name: Name "(" params: Arguments __ ")" #MethodExpr }
+	    / recv:^ { "." name: Name #GetExpr }
+	    / name:^ { "(" params: Arguments __ ")"  #ApplyExpr }
+        / recv:^ { "[" (left: Expression)? ":" (right: Expression)? "]" #Slice }
+	    / recv:^ { "[" index: Expression "]" #IndexExpr }
+	)*
+
+Arguments = { 
+    Argument? ("," __ Argument )*
+    #Arguments
+}
+
+Argument = 
+    / { Name "=" Expression #Option }
+    / ListArgument
+    / Expression
+
+ListArgument = {
+    { '*' '*'? #Prefix } _ 
+    Expression
+    #ListArgument
+}
+
+/* Primary */
+
+Primary =
+    / GroupExpr / TupleExpr / ListExpr / DataExpr
+    / Constant
+    / Name
+
+GroupExpr = 
+    { "(" Expression ")" #Group }
+
+TupleExpr =
+    { "(" Expression ( ("," __ Expression)+  __ / ",")  ")" #Tuple }
+
+ListExpr = { "[" (Expression ("," __ Expression)* )? ","?  __ "]" #List }
+
+DataExpr = { "{" (KeyValue ("," __ KeyValue)*)? ","? __ "}" #Data }
+
+KeyValue = {
+	name: (Name/StringExpr/CharExpr)
+	":"
+	value: Expression
+	#KeyValue
+}
+
+/* Name, Identifier */
+
+Name = Identifier 
+
+Identifier = {
+    NAME
+    #Name
+} _
+
+Names = { Name ("," Name)* #Names }
+
+NAME = [A-Za-z_] W*
+W = [A-Za-z0-9_]
+
+NSName = {
+    NAME ('.' W)*
+    #Name
+} _ 
+
+/* Literal */
+
+Constant =
+    / FormatString
+    / LongString
+    / StringExpr {^ "*" Expression #Mul}?
+	/ CharExpr
+	/ Number
+	/ TrueExpr
+	/ FalseExpr
+	/ NullExpr
+
+FormatString = [Ff] (
+    '\'\'\'' { FormatContent3* #Format } '\'\'\''
+    / '\'' { FormatContent1* #Format } '\''
+    / '"""' { FormatContent3D* #Format } '"""'
+    / '"' { FormatContent1D* #Format } '"' ) _
+
+FormatContent3 =
+    '{' Expression '}' / { (!'\'\'\'' !'{' .)* #StringPart }
+
+FormatContent1 =
+    '{' Expression '}' / { (!'\'' !'{' .)* #StringPart }
+
+FormatContent3D =
+    '{' Expression '}' / { (!'"""' !'{' .)* #StringPart }
+
+FormatContent1D =
+    '{' Expression '}' / { (!'"' !'{' .)* #StringPart }
+
+LongString = 
+    '\'\'' { '\'' ( ESCAPE / ![\\'] . / !'\'\'\'' '\'' )* '\'' #MultiString } '\'\'' _
+    / '""' { '"' ( ESCAPE / ![\\"] . / !'"""' '"' )* '"' #MultiString } '""' _
+
+StringExpr = 
+    / { '"' STRING* '"' #String } _
+    / DQ { ZSTRING* #ZString } DQ _
+
+CharExpr = 
+    / { '\'' CHAR* '\'' #String } _
+    / SQ {  ZCHAR* #ZChar } SQ _
+
+SQ = ['’‘＇]
+DQ = ["”“＂]
+STRING = ESCAPE / ![\"\n\\] .
+CHAR   = ESCAPE / !['\n\\] .
+ZSTRING = ESCAPE / !DQ ![\n\\] .
+ZCHAR   = ESCAPE / !SQ ![\n\\] .
+
+ESCAPE =
+	'\\' ['\"\\bfnrt]
+	/ '\\' [0-3] [0-7] [0-7]
+    / '\\' [0-7] [0-7]
+    / '\\' [0-7]
+	/ '\\' [uU] HEX HEX HEX HEX
+
+/* Number,Unit */
+
+Number = FloatExpr / IntExpr
+
+IntExpr = {
+	(HEXADECIMAL / BINARY / DECIMAL )
+	#Int
+} _
+
+DECIMAL = !'_' DIGIT ( DIGIT )*
+HEXADECIMAL = '0' [xX] HEX ( '_'* HEX )*
+BINARY = '0' [bB] [01] ( '_'* [01] )*
+DIGIT = [0-9０-９_]
+HEX = [a-fA-F0-9]
+LONG_SUFFIX = [lL]
+
+FloatExpr = {
+	FLOAT #Double
+} _
+
+FLOAT = !'_' (
+	FRACTION EXPONENT? / DIGIT+ EXPONENT
+)
+
+FRACTION =
+	/ DIGIT* "." !'_' DIGIT+
+    / DIGIT DIGIT* "." !'.'
+
+EXPONENT =
+	[eE] [+\-]? !'_' DIGIT+
+
+/* Const */
+
+TrueExpr  = { [Tt] 'rue' !W #True } _
+FalseExpr = { [Ff] 'alse' !W #False } _
+NullExpr  = { ('None' / 'null') !W #Null } _
+
+//W     = [ァ-ヶ㐀-䶵一-龠々〇〻Ａ-Ｚー]
+//DIGIT = [０-９]
+
+"{" = [{｛] __
+"}" = [}｝] _
+"[" = [[［] __
+"]" = [\]］] _
+"(" = [(（] __
+")" = [)）] _
+"=" = [=＝] ![=＝] _
+"." = [.．。] _
+"," = [,，、] _
+";" = ([;；] _)+
+":" = [:：] _
+"_" = [_＿]
+
+/* Code Layout */
+
+EOF          = !.
+LF           = '\n' / EOF
+S            = [ \t\u200B\v\r　]
+
+_            = ( S / BLOCKCOMMENT )*
+__           = ( S / '\n' / BLOCKCOMMENT )*
+SPC          = ( S / BLOCKCOMMENT )+
+
+BLOCKCOMMENT = '/*' ( !'*/' . )* '*/'
+
+
+example Statement '''
+a,b = b,a
+'''
+
+example Statement '''
+a,b = b
+'''
