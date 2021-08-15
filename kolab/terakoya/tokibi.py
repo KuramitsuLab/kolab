@@ -6,6 +6,15 @@ import random
 # from . import verb
 import verb
 
+# オプション
+
+OPTION = {
+    '--random': True,
+    '--single': False, # ひとつしか選ばない (DAはオフ)
+    '--order': False, # 順序も入れ替える
+    '--short': False # 短い類義語を選ぶ
+}
+
 def verb_emit(base, vpos=None, mode=0):
     if vpos is None:
         base, vpos, mode = verb_parse(base)
@@ -19,49 +28,9 @@ def verb_parse(s):
         return prefix+base, vpos, mode
     return s, None, None
 
-
-
 EMPTY = tuple()
 DEBUG = False
 
-# オプション
-
-OPTION = {
-    'Simple': False,  # シンプルな表現を優先する
-    'Block': False,  # Expressionに <e> </e> ブロックをつける
-    'EnglishFirst': False,  # 英訳の精度を優先する
-    'ShuffleSynonym': True,  # 同音異議語をシャッフルする
-    'MultipleSentence': False,  # 複数行モード
-    'ShuffleOrder': True,  # 順序も入れ替える
-    'Verbose': True,  # デバッグ出力あり
-}
-
-RandomIndex = 0
-
-def randomize():
-    global RandomIndex
-    if OPTION['ShuffleSynonym']:
-        RandomIndex = random.randint(1, 1789)
-    else:
-        RandomIndex = 0
-
-
-def random_index(arraysize: int, seed):
-    if OPTION['ShuffleSynonym']:
-        return (RandomIndex + seed) % arraysize
-    return 0
-
-
-def alt(s: str):
-    if '|' in s:
-        ss = s.split('|')
-        if OPTION['EnglishFirst']:
-            return ss[-1]  # 最後が英語
-        return filter_synonym_annotation(ss[random_index(len(ss), len(s))])
-    return s
-
-def choice(ss: list):
-    return ss[random_index(len(ss), 17)]
 
 # 異音同義語
 
@@ -94,6 +63,36 @@ def update_synonyms(synonyms, key, value):
     if key2 not in values:
         values.append(key2)
     synonyms[key] = encode_synonyms(values)
+
+RandomIndex = 0
+
+def randomize():
+    global RandomIndex
+    if OPTION['--random']:
+        RandomIndex = random.randint(1, 1789)
+    else:
+        RandomIndex = 0
+
+
+def random_index(arraysize: int, seed):
+    if OPTION['--random']:
+        return (RandomIndex + seed) % arraysize
+    return 0
+
+def choice(ss: list):
+    return ss[random_index(len(ss), 17)]
+
+
+def alt(s: str):
+    if '|' in s:
+        ss = decode_synonyms(s)
+        if OPTION['--random']:
+            return choice(ss)
+        if OPTION['--short']:
+            ss.sort(key=lambda x: len(x))
+            return ss[0]
+        return ss[0]
+    return s
 
 # NExpr
 
@@ -134,6 +133,8 @@ class NExpr(object):
                 ss.append(s)
             else:
                 c += 1
+        if OPTION['--single'] and len(ss) > 0:
+            ss = [ss[0]]
         return ss
 
 class NWord(NExpr):
@@ -253,7 +254,7 @@ class NOrdered(NExpr):
 
     def emit(self, buffers):
         subs = list(self.subs)
-        if OPTION['ShuffleOrder']:
+        if OPTION['--order']:
             random.shuffle(subs)
         for p in subs:
             p.emit(buffers)

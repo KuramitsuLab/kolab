@@ -1,7 +1,5 @@
 import sys
-import collections
 import tokibi
-
 
 def read_terakoya(filename, synonyms, dataset=None):
     if dataset is None:
@@ -62,6 +60,13 @@ if __name__ == '__main__':
         dataset=[]
         synonyms = {}
         for filename in sys.argv[1:]:
+            if filename.startswith('-'):
+                if '=' not in filename:
+                    filename += '=True'
+                key, value = filename.split('=')
+                tokibi.OPTION[key] = int(value) if value.isdigit() else value == 'True'
+                continue
             read_terakoya(filename, synonyms, dataset)
         write_tsv(dataset, synonyms)
+        print(tokibi.OPTION)
 
