@@ -1,6 +1,8 @@
 import torch
 import torchtext
 import torch.nn as nn
+from torch.nn import (TransformerEncoder, TransformerDecoder,
+                      TransformerEncoderLayer, TransformerDecoderLayer)
 from torchtext.vocab import Vocab, build_vocab_from_iterator
 from torchtext.utils import unicode_csv_reader
 from torchtext.data.datasets_utils import _RawTextIterableDataset
@@ -9,11 +11,42 @@ from typing import Iterable, List
 import sentencepiece as spm
 import io
 import math
+import pandas as pd
+import csv
+from sklearn.model_selection import train_test_split
 
 UNK_IDX, PAD_IDX, SOS_IDX, EOS_IDX = 0, 1, 2, 3
 
-from torch.nn import (TransformerEncoder, TransformerDecoder,
-                      TransformerEncoderLayer, TransformerDecoderLayer)
+# tsv ファイルから train/valid/test それぞれのファイルを作成する関数
+def from_tsv(f_path):
+  df = pd.read_table(f_path, header=None)
+  # 欠損値の削除
+  df = df.dropna()
+  print('BEFORE', df.shape)
+
+  # 重複データの削除
+  df.drop_duplicates(inplace=True)
+  df = df.reset_index(drop=True)
+  print('AFTER_drop', df.shape)
+
+  # データ数の調整
+  # df = df.iloc[range(2674), :]
+  # print('AFTER_iloc', df.shape)
+
+  df_train, df_test = train_test_split(df, test_size=0.3, random_state=42)
+  df_valid, df_test = train_test_split(df_test, test_size=0.5, random_state=42)
+
+  df_train.to_csv('data/train.tsv', header=False, index=False, sep='\t', quoting=csv.QUOTE_NONE, doublequote=False, escapechar='\\')
+  df_valid.to_csv('data/valid.tsv', header=False, index=False, sep='\t', quoting=csv.QUOTE_NONE, doublequote=False, escapechar='\\')
+  df_test.to_csv('data/test.tsv', header=False, index=False, sep='\t', quoting=csv.QUOTE_NONE, doublequote=False, escapechar='\\')
+
+  NUM_LINES = {
+      'train': len(df_train),
+      'valid': len(df_valid),
+      'test': len(df_test),
+  }
+
+  return NUM_LINES
 
 class Seq2SeqTransformer(nn.Module):
     def __init__(self, 
