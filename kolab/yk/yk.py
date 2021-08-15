@@ -1,46 +1,92 @@
+from os import read
 import sys
 import pegtree as pg
 import csv
 
+from pegtree.optimizer import optimize
+
 peg = pg.grammar('yk.tpeg')
 parse = pg.generate(peg)
 
-VAR = 'ABCDEFEGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+VAR_literal = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+NAME_literal = 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ'
+VAL_literal = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
 
-def replace_as_special_parameter(s, mapped):
+OPTION = {
+    '--notConv': False,
+    '--diff': False,
+    '--reverse': False,
+}
+
+def replace_as_special_parameter(s, mapped, tag=None):   # mapped => {'df': '<A>'}
     if s in mapped:
         return mapped[s]
-    x = '<' + VAR[len(mapped)] +'>' #辞書
+
+    if tag == 'Name':
+        x = '<' + NAME_literal[len(mapped)] +'>' #辞書
+    elif tag == 'Value':
+        x = '<' + VAL_literal[len(mapped)] +'>' #辞書
+    else:
+        x = '<' + VAR_literal[len(mapped)] +'>' #辞書
+
     mapped[s] = x
     return x
 
-def convert_nothing(tok, doc, mapped):
+def convert_nothing(tok, doc, mapped, diff):
     s = str(tok)
     if s == ';':  # ; だけはセミコロンに変える
         return '<sep>'
     return s
 
-def convert_all(tok, doc, mapped):
+def convert_all(tok, doc, mapped, diff):
     tag = tok.getTag()
     s = str(tok)
-    if tag == 'Name':
-        if s in doc:  # 変数名の特殊記号化
-            return replace_as_special_parameter(s, mapped)
-        else:
-            if s.startswith('.'):
-                s = '. ' + s[1:]
-            return s
-    if tag == 'Value' and s in doc: # 値リテラルの特殊記号化
-        return replace_as_special_parameter(s, mapped)
-    return convert_nothing(tok, doc, mapped)
+    # print('@@', s, tag)
+    if diff:
+        if tag == 'Name':
+            if s in doc:
+                return replace_as_special_parameter(s, mapped, tag='Name')
+            else:
+                if s.startswith('.'):
+                    s = '. ' + s[1:]
+                return s
+        if tag == 'Value':
+            # print(f"@@val '{s[1:-1]}'")
+            if s in doc:
+                return replace_as_special_parameter(s, mapped, tag='Value')
+            s_q1 = f"'{s[1:-1]}'"
+            if s_q1 in doc:
+                return replace_as_special_parameter(s_q1, mapped, tag='Value')
+            s_q2 = f'"{s[1:-1]}"'
+            if s_q2 in doc:
+                return replace_as_special_parameter(s_q2, mapped, tag='Value')
+    else:
+        if tag == 'Name':
+            if s in doc:
+                return replace_as_special_parameter(s, mapped)
+            else:
+                if s.startswith('.'):
+                    s = '. ' + s[1:]
+                return s
+        if tag == 'Value':
+            if s in doc:
+                return replace_as_special_parameter(s, mapped)
+            s_q1 = f"'{s[1:-1]}'"
+            if s_q1 in doc:
+                return replace_as_special_parameter(s_q1, mapped)
+            s_q2 = f'"{s[1:-1]}"'
+            if s_q2 in doc:
+                return replace_as_special_parameter(s_q2, mapped)
+    return convert_nothing(tok, doc, mapped, diff)
 
-def make(code, doc0, convert=convert_all):
-    #print('BEFORE', code, doc)
+def make(code, doc0, convert=convert_all, diff=False, reverse=False):
+    # print('BEFORE', code, doc)
     mapped = {}
     doc = []
-    flag=0
+    flag = 0
     for tok in parse(doc0):
         s = str(tok)
+        # TODO: この分岐の意味とflagの意味
         if tok.getTag() == 'Raw':
             q = f"'{s}'"
             q2 = f'"{s}"'
@@ -54,39 +100,86 @@ def make(code, doc0, convert=convert_all):
                 doc.append(q2)
                 flag=1
                 continue
-            print('@', s, code)
         doc.append(s)
-    #doc = [str(tok) for tok in parse(doc)]
-    ws = [convert(tok, doc, mapped) for tok in parse(code)]
+    ws = [convert(tok, doc, mapped, diff) for tok in parse(code)]
+    # print('@@ws', ws)
     code = ' '.join(ws)
+
+    if reverse:
+        reverse_stoken = {}
+        if convert == convert_all:
+            if diff:
+                cnt = 1
+                for k, v in mapped.items():
+                    if v[1] in NAME_literal:
+                        s_token = '<' + NAME_literal[len(mapped) - cnt] + '>'
+                    else:
+                        s_token = '<' + VAL_literal[len(mapped) - cnt] + '>'
+                    mapped[k] = s_token
+                    reverse_stoken[v] = s_token
+                    cnt += 1
+            else:
+                cnt = 1
+                for k, v in mapped.items():
+                    s_token = '<' + VAR_literal[len(mapped) - cnt] + '>'
+                    mapped[k] = s_token
+                    reverse_stoken[v] = s_token
+                    cnt += 1
+
+        # print('@@rd', reverse_stoken)
+        ws_rev = [reverse_stoken[tok] if tok in reverse_stoken else tok for tok in ws]
+        code = ' '.join(ws_rev)
+
+    # print('@@mp', mapped)
     ws = [mapped[tok] if tok in mapped else tok for tok in doc if tok.strip() != '']
     doc = ' '.join(ws)
-    # if flag == 1:
-    #     print('AFTER ', code, doc)
+
     return code, doc
 
-# make('open(a, "file.txt", "w")', '書き込みモードでファイル"file.txt"を開く')
-# make('a+b', 'aにbを足した値')
-# make('a[-1]', 'aの末尾')
-# make('while fib[-1] < 4000000:', 'fibの末尾要素が4000000未満の間繰り返し')
-# make('while fib[-1] < sin(x)', 'fibの末尾要素が_sin(x)未満の間、繰り返し')
-# make("data['名前'].values", "dataの'名前'カラムの配列")
-# make('temp=a;a=b;b=temp', 'aとbを入れ替える')
+def read_tsv(input_filename, output_filename=None):
+    with open(input_filename) as f:
+        reader = csv.reader(f, delimiter='\t')
+        if output_filename != None:
+            writer = csv.writer(output_filename, delimiter='\t')
 
-make('if a> 0: <blk>print(a)</blk>', 'もし`a`が正の数ならば`a`を表示する', convert_all)
-make('if a> 0: <blk>print(a)</blk>', 'もしaが正の数ならばaを表示する', convert_nothing)
-
-
-def read_tsv(filename):
-    with open(filename) as f:
-        with open('result_yk.tsv', 'w') as f2:
-            reader = csv.reader(f, delimiter='\t')
-            writer = csv.writer(f2, delimiter='\t')
-
-            for row in reader:
+        for row in reader:
+            code2 = None
+            if OPTION['--notConv']:
+                code, doc = make(row[0], row[1], convert=convert_nothing)
+            elif OPTION['--diff'] and OPTION['--reverse']:
+                code, doc = make(row[0], row[1], diff=True, reverse=False)
+                code2, doc2 = make(row[0], row[1], diff=True, reverse=True)
+            elif OPTION['--diff']:
+                code, doc = make(row[0], row[1], diff=True, reverse=False)
+            elif OPTION['--reverse']:
+                code, doc = make(row[0], row[1], diff=False, reverse=False)
+                code2, doc2 = make(row[0], row[1], diff=False, reverse=True)
+            else:
                 code, doc = make(row[0], row[1])
+            
+            if output_filename == None:
+                print(code, doc)
+                if code2 != None and code2 != code:
+                    print(code2, doc2)
+            else:
                 writer.writerow([code, doc])
+                if code2 != None and code2 != code:
+                    writer.writerow([code2, doc2])
 
 if __name__ == '__main__':
-    for f in sys.argv[1:]:
-        read_tsv(f)
+    if len(sys.argv) > 1:
+        for filename in sys.argv[1:]:
+            if filename.startswith('-'):
+                if '=' not in filename:
+                    filename += '=True'
+                key, value = filename.split('=')
+                OPTION[key] = int(value) if value.isdigit() else value == 'True'
+                continue
+
+            try:
+                read_tsv(filename, sys.stdout)
+            except:
+                read_tsv(filename)
+
+    else:
+        pass
