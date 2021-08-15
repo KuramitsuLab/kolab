@@ -4,6 +4,34 @@ from pegtree.visitor import ParseTreeVisitor
 import random
 # from . import verb
 import verb
+import gzip
+import shutil
+import sqlite3
+import pandas as pd
+import random
+from math import ceil
+
+#!wget "http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz" 
+
+with gzip.open('wnjpn.db.gz', 'rb') as f_in:
+    with open('wnjpn.db', 'wb') as f_out:
+        shutil.copyfileobj(f_in, f_out)
+
+
+conn = sqlite3.connect("wnjpn.db")
+q = 'SELECT synset,lemma FROM sense,word USING (wordid) WHERE sense.lang="jpn"'
+sense_word = pd.read_sql(q, conn)
+
+
+def get_synonyms(word):
+    synsets = sense_word.loc[sense_word.lemma == word, "synset"]
+    synset_words = set(sense_word.loc[sense_word.synset.isin(synsets), "lemma"])
+
+    if word in synset_words:
+        synset_words.remove(word)
+
+    return list(synset_words)
+
 
 def verb_emit(base, vpos=None, mode=0):
     if vpos is None:
@@ -107,7 +135,8 @@ class NWord(NExpr):
 
     def __init__(self, w):
         NExpr.__init__(self)
-        self.w = str(w)
+        self.w = '|'.join(get_synonyms(str(w)))
+        #self.w = str(w)
 
     def __repr__(self):
         # if DEBUG:
