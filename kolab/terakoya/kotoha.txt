@@ -1131,7 +1131,7 @@ sys.exit()
 sys.exit(0)
 プログラムを正常終了する
 
-sys.exit(1)
+sys.exit(1) 
 プログラムを異常終了する
 
 sys.setrecursionlimit(1000000)
