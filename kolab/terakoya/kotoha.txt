@@ -1136,7 +1136,7 @@ sys.exit(1)
 
 sys.setrecursionlimit(1000000)
 再帰エラーを防ぎたい
-再帰数の上限をあげる
+再帰の上限をあげる
 
 sys.argv[0]
 スクリプト名

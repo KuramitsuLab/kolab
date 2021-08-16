@@ -29,22 +29,28 @@ def read_terakoya(filename, synonyms, dataset=None):
             dataset.append((code, tuple(desc)))
     return dataset
 
+def emit_tsv(doc, code, file):
+    if tokibi.OPTION['--pyfirst']:
+        print(f'{code}\t{doc}', file=file)
+    else:
+        print(f'{doc}\t{code}', file=file)
+
 条件 = tokibi.parse('[もし|]X[ならば]|X[とき|場合]|')
 条件2 = tokibi.parse('[もし|]X[ならば]|Xの[とき|場合]|')
 
 def emit(doc, code, file):
     if doc.endswith('かどうか'):
-        print(f'{doc}\t{code}', file=file)
         tokibi.randomize()
         cond = doc[:-4]
+        emit_tsv(cond+tokibi.alt('かどうか|か否か|か|か'), code, file)
         if cond.endswith('る') or cond.endswith('い') or cond.endswith('た'):
             doc = tokibi.choice(条件.apply({'X': doc[:-4]}).generate())
         else:
             doc = tokibi.choice(条件2.apply({'X': doc[:-4]}).generate())
-        print(f'{doc}\tif {code}:', file=file)        
+        emit_tsv(doc, f'if {code}:', file)
     else:
-        print(f'{doc}\t{code}', file=file)
-
+        emit_tsv(doc, code, file)
+    
 def write_tsv(datasetset, synonyms, file=sys.stdout):
     for code, desc in datasetset:
         for d in desc:
