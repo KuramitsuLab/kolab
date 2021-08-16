@@ -18,7 +18,7 @@ def read_terakoya(filename, synonyms, dataset=None):
                 desc = []
                 continue
             if code is None and ord(line[0])>127 and '=' in line:
-                key, value = [s.strip() for s in line.split('=')]
+                key, value = [s.strip() for s in line.split('#')[0].split('=')]
                 tokibi.update_synonyms(synonyms, key, value)
                 continue
             if code is None:
@@ -68,5 +68,4 @@ if __name__ == '__main__':
                 continue
             read_terakoya(filename, synonyms, dataset)
         write_tsv(dataset, synonyms)
-        print(tokibi.OPTION)
 

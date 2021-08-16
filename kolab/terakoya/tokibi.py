@@ -279,26 +279,6 @@ class NClause(NExpr):  # 名詞節　〜する(verb)＋名詞(noun)
         verb.emit(buffers)
         noun.emit(buffers)
 
-class NParam(NExpr):
-    unit: str
-    def __init__(self, x, unit):
-        NExpr.__init__(self, (x,))
-        self.unit = unit
-
-    def __repr__(self):
-        if DEBUG:
-            return f'NParam({repr(self.subs[0])},{repr(self.unit)})'
-        return grouping(self.subs[0]) + f'({self.unit})'
-
-    def apply(self, dict_or_func=identity):
-        return NParam(self.subs[0].apply(dict_or_func), self.unit)
-
-    def emit(self, buffers):
-        inner = self.subs[0]
-        inner.emit(buffers)
-        if not isinstance(inner, NClause):
-            buffers.append(alt(self.unit))
-
 class NSuffix(NExpr):
     suffix: str
 
@@ -365,6 +345,32 @@ class NSymbol(NExpr):
 
     def emit(self, buffers):
         buffers.append(self.w)
+
+class NParam(NExpr):
+    unit: str
+    def __init__(self, x, unit):
+        NExpr.__init__(self, (x,))
+        self.unit = unit
+
+    def __repr__(self):
+        if DEBUG:
+            return f'NParam({repr(self.subs[0])},{repr(self.unit)})'
+        return grouping(self.subs[0]) + f'({self.unit})'
+
+    def apply(self, dict_or_func=identity):
+        return NParam(self.subs[0].apply(dict_or_func), self.unit)
+
+    def emit(self, buffers):
+        inner = self.subs[0]
+        if isinstance(inner, NSymbol):
+            if len(buffers) == 0: # prefixをつける
+                buffers.append(alt(self.unit+'|'))
+                inner.emit(buffers)
+            else:
+                inner.emit(buffers)
+        else:
+            inner.emit(buffers)
+
 
 peg = pg.grammar('tokibi.pegtree')
 tokibi_parser = pg.generate(peg)

@@ -16,7 +16,7 @@ xはyである
 スワップする=スワップする|入れ替える
 
 x, y = y, x
-xとy[の値|]を[スワップする|入れ替える]
+xとy[の値|]をスワップする
 
 x % 2 == 0
 xが偶数かどうか
@@ -161,24 +161,23 @@ xの浮動小数点数
 int(x)
 {xを変換した}整数値
 
-int(x, n)
-{xを/n進数として変換した}整数
+表記=表記|表現|の文字列
 
-二進数=２進数|2進数
-
-int(x, 2)
-{二進数xを変換した}整数
-{xを/二進数として変換した}整数
+int(s, 2)
+2進数[表記]sから整数に[変換|]する
+s(文字列)を/2進数として整数に[変換|]する
+{2進数[表記]sから変換した}整数
 
 コードポイント = 文字コード|コードポイント
 
-ord(c)  # cのコードポイント
+ord(c)
+cのコードポイント
 
 大きな方 = 大きな値|大きな方|最大値
 小さな方 = 小さな値|小さな方|最小値
 
 max(x)
-数列xの最大値
+x(数列)の最大値
 
 max(x, y)
 xとyの大きな方
@@ -187,7 +186,7 @@ max(x, y, z)
 x, y, zの最大値
 
 min(x)
-数列xの最小値
+x(数列)の最小値
 
 min(x, y)
 xとyの小さな方
@@ -214,19 +213,21 @@ round(x, n)
 xを少数部n桁[まで|で]丸める
 {xの少数部をn桁[まで|で]丸めた}整数
 
+の少数部=の少数|の少数部|
+
 math.trunc(x)
-xの少数部を切り捨てる
-{xの少数部を切り捨てた}整数
+x[の少数部]を切り捨てる
+{x[の少数部]を切り捨てた}整数
 
 math.floor(x)
-[数値|]xを切り上げる
+x[の少数部]を切り上げる
 x以下の最大[な|の]整数
-{xを切り上げた}整数
+{x[の少数部]を切り上げた}整数
 
 math.ceil(x)
-[数値|]xを切り捨てる
+x[の少数部]を切り捨てる
 x以上の最小[な|の]整数
-{xを切り捨てた}整数
+{x[の少数部]を切り捨てた}整数
 
 # 組み込み関数（文字列）
 
@@ -235,19 +236,19 @@ xを印字できる文字列にする
 xの印字可能な文字列
 
 bin(x)
-xを2進数[文字列|表記]にする
+xを2進数[表記]にする
 xの2進数文字列
 
 hex(x)
-xを16進数[文字列|表記]にする
+xを16進数[表記]にする
 xの16進数文字列
 
 oct(x)
-xを8進数[文字列|表記]にする
+xを8進数[表記]にする
 xの8進数文字列
 
 chr(c)
-[コードポイント|]cの文字
+c(コードポイント)の文字
 文字コードcを文字に[変換|]する
 
 repr(object)
@@ -265,7 +266,7 @@ iterableの全てが真かどうか
 any(iterable)
 iterableのいずれかが真かどうか
 
-順序=順番
+順序=順番|順序
 
 enumerate(x)
 xの[順序]数列
@@ -327,8 +328,11 @@ xからyまでのzごとによるスライス
 合計 = 合計値|総和|合計
 平均 = 平均値|平均
 
-sum(x)  # x(数列)の合計}整数値
-sum(x)/len(x)  # x(数列)の平均}整数値
+sum(x)
+x(数列)の合計
+
+sum(x)/len(x)
+x(数列)の平均
 
 タプル=組|タプル
 
@@ -352,56 +356,56 @@ dict(x)
 xの辞書
 
 dict[key]
-辞書 dictのキーkey
+dict(辞書)のkey(キー)の値
+dict(辞書)のkey(キー)を参照した値
 
 list(dict)
-辞書dictの[キー]一覧
+dict(辞書)の[キー]一覧
 
 len(dict)  # dictのエントリ数}整数値
-辞書dictの[エントリ]数
+dict(辞書)の[エントリ]数
 
 dict.clear()
-辞書dictの全[エントリ]を消去する
+dict(辞書)の全[エントリ]を消去する
 
 dict.copy()
-辞書dictの[浅い|]コピー
+dict(辞書)の[浅い|]コピー
 
 dict.get(key)
-辞書dictのキーkeyの値
+dict(辞書)のkey(キー)の値
 
 dict.get(key, x)
-辞書 dictのキーkeyの値、もし[存在し|]なければ x
+dict(辞書)のkey(キー)の値、もし[存在し|]なければ x
 
 dict.items()
-辞書dictの[エントリ]一覧
+dict(辞書)の[エントリ]一覧
 
 dict.keys()
-辞書dictの[キー]一覧
+dict(辞書)の[キー]一覧
 
 dict.pop(key)
-{辞書 dictのキーkeyを取り出した}値
+dict(辞書)のkey(キー)を取り出す
 
 dict.popitem()
-{dictから最後に追加したエントリを取り出した}値
+dict(辞書)から最後に追加したエントリを取り出す
 
 dict.setdefault(key, x)
 dict内にkey(エントリ)が[存在し|]なければ、そのエントリをxにする
 
 dict.update()
-辞書dictをアップデートする
+dict(辞書)をアップデートする
 
 dict.update(x)
-辞書dictをxでアップデートする
+dict(辞書)をxでアップデートする
 
 dict.values()
-辞書dictの値一覧
+dict(辞書)の値一覧
 
 dict | dict2
-{辞書 dict と dict2をマージした}辞書
+dict(辞書)とdict2をマージする
 
 dict |= dict2
-{辞書 dictにdict2を加えた}辞書
-辞書 dictにdict2を加える
+dict(辞書)に/dict2(辞書)を[追加する|加える]
 
 # 組み込み関数（バイト列、IO）
 
@@ -438,36 +442,34 @@ memoryview(x)
 xのメモリビュー
 
 オープンする = 開く@2|オープンする
-オープンした = 開いた@2|オープンした
+オープンして = 開いて@2|オープンして
 
 open(filename)
-ファイルfilenameをオープンする
-ファイルfilenameを[読む|読み込む]
-{ファイルfilenameをオープンした}ファイル
+filename(ファイル)をオープンする
+filename(ファイル)を[読む|読み込む]
+
+with open(filename) as f:
+filename(ファイル)をオープンし、fとする
+
+読み込みモードで=読み込み用に|読み込みモードで
+書き込みモードで=書き込み用に|保存用に|書き込みモードで
+追加モードで=追加用に|追加モードで
+バイナリモードで=バイナリ用に|バイナリモードで
 
 open(filename, 'r')
-{ファイルfilenameを読み込みモードでオープンした}ファイル
+filename(ファイル)を/[読み込みモードで]でオープンする
 
 open(filename, 'w')
-{filenameを/書き込みモードでオープンした}ファイル
+filename(ファイル)を/[書き込みモードで]オープンする
 
 open(filename, 'a')
-{filenameを/追加書き込みモードでオープンした}ファイル
+filename(ファイル)を/[追加モードで]オープンする
 
-_mode = 'r'
-読み込みモードを用いる
-
-_mode = 'w'
-書き込みモードを用いる
-
-_mode = 'a'
-追加モードを用いる
+open(filename, 'b')
+filename(ファイル)を/[バイナリモードで]オープンする
 
 _mode = 'b'
 バイナリモードを用いる
-
-#_mode = 'モード'
-#newline = '改行コード'
 
 _buffering = -1 
 バッファリングしない
@@ -520,44 +522,61 @@ eval(s)
 globals()
 グローバル変数の一覧 
 
-適用して = 用いて|適用して
-
 filter(function, x)
-{xを/{functionを適用して}フィルタした}リスト
+x(列)[のそれぞれ|の各要素|]を/function(関数)でフィルタする
 
 map(function, x)
-{xにそれぞれfunctionを適用した}リスト
+x(列)[のそれぞれ|の各要素|]を/function(関数)でマップする
 
 # 組み込み関数（オブジェクト）
 
 プロパティ=プロパティ@3|属性|フィールド
 
 delattr(x, attrname)
-[オブジェクト|]xの[プロパティ]attrnameを削除する
+x(オブジェクト)の[プロパティ]attrnameを削除する
 
 getattr(x, attrname)
-[オブジェクト|]xの[プロパティ]attrnameの値
+x(オブジェクト)の[プロパティ]attrnameの値
 
 hasattr(x, attrname)
-[オブジェクト|]xが[プロパティ]attrnameを持つかどうか
+x(オブジェクト)が[プロパティ]attrnameを持つかどうか
 
 setattr(x, attrname, y)
-[オブジェクト|]xの[プロパティ]attrnameの値をyにする
+x(オブジェクト)の[プロパティ]attrnameの値をyにする
 
 hash(x)
 xのハッシュ値
 
 isinstance(x, class1)
-xがclass1のインスタンスかどうか
+x(オブジェクト)がclass1[のインスタンス|]かどうか
+
+isinstance(x, (class1, class2))
+x(オブジェクト)がclass1[または]class2[のインスタンス|]かどうか
+
+isinstance(x, int)
+x(オブジェクト)が整数かどうか
+
+isinstance(x, float)
+x(オブジェクト)が浮動小数点数かどうか
+
+isinstance(x, str)
+x(オブジェクト)が文字列かどうか
+
+isinstance(x, list)
+x(オブジェクト)がリストかどうか
+
+isinstance(x, (list, tuple))
+x(オブジェクト)がリスト[または]タプルかどうか
 
 issubclass(class1, class2)
-class1がclass2のサブクラスかどうか
+class(クラス)がclass2のサブクラスかどうか
 
 id(x)
-xのユニークな識別値
+xのオブジェクト[識別子|ID]
+xの[ユニークな識別値|ポインタ]
 
 type(x)
-xの型
+xの[型|クラス|種類]
 
 # 整数
 
@@ -613,63 +632,80 @@ string.printable
 string.whitespace
 全空白文字
 
-str.capitalize()
-[文字列|]strをキャピタライズする
-{strをキャピタライズした}文字列
+s.capitalize()
+s(文字列)をキャピタライズする
+{s(文字列)をキャピタライズした}文字列
 
-str.casefold()
-[文字列|]strをケースフォルドする
-{strをケースフォルドした}文字列
+s.casefold()
+s(文字列)をケースフォルドする
+{s(文字列)をケースフォルドした}文字列
 
 中央寄せ=センタリング
 
-str.center(x)
-[文字列|]strを[中央寄せ]する
-{strを幅xで[中央寄せ]した}文字列
+s.center(x)
+s(文字列)を幅xで[中央寄せ]する
+{s(文字列)を幅xで[中央寄せ]した}文字列
 
-str.ljust(x)
-[文字列|]strを右寄せする
-{strを幅xで右寄せした}文字列
+s.ljust(x)
+s(文字列)を幅xで右寄せする
+{s(文字列)を幅xで右寄せした}文字列
 
-str.rjust(x)
-[文字列|]strを左寄せする
-{strを幅xで左寄せした}文字列
+s.rjust(x)
+s(文字列)を幅xで左寄せする
+{s(文字列)を幅xで左寄せした}文字列
 
 fillchar = c
 c(文字)で埋める
 
-str.count(sub)
-[文字列|]str内のsubを数える
-[文字列|]str内のsubの出現回数
+カウントする=数える|カウントする
 
-str.encode()
-[文字列|]strをバイト列に変換する
-{strから変換された}バイト列
+s.count(sub)
+s(文字列)内[の|に含まれる|に現れる]sub[の数|]をカウントする
+s(文字列)内のsubの出現回数
+
+s.encode()
+s(文字列)をバイト列に変換する
+{s(文字列)から変換された}バイト列
+
+s.encode(enc)
+s(文字列)を/enc(文字コード)でバイト列に変換する
+
+s.encode('shift-jis')
+s(文字列)を/SJISでバイト列に変換する
+
+エンコーディング=文字コード|エンコーディング
+
+_encoding='utf-8'
+[エンコーディング]は、'utf-8'を用いる
+
+_errors='ignore'
+[発生する|]エラーは無視する
+
 
 接頭辞=始まり|始端|プレフィックス
 始まる=開始する
 
-str.startswith(prefix)
-[文字列|]strがprefixで始まるかどうか
-[文字列|]strの[接頭辞]がsuffix[である|]かどうか
+s.startswith(prefix)
+s(文字列)がprefixで始まるかどうか
+s(文字列)の[接頭辞]がsuffix[である|]かどうか
 
 接尾辞=始まり|終端|サフィックス
 終わる=終了する
 
-str.endswith(suffix)
-[文字列|]strがsuffixで終わるかどうか
-[文字列|]strの[接尾辞]がsuffix[である|]かどうか
+s.endswith(suffix)
+s(文字列)がsuffixで終わるかどうか
+s(文字列)の[接尾辞]がsuffix[である|]かどうか
 
 置き換える=置換する
 置き換えた=置換した
 
-str.expandtabs()
-{[文字列|]strのタブ}を/空白で置き換える
-{{str内のタブ}を/空白で置き換えた}文字列
+s.expandtabs()
+{s(文字列)のタブ}を/空白で置き換える
+{{s(文字列)内のタブ}を/空白で置き換えた}文字列
 
-str.expandtabs(n)
-[文字列|]{str内のタブ}を/{n文字の空白}で置き換える
-{{str内のタブ}を/{n文字の空白}で置き換えた}文字列
+s.expandtabs(n)
+{s(文字列)内のタブ}を/{n文字の空白}で置き換える
+{{s(文字列)内のタブ}を/{n文字の空白}で置き換えた}文字列
 
 _tabsize = x  # タブは、空白x文字分とする
 
@@ -678,131 +714,130 @@ _tabsize = x  # タブは、空白x文字分とする
 内 = 内|の中|中
 位置@index=位置|インデックス
 
-str.find(sub)
-[文字列|]str内でsubを探す
-[文字列|]str内の[最初の|]subの位置@index
-{[文字列|]str内で/subが/[最初に|]見つかった}位置@index
+s.find(sub)
+s(文字列)内でsubを探す
+s(文字列)内の[最初の|]subの位置@index
+{s(文字列)内で/subが/[最初に|]見つかった}位置@index
 
-str.find(sub) >= 0
-{[文字列|]str内に/subがある}かどうか
-{[文字列|]str内で/subが見つかる}かどうか
+s.find(sub) >= 0
+{s(文字列)内に/subがある}かどうか
+{s(文字列)内で/subが見つかる}かどうか
 
-str.find(sub) == -1
-{[文字列|]str内に/subがない}かどうか
-{[文字列|]str内で/subが見つからない}かどうか
+s.find(sub) == -1
+{s(文字列)内に/subがない}かどうか
+{s(文字列)内で/subが見つからない}かどうか
 
-str.find(sub, start)
-{{str内を/startから探した}とき、subが/[最初に|]見つかった}位置@index
+s.find(sub, start)
+{{s(文字列)内を/startから探して}subが/[最初に|]見つかった}位置@index
 
-str.find(sub, start, end)
-{{str内を/startからendまで探した}とき、subが/[最初に|]見つかった}位置@index
+s.find(sub, start, end)
+{{s(文字列)内を/startからendまで探して}subが/[最初に|]見つかった}位置@index
 
-str.index(sub)
-{str内で/subが最初に見つかった}位置@index
+s.index(sub)
+{s(文字列)内で/subが[最初に|]見つかった}位置@index
 
-str.index(sub, start)
-{{str内を/startから探した}とき、subが/最初に 見つかった}位置@index
+s.index(sub, start)
+{{s(文字列)内を/startから探して}subが/[最初に|]見つかった}位置@index
 
-str.index(sub, start, end)
-{{str内を/startからendまで探した}とき、subが/最初に 見つかった}位置@index
+s.index(sub, start, end)
+{{s(文字列)内を/startからendまで探して}subが/[最初に|]見つかった}位置@index
 
-str.rfind(sub)
-str内でsubが最後に見つかった}位置@index
+s.rfind(sub)
+{s(文字列)内でsubが最後に見つかった}位置@index
 
-str.rfind(sub, start)
-{{str内をstartから探した}とき、subが最後に 見つかった}位置@index
+s.rfind(sub, start)
+{{s(文字列)内をstartから探して}subが最後に見つかった}位置@index
 
-str.rfind(sub, start, end)
-{{str内をstartからendまで探した}とき、subが最後に 見つかった}位置@index
+s.rfind(sub, start, end)
+{{s(文字列)内をstartからendまで探して}subが最後に見つかった}位置@index
 
-str.rindex(sub)
-{str内でsubが最後に 見つかった}位置@index
+s.rindex(sub)
+{s(文字列)内でsubが最後に見つかった}位置@index
 
-str.rindex(sub, start)
-{{str内をstartから探した}とき、subが最後に 見つかった}位置@index
+s.rindex(sub, start)
+{{s(文字列)内をstartから探して}subが最後に 見つかった}位置@index
 
-str.rindex(sub, start, end)
-{{str内を/startからendまで 探した}とき、subが最後に 見つかった}位置@index
+s.rindex(sub, start, end)
+{{s(文字列)内を/startからendまで探して}subが最後に 見つかった}位置@index
 
 フォーマットする = 整形する|フォーマットする
 フォーマットする = 整形した|フォーマットした
 
-テンプレ@=書式|テンプレート|テンプレ|
+テンプレ=書式|テンプレート|テンプレ
 
 fmt.format(x)
-[テンプレ@]fmtを/xでフォーマットする
-{[テンプレ@]fmtを/xでフォーマットした}文字列
+fmt(テンプレを/xでフォーマットする
+{fmt(テンプレ)を/xでフォーマットした}文字列
 
 fmt.format(x, y)
-[テンプレ@]fmtを/{xとy}でフォーマットする
-{[テンプレ@]fmtに/{xとy}をフォーマットした}文字列
+fmt(テンプレ)を/{xとy}でフォーマットする
+{fmt(テンプレ)に/{xとy}をフォーマットした}文字列
 
 fmt.format(x, y, z)
-[テンプレ@]fmtを/{x, y, z}でフォーマットする
-{[テンプレ@]fmtに/{x, y, z}をフォーマットした}文字列
+fmt(テンプレ)を/{x, y, z}でフォーマットする
+{fmt(テンプレ)に/{x, y, z}をフォーマットした}文字列
 
 アルファベット = アルファベット|英字
 
-str.isalnum()
-[文字列|]strが[英数字]かどうか
+s.isalnum()
+s(文字列)が[英数字]かどうか
 
-str.isalpha()
-[文字列|]strが[アルファベット]かどうか
+s.isalpha()
+s(文字列)が[アルファベット]かどうか
 
-str.isascii()
-[文字列|]strが[ASCII文字]かどうか
+s.isascii()
+s(文字列)が[ASCII文字]かどうか
 
-str.isdecimal()
-[文字列|]strが数字かどうか
+s.isdecimal()
+s(文字列)が数字かどうか
 
-str.isdigit()
-[文字列|]strが数字かどうか
+s.isdigit()
+s(文字列)が数字かどうか
 
-str.isidentifier()
-[文字列|]strが[識別子文字]かどうか
+s.isidentifier()
+s(文字列)が[識別子文字]かどうか
 
-str.islower()
-[文字列|]strが[英小文字]かどうか
+s.islower()
+s(文字列)が[英小文字]かどうか
 
-str.isnumeric()
-[文字列|]strが[数字]かどうか
+s.isnumeric()
+s(文字列)が[数字]かどうか
 
-str.isprintable()
-[文字列|]strが印字可能かどうか
-[文字列|]strが印字できるかどうか
+s.isprintable()
+s(文字列)が印字[可能|できる]かどうか
 
-str.isspace()
-[文字列|]strが空白かどうか
+s.isspace()
+s(文字列)が空白かどうか
 
-str.istitle()
-[文字列|]strがタイトルケース文字列かどうか
+s.istitle()
+s(文字列)がタイトルケース文字列かどうか
 
-str.isupper()
-[文字列|]strが英大文字かどうか
+s.isupper()
+s(文字列)が英大文字かどうか
 
 ジョインする = 結合する@3|連結する@3|ジョインする
 ジョインした = 結合した@3|連結した@3|ジョインした
 
-str.join(x)
-{[文字列リスト|]x[のそれぞれ|各要素|]}を/[文字列|]strでジョインする
-{xの間に{[文字列|]strを入れて}ジョインした}文字列
+s.join(x)
+{[文字列リスト|]x[のそれぞれ|各要素|]}を/s(文字列)でジョインする
+{xの間に{s(文字列)を入れて}ジョインした}文字列
 
 ''.join(x)
 {[文字列リスト|]x[のそれぞれ|各要素|]}をジョインする
-{xの間に{[文字列|]strを入れて}ジョインした}文字列
+{xの間に{s(文字列)を入れて}ジョインした}文字列
 
-str.join(str(x) for x in a)
-aを文字列に変換して[文字列|]strでジョインする
-{aを文字列に変換して[文字列|]strでジョインした}文字列
+s.join(str(x) for x in a)
+aを文字列に変換してs(文字列)でジョインする
+{aを文字列に変換してs(文字列)でジョインした}文字列
 
 英大文字=大文字
 英小文字=小文字
 
-str.lower()
+s.lower()
 strの[英小文字]
 英[小文字化]したstr
 
-str.upper()
+s.upper()
 strの英[大文字]
 [英大文字]化したstr
 
@@ -818,80 +853,80 @@ _chars = '文字集合'
 先頭=前
 末尾=後ろ
 
-str.lstrip()
-[文字列|]strの先頭から/[余分な]空白を除去する
-{strの先頭から/[余分な]空白を除去した}文字列
+s.lstrip()
+s(文字列)の先頭から/[余分な]空白を除去する
+{s(文字列)の先頭から/[余分な]空白を除去した}文字列
 
-str.lstrip(chars)
-[文字列|]strの先頭から/charsを除去する
-{strの先頭から/charsを除去した}文字列
+s.lstrip(chars)
+s(文字列)の先頭から/charsを除去する
+{s(文字列)の先頭から/charsを除去した}文字列
 
-str.rstrip()
-[文字列|]strの末尾から/空白を除去する
-{strの末尾から/空白を除去した}文字列
+s.rstrip()
+s(文字列)の末尾から/空白を除去する
+{s(文字列)の末尾から/空白を除去した}文字列
 
-str.rstrip(chars)
-[文字列|]strの末尾から/charsを除去する
-{strの末尾から/charsを除去した}文字列
+s.rstrip(chars)
+s(文字列)の末尾から/charsを除去する
+{s(文字列)の末尾から/charsを除去した}文字列
 
-str.strip()
-[文字列|]strの先頭と末尾から/[余分な]空白を除去する
-{strの先頭と末尾から/[余分な]空白を除去した}文字列
+s.strip()
+s(文字列)の先頭と末尾から/[余分な]空白を除去する
+{s(文字列)の先頭と末尾から/[余分な]空白を除去した}文字列
 
-str.strip(chars)
-[文字列|]strの先頭と末尾から/charsを除去する
-{strの先頭と末尾から/charsを除去した}文字列
+s.strip(chars)
+s(文字列)の先頭と末尾から/charsを除去する
+{s(文字列)の先頭と末尾から/charsを除去した}文字列
 
-str.partition(sep)
-{strを/sepでパーティションした}タプル
+s.partition(sep)
+{s(文字列)を/sepでパーティションした}タプル
 
-str.partition(sep)
-{strを/末尾から/sepでパーティションした}タプル
+s.partition(sep)
+{s(文字列)を/末尾から/sepでパーティションした}タプル
 
-str.removeprefix(prefix)
-{strの先頭から/prefixを取り除いた}文字列
+s.removeprefix(prefix)
+{s(文字列)の先頭から/prefixを取り除いた}文字列
 
-str.removesuffix(suffix)
-{strの末尾から/suffixを取り除いた}文字列
+s.removesuffix(suffix)
+{s(文字列)の末尾から/suffixを取り除いた}文字列
 
-str.replace(sub, s2)
-[文字列|]str[内]のsubを[全て|]/s2に置き換える
-{str[内]のsubを[全て|]/s2に置き換えた}文字列
+s.replace(sub, s2)
+s(文字列)[内]のsubを[全て|]/s2に置き換える
+{s(文字列)[内]のsubを[全て|]/s2に置き換えた}文字列
 
-str.replace(sub, '')
-[文字列|]str[内]のsubを/[全て|]取り除く
-{str[内]のsubを/[全て|]取り除いた}文字列
+s.replace(sub, '')
+s(文字列)[内]のsubを/[全て|]取り除く
+{s(文字列)[内]のsubを/[全て|]取り除いた}文字列
 
 スプリットする = 分割する|分ける|区切る|スプリットする
 スプリットした = 分割した|分けた|区切った|スプリットした
 区切り = 区切り|区切り記号|
 
-str.split(sep)
-[文字列|]strを/[区切り]sepでスプリットする
-[文字列|]strを/{sepで区切って}リストにする
-{strを/[区切り]sepでスプリットした}文字列リスト
+s.split(sep)
+s(文字列)を/[区切り]sepでスプリットする
+s(文字列)を/{sepで区切って}リストにする
+{s(文字列)を/[区切り]sepでスプリットした}文字列リスト
 
-str.rsplit(sep)
-[文字列|]strを/[区切り]sepで[右|後ろ]から スプリットする
-#{strを/[区切り]sepで[右|後ろ]から　スプリットした}文字列リスト
+s.rsplit(sep)
+s(文字列)を/[区切り]sepで[右|後ろ]から スプリットする
+#{s(文字列)を/[区切り]sepで[右|後ろ]から　スプリットした}文字列リスト
 
-str.split(sep)[0]
-[文字列|]strの[区切り]sepより前の[文字列|部分]
+s.split(sep)[0]
+s(文字列)の[区切り]sepより前の[文字列|部分]
 
-str.split(sep)[-1]
-[文字列|]strの[区切り]sepより後の[文字列|部分]
+s.split(sep)[-1]
+s(文字列)の[区切り]sepより後の[文字列|部分]
 
 _maxsplit = '最大分割回数'
 
 _convtable = '変換表'
 
-str.translate(convtable)
-[文字列|]str[の文字|]を/[変換表|]convtableで変換する
-{str[の文字]を/[変換表|]convtableで変換した}文字列
+s.translate(convtable)
+s(文字列)[の文字|の各文字|のそれぞれの文字]を/[変換表|]convtableで変換する
+{s(文字列)[の文字]を/[変換表|]convtableで変換した}文字列
 
-str.zfill(x)  
-[文字列|]strの[長さ|大きさ|サイズ]をxにする
-{strを/{幅xになる}ように'0'文字で埋めた}文字列
+s.zfill(x)  
+s(文字列)の[長さ|大きさ|サイズ]をxにする
+{s(文字列)を/{幅xになる}ように'0'文字で埋めた}文字列
 
 
 ##
