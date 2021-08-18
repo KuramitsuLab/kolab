@@ -335,11 +335,14 @@ class NSymbol(NExpr):
 
     def apply(self, dict_or_func=identity):
         if isinstance(dict_or_func, dict):
+            mapped = self
             if self.index in dict_or_func:
-                return dict_or_func[self.index]
-            if self.w in dict_or_func:
-                return dict_or_func[self.w]
-            return self
+                mapped = dict_or_func[self.index]
+            elif self.w in dict_or_func:
+                mapped = dict_or_func[self.w]
+            if not isinstance(mapped, NExpr):
+                mapped = NWord(str(mapped))
+            return mapped
         else:
             return dict_or_func(self)
 
