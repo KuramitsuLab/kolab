@@ -576,43 +576,43 @@ class CodeParser(ParseTreeVisitor):
         print(repr(tree))
         raise RuntimeError
 
-# cmatch
+# # cmatch
 
-def cmatch(cpat, code, mapped: dict):
-        if cpat.__class__ is not code.__class__:
-            return False
-        if cpat.name != code.name or len(cpat.params) != len(code.params):
-            return False
-        for e, e2 in zip(cpat.params, code.params):
-            # print(':: ', type(e), e, type(e2), e2)
-            if isinstance(e, CMetaVar):
-                if e.index in mapped:
-                    if str(mapped[e.index]) != str(e2):
-                        return False
-                    else:
-                        continue
-                mapped[e.index] = e2
-                continue
-            if isinstance(e, CValue) and isinstance(e2, CValue):
-                if e.value != e2.value:
-                    return False
-                continue
-            if not cmatch(e, e2, mapped):
-                return False
-        for opat in cpat.options:
-            option = code.getoption(opat.name)
-            if option is None:
-                return False
-            if not cmatch(opat, option, mapped):
-                return False
-        if len(code.options) > 0:
-            os = []
-            for option in code.options:
-                opat = cpat.getoption(option.name)
-                if opat is None:
-                    os.append(option)
-            mapped['options'] = os
-        return True
+# def cmatch(cpat, code, mapped: dict):
+#         if cpat.__class__ is not code.__class__:
+#             return False
+#         if cpat.name != code.name or len(cpat.params) != len(code.params):
+#             return False
+#         for e, e2 in zip(cpat.params, code.params):
+#             # print(':: ', type(e), e, type(e2), e2)
+#             if isinstance(e, CMetaVar):
+#                 if e.index in mapped:
+#                     if str(mapped[e.index]) != str(e2):
+#                         return False
+#                     else:
+#                         continue
+#                 mapped[e.index] = e2
+#                 continue
+#             if isinstance(e, CValue) and isinstance(e2, CValue):
+#                 if e.value != e2.value:
+#                     return False
+#                 continue
+#             if not cmatch(e, e2, mapped):
+#                 return False
+#         for opat in cpat.options:
+#             option = code.getoption(opat.name)
+#             if option is None:
+#                 return False
+#             if not cmatch(opat, option, mapped):
+#                 return False
+#         if len(code.options) > 0:
+#             os = []
+#             for option in code.options:
+#                 opat = cpat.getoption(option.name)
+#                 if opat is None:
+#                     os.append(option)
+#             mapped['options'] = os
+#         return True
 
 
 class BTModel(ParseTreeVisitor):
@@ -667,8 +667,45 @@ class BTModel(ParseTreeVisitor):
         #print('adding', name, (size, cpat, pred))
         self.rules[name].append((size, cpat, pred))
 
-    def predict(self, source: str) -> tuple:
+    def cmatch(self, cpat, code, mapped: dict):
+        if cpat.__class__ is not code.__class__:
+            return False
+        if cpat.name != code.name or len(cpat.params) != len(code.params):
+            return False
+        for e, e2 in zip(cpat.params, code.params):
+            # print(':: ', type(e), e, type(e2), e2)
+            if isinstance(e, CMetaVar):
+                if e.index in mapped:
+                    if str(mapped[e.index]) != str(e2):
+                        return False
+                    else:
+                        continue
+                mapped[e.index] = e2
+                continue
+            if isinstance(e, CValue) and isinstance(e2, CValue):
+                if e.value != e2.value:
+                    return False
+                continue
+            if not self.cmatch(e, e2, mapped):
+                return False
+        for opat in cpat.options:
+            option = code.getoption(opat.name)
+            if option is None:
+                return False
+            if not self.cmatch(opat, option, mapped):
+                return False
+        if len(code.options) > 0:
+            os = []
+            for option in code.options:
+                opat = cpat.getoption(option.name)
+                if opat is None:
+                    os.append(option)
+            mapped['options'] = os
+        return True
+
+    def predict(self, source: str, nested=True) -> tuple:
         code = self.reader.parse(source)
+        results = []
         name = code.name
         # print('matching', name)
         # if len(code.params) > 0:  # レシーバの型を調べる
@@ -685,15 +722,18 @@ class BTModel(ParseTreeVisitor):
             for _, pat, pred in self.rules[name]:
                 mapped = {}
                 # print(f'trying {name}.. ', pat, type(code), code)
-                if cmatch(pat, code, mapped):
+                if self.cmatch(pat, code, mapped):
+                    print('mapped', mapped)
                     for key in mapped.keys():
                         if key == 'options':
                             mapped[key] = [self.match(e) for e in mapped[key]]
                         else:
-                            mapped[key] = self.match(mapped[key])
-                    return pred.apply(mapped)
+                            mapped[key] = self.asNoun(mapped[key])
+                    pred = pred.apply(mapped)
+                    print(pred.src())
+                    results.extend(pred.generate()) #.apply(mapped))
             # print(f'unmatched: {name}', str(code), type(code))
-            if len(code.params) > 0 and isinstance(code, CApp):  
+            if len(results) == 0 and len(code.params) > 0 and isinstance(code, CApp):  
                 # パラメータ圧縮する print(1,2,3) -> print(1,(2,3))
                 paramsize = max(size for size, _, _ in self.rules[name])
                 # print('減らす', name, paramsize,
@@ -703,14 +743,16 @@ class BTModel(ParseTreeVisitor):
                     ss.append(CSeq(code.params[paramsize-1:]))
                     code.params = tuple(ss)
                     return self.match(code)
+        if len(results) > 0:
+            return tuple(results)
         print('predict others..', code)
-        return None
+        return self.visit(snipet_parser(source))
 
-    def predict(self, code):
-        tree = snipet_parser(code)
-        # print(repr(tree))
-        docs = self.visit(tree)
-        return docs
+
+    def asNoun(self, source, nested=True):
+        source = str(source)
+        ndocs = self.predict(source, nested)
+        return ndocs[0]
 
     def acceptSource(self, tree):
         for t in tree:
@@ -794,11 +836,7 @@ class BTModel(ParseTreeVisitor):
         return CIndex(recv, index)
 
     def acceptName(self, tree):
-        s = str(tree)
-        if self.isRuleMode():
-            if s in self.symbols:
-                return CMetaVar(self.symbols[s], s)
-        return CVar(s)
+        return tuple(str(tree))
 
     def acceptString(self, tree):
         s = str(tree)
@@ -816,23 +854,23 @@ class BTModel(ParseTreeVisitor):
             n = int(s[2:],16)
         else:
             n = int(s)
-        return CValue(n)
+        return tuple(f'{n}')
 
     def acceptDouble(self, tree):
         try:
             s = str(tree).replace(' ', '')
-            return CValue(float(s))
+            return tuple(f'{float(s)}')
         except ValueError:
-            return CValue(0.0)
+            return tuple('0.0')
 
     def acceptTrue(self, tree):
-        return CValue(True)
+        return tuple('True')
 
     def acceptFalse(self, tree):
-        return CValue(False)
+        return tuple('False')
 
     def acceptNull(self, tree):
-        return CValue(None)
+        return tuple('Null')
 
     def acceptList(self, tree):
         es = [self.visit(t) for t in tree]
@@ -857,7 +895,7 @@ class BTModel(ParseTreeVisitor):
     def acceptUndefined(self, tree):
         logger.warning(f'@undefined {repr(tree)}')
         s = str(tree)
-        return CValue(s)
+        return tuple(s)
 
     def accepterr(self, tree):
         # print(repr(tree))
