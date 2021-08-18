@@ -1,0 +1,477 @@
+
+X = auto.drop('price', axis=1)
+列'price'以外のautoをXとする
+
+adult.groupby('flg-50K').size()
+列'flg-50K'の値ごとのデータの数を表示
+
+auto = auto.assign(price=pd.to_numeric(auto.price))
+autoの列'price'を数値型に変換
+
+auto = auto.replace('?', np.nan).dropna()
+autoに存在する'?'を欠損値に置換し、欠損値がある行を削除
+
+auto = auto[['price', 'horsepower', 'width', 'height']]
+autoから列'price', 列'horsepower', 列'width', 列'height'を抽出して、autoとする
+
+auto.isin(['?']).sum()
+autoのそれぞれのカラムに存在する'?'の個数の合計値を算出
+
+df = pd.read_csv('./data/lunch_box.csv', sep=',')
+'./data/lunch_box.csv'をカンマ区切りで読み込み、dfとする
+'./data/lunch_box.csv'をカンマ区切りで読み込んで、dfとする
+'./data/lunch_box.csv'をカンマ区切りで読み込んだものをdfに代入
+'./data/lunch_box.csvをカンマ区切りで読み込み、dfとして扱う
+'./data/lunch_box.csv'をカンマ区切りで読み、df とする
+
+df.columns
+dfの列の名前を取得する。
+dfのカラムを表示
+dfのcolumnを確認
+dfのカラムを確認する
+dfのcolumnsを表示する
+
+df.describe()
+dfのそれぞれの行に対して重複をbool値で取得する。
+dfの統計情報を取得する
+dfの各列の要約統計量を取得
+
+df.drop(['remarks'], axis=1, inplace=True)
+dfの'remarks'列を削除する
+dfから列'remarks'を削除
+
+df.drop_duplicates()
+dfから重複した行を削除したデータを取得する。
+dfのうち、重複した行を削除
+重複している行をdfから削除する
+
+df.dropna(subset=['kcal'], axis=0, inplace=True)
+列'kcal'の列に欠損値がある行を削除する
+dfの'kcal'列に欠損値がある行を削除する
+dfの列'kcal'に欠損値がある行を削除する
+
+df.dropna(subset=['temperature_diff', 'temperature_rolling_mean', 'temperature_pct_change'], axis=0, inplace=True)
+dfのうち、列'temperature_diff', 'temperature_rolling_mean', 'temperature_pct_change'に1つでも欠損値がある行は削除
+'temperature_diff', 'temperature_rolling_mean', 'temperature_pct_change'の行のいずれかに欠損値がある列は削除する。
+dfの'temperature_diff'列、'temperature_rolling_mean'列、'temperature_pct_change'列に欠損値がある行を削除する
+
+df.dtypes
+dfのデータ型を表示
+dfの各列のデータ型を確認
+dfのデータ型を確認する
+dfの形状を取得する。
+
+df.fillna(value={'payday': 0.0}, inplace=True)
+列'payday'に欠損値があれば0.0に置換する
+dfの列'payday'にある欠損値を'0.0'に置換
+dfの'paypay'列に含まれる欠損値を0.0に置き換える
+
+df.groupby(['month', 'period'])['sales'].sum()
+dfの'month'列と'period'列ごとに'sales'列の値の和を計算する
+'month'、'period'を2軸として'sales'の合計値を求める。
+dfについて、列'month', 列'period'の値ごとに'soldout'の数をカウント
+
+df.groupby(['weather'])['temperature'].mean()
+dfについて、列'weather'の値ごとに'temperature'の平均を算出
+dfの'weather'列ごとに'temperature'列の値の平均を計算する
+'weather'を軸に'temperature'の平均値を求める。
+
+df.groupby(['week'])['soldout'].count()
+dfの'week'列ごとに'soldout'列の値をカウントする
+dfについて、列'week'の値ごとに'soldout'の数をカウント
+'week'を軸に'soldout'の個数をカウントする。
+
+df.head()
+dfの上5行を表示する
+dfの初めの5行を表示する
+dfの最初の5行を表示させる
+dfの先頭の5行を表示
+dfの先頭5行を表示する
+
+df.head(3)
+dfの先頭3行を表示する
+dfの先頭の3行を表示
+dfの最初の3行を表示させる
+dfの初めの3行を表示する
+dfの上3行を表示する
+
+df.iloc[[1,2,4],[0,2]]
+dfのうち、1,2,4行目の0,2列目を取得
+dfの1,2,4行目と0,2列目を抽出する
+dfの1、2、4行目の0、2列目であるものを取得する
+
+df.index
+dfのindexを表示する
+dfのインデックスを表示
+dfのindexを確認
+dfのindexを表示する
+dfのインデックスを確認する
+
+df.index = pd.to_datetime(df.index, format='%Y-%m-%d')
+dfのインデックスをdatetime型に変換する
+dfのインデックスをdatetime64[ns]型の年月日をハイフン区切りにしたものに変更
+df.indexを参照し、年月日をハイフン区切りの形式に変更する。
+
+df.isnull().sum()
+dfのそれぞれの列に対して欠損値の個数をカウントする。
+dfに含まれる欠損値の個数を列ごとに算出
+dfの欠損値の個数を列単位で確認する
+
+df.loc[100]
+dfのうち、indexが100の行のみを取得
+dfのインデックスが100の行を抽出する
+dfの100列目を取得する
+
+df.plot(kind='hist', y='sales' , bins=10, figsize=(16,4), alpha=0.5)
+dfの'sales'列の値を横16縦4のサイズで透過率が0.5のヒストグラムとして表示する
+y軸='sales'、階級数=10、サイズ=(16, 4)、透過率=0.5のヒストグラムを描く。
+y軸を'sales'として、図のサイズ16×4、ビンのサイズ10、透過率0.5のヒストグラムを表示
+
+df.plot(kind='scatter', x='kcal', y='sales')
+x軸に'kcal'、y軸に'sales'と設定したdfの散布図を描く。
+x軸を'kcal'、y軸を'sales'とした散布図を表示
+dfの'kcal'列をx軸、'sales'列をy軸とした散布図を表示する
+
+df.plot(y=['temperature', 'temperature_rolling_mean', 'temperature_pct_change'], figsize=(16,4), alpha=0.5)
+y軸=['temperature', 'temperature_rolling_mean', 'temperature_pct_change']、サイズ=(16, 4)、透過率=0.5の折れ線グラフを描く。
+dfの'temperature'列、'temperature_rolling'列、'temperature_pct_change'列の値を、横16縦4のサイズで透過率が0.5の折れ線グラフとして表示する
+列'temperature', 列'temperature_rolling_mean', 列'temperature_pct_change'の値をサイズ16×4、透過度0.5の折れ線グラフで表示
+
+df.rename(columns={'y': 'sales'}, inplace=True)
+列の名前を'y'から'sales'に変更する。
+dfの列'y'のカラム名を'sales'に変更
+dfの'y'列を'sales'列とする
+
+df.set_index('datetime', inplace=True)
+datetime'列をdfのインデックスとする
+datetime列をindexに設定する。
+dfの列'datatime'をインデックスとして設定
+
+df.shape
+dfの形状を表示する
+dfの行数および列数を表示
+dfの大きさを表示する
+dfの行数・列数を確認
+dfの行数と列数を確認する
+
+
+df.sort_values(['sales', 'temperature'], ascending=False).head()
+'sales'、'temperature'をそれぞれ降順に並び替えた後、カッコ内の列の初めの5行を表示する。
+dfの列'sales'と列'temprature'を照準で並び替え、最初の5行を表示
+'sales'列と'temperature'列が降順になるようdfをソートし、上5行を表示する
+
+df.sort_values(by="sales", ascending=True).head()
+"sales"列が昇順になるようdfをソートし、上5行を表示する
+"sales"を参照して昇順に並び替えた後、dfの初めの5行を表示する。
+dfの列"sales"を降順で並び替え、最初の5行を表示
+
+df.tail()
+dfの末尾5行を表示する
+dfの最後の5行を表示
+dfの最後の5行を表示させる
+dfの下5行を表示する
+dfの最後の5行を表示する
+
+df['precipitation'] = df['precipitation'].str.replace('--', 0).astype(float)
+dfの'percipitation'列内の'--'を0.0に置き換える
+列'precipitation'の要素をstr型にした後に'--' を 0に置き換えて、float型にデータ型を変換する。
+dfの列'precipitation' の型タイプをfloatに変更すると同時に、 '--' を 0に置換
+
+df['remarks'].unique()
+dfの列'remarks'に存在する値を重複を省いて取得
+'remarks'の中身を重複を除いて取得する。
+dfの'remarks'列に含まれるデータを確認する
+
+df['sales'].plot()
+dfの'sales'列の値を折れ線グラフとして表示する
+dfの列'sales'の値を折れ線グラフとしてプロット
+'sales'の値を二次元グラフにプロットする
+
+df['temperature_diff'] = df['temperature'].diff(periods=1)
+dfの'temperature'列内の前の行との差を計算し、'temperature_diff'列とする
+'temperature'を参照して1行前の値との差分を算出し、'temperature_diff'という列に代入する。
+
+df['temperature_rolling_mean'] = df['temperature'].rolling(window=3).mean()
+列'temperature'を参照において、自身も含めた後ろ3つの要素の平均値を、列'temperature_rolling_mean'に格納する。
+dfの'temperature'列の移動平均をwindowサイズを3として計算し、'temperature_rolling_mean'列とする
+dfの列'temperature'について、頭からwindowサイズ3で移動平均を算出
+
+df['weather'].value_counts()
+dfの列'weather'について、値の集計をとる
+dfの'wether'列の値をカウントする
+dfの'weather'を参照し、各要素の出現回数を取得する
+
+df[100:106]
+dfの100行目から105行目を表示する
+dfの100行目から105行目までを取得
+dfの100行目から105行目を抽出する
+
+df[['kcal', 'sales']].corr()
+dfの'kcal'列と'sales'列の[相関|相関係数]を[求める|算出する|取得する]
+
+df[['name', 'kcal']].head()
+dfの'name'列と'kcal'列だけ上5行を表示する
+dfの列 'name'、列 'kcal'の最初の5行を表示
+dfの'name', 'kcal'の列の初めの5行を表示する
+dfのnameとkcalを抽出し、先頭5行を表示する
+
+df[['name', 'kcal']].query('kcal > 450 and name == "豚肉の生姜焼"')
+'kcak'列が450より大きい、かつ'name'列が"豚肉の生姜焼"にあてはまる行の'name'列と'kcal'列をdfから抽出する
+dfのうち、列'kcal'が450よりも大きく、列'name'の値が"豚肉の生姜焼"の行のみを取得
+'name'と'kcal'の列の、'kcal'が450より大きいかつ、'name'が"豚肉の生姜焼き"である行を取得する。
+
+df[['temperature','temperature_diff']].head()
+dfの列'temperature',列'temperature_diff'について最初の5行を表示
+dfの'temperature', 'temperature_diff'の列の初めの5行を表示する
+dfの'temperature'列と'temperature_diff'列の上5行を表示する
+
+df[df.isnull().any(axis=1)].head()
+dfのそれぞれの行に対して欠損値を含むか否かbool値で取得し、True限定で初めの5行を表示する。
+dfの欠損値が含まれている行を抽出し、上5行を表示する
+dfに含まれる欠損値の有無を行ごとに判定し、初めの5行について結果を表示
+
+df[df.isnull().any(axis=1)].shape
+dfのそれぞれの行に対して欠損値を含むか否かbool値で取得し、Trueだけを抽出したときに形状を取得する。
+dfに含まれる欠損値の有無を行ごとに判定し、欠損値が含まれるもののみを抽出したときの形状を取得
+dfの欠損値が含まれている行を抽出し、その列数と行数を確認する
+
+df[df['kcal'] > 450]
+dfの'kcal'列が450より大きいものを抽出する
+dfの'kcal'列を参照し、450より大きいものだけ表示する。
+dfのうち、列'kcal'が450よりも大きい行のみを取得
+
+dummy_df = pd.get_dummies(df, columns=['week', 'name', 'event', 'weather', 'period'])
+dfの'week'列、'name'列、'event'列、'weather'列、'period'列をダミー化したものをdummy_dfとする
+dfを参照して、列=['week', 'name', 'event', 'weather', 'period']のダミー変数を生成する。
+列'week', 列'name', 列'event', 列'weather', 列'period'を全てダミー化したものをdummy_dfとする
+
+dummy_df.to_csv('./data/processed_datamart.csv', encoding='utf-8')
+dummy_dfを'./data/processed_datamart.csv'にutf-8で保存する
+dummy_dfを、文字コードをutf-8で'./data/processed_datamart.csv'という名前のcsvファイルにして保存する。
+dummy_dfを'./data/processed_datamart.csv'にutf-8で保存
+
+from pandas import Series, DataFrame
+pandasからSeriesとDataFrameをインポート
+pandasのSeriesとDataFrameをインポートする
+pandasのSeries,DataFrameをインポートする。
+
+from sklearn import linear_model
+sklearnからliner_modelをインポート
+sklearnのlinear_modelをインポートする。
+sklearnからlinear_modelをインポートする
+
+from sklearn.linear_model import LinearRegression
+sklearn_linearからLinearRegressionをインポート
+sklearn.linear_modelからLogisticRegressionをインポート
+sklearn.linear_modelからRidgeをインポート
+
+import matplotlib as mpl
+matplotlibをmplとしてインポートする。
+matplotlibをmplとしてインポートする
+matplotlibをmplと名前を付けてインポート
+
+import matplotlib.pyplot as plt
+matplotlib.pyplotをpltと名前を付けてインポート
+matplotlib.pyplotをpltとしてインポートする
+matplotlib.pyplotをpltという名前でインポートする。
+matplotlib.pyplotをpltとしてインポートする
+matplotlib.pyplotをpltと名前を付けてインポート
+matplotlib.pyplot'を'plt'としてインポートする。
+
+import numpy as np
+numpyをnpと名前を付けてインポート
+numpyをnpとしてインポートする
+numpyをnpとしてインポートする。
+
+import numpy.random as random
+numpy.randomをrandomと名前を付けてインポート
+numpy.randomをrandomとしてインポートする。
+numpyのrandomモジュールをrandomとしてインポートする
+
+import pandas as pd
+pandasをpdとしてインポートする
+pandasをインポートし以降pdとして扱う
+pandasをpdと名前を付けてインポート
+pandasをpdとしてインポート
+pandasをpdとしてインポートする
+
+import scipy as sp
+scipyをspという名前でインポートする。
+scipyをspと名前を付けてインポート
+scipyをspとしてインポートする
+
+import seaborn as sns
+seabornをsnsとしてインポートする。
+seabornをsnsと名前を付けてインポート
+seabornをsnsとしてインポートする
+
+import sklearn
+sklearnをインポート
+
+np.corrcoef([student_data_math['G1'], student_data_math['G3']])
+データstudent_data_mathのG1, G3について相関行列を算出
+
+np.cov(student_data_math['G1'], student_data_math['G3'])
+データstudent_data_mathのG1, G3について共分散行列を算出
+
+pd.DataFrame(df['sales'].mask(df['sales'] > 80, 100)).head()
+データフレームの'sales'の値が80よりも大きければ、その値を100に置換し、最初の5行を出力
+列'sales'の値が0より大きいとき100に置き換えて、初めの5行を表示する。
+dfの'sales'列が80より大きければ100に置換し、上5行を表示する
+
+pd.set_option('display.max_columns', 160)
+160番目までの列を表示させる
+最大表示列数を160列に設定する。
+
+pivot_monthly_df.plot(kind='bar', alpha=0.6, figsize=(12,3))
+pivot_monthly_dfを参照して透過率=0.6、サイズ=(12, 3)の垂直棒グラフを描く。
+monthly_dfのインデックスをリセットし、'month'列をインデックス、'period'列をカラム、'sales'列を値としたピボットテーブルを表示する
+
+plt.bar(x, y, align='center', width = 0.5)
+横軸をx、縦軸をyとして、幅0.5の棒グラフを表示する
+X軸をx、Y軸をyとして幅0.5の棒グラフをxのメモリの真ん中の位置に来るように配置
+
+plt.barh(x, y, align = 'center')
+横軸をx、縦軸をyとして、幅0.5の棒グラフを横向きに表示する
+Xの軸とYの軸を入れ替えた棒グラフをxのメモリの真ん中の位置に来るように配置
+
+plt.boxplot([student_data_math['G1'], student_data_math['G2'], student_data_math['G3']])
+データstudent_data_mathのG1, G2, G3についての箱ひげ図を表示
+データstudent_data_mathのG1についての箱ひげ図を表示
+
+plt.figure(figsize=(20, 6))
+グラフの大きさを20×6に指定
+グラフの大きさを横20縦6とする
+グラフのサイズをfigsize=(20, 6)に設定する。
+
+plt.grid(True)
+グラフにグリッドを表示する
+グラフにグリッドを表示させる。
+グリッドを表示する
+
+plt.hist(student_data_math['absences'])
+データstudent_data_mathのabsencesについてのヒストグラムを表示
+student_data_mathの'absences'列を値としたヒストグラムを表示する
+
+plt.legend()
+グラフ内に凡例を表示する。
+凡例を表示する
+凡例の表示
+
+plt.legend(loc = 'best')
+凡例を最適な位置に配置
+凡例を最適な位置に表示する
+
+plt.plot(X, reg.predict(X))
+線形回帰直線を引く
+
+plt.plot(student_data_math['G1'], student_data_math['G3'], 'o')
+データstudent_data_mathのG1, G3についての散布図をプロットを'o'として表示
+
+plt.plot(x, y, color="#0F0F0F")
+グラフの色をカラーコードで"#0F0F0F"の色に指定して、xとyからグラフをプロットする。
+16進数表記のカラーコードを"#0F0F0F"と指定して、xとyの値からプロット
+色を"#0F0F0F"とし、x,yの値を折れ線グラフとして表示する
+
+plt.plot(x, y, color=(0,0,1))
+色をRGB=(0,0,1)とし、x,yの値を折れ線グラフとして表示する
+RGBを(0,0,1)と指定して、xとyの値からプロット
+グラフの色をRGBで(0,0,1)の色に指定して、xとyからグラフをプロットする。
+
+plt.plot(x, y, label="test")
+ラベルを"test"として、xとyの値からプロット
+ラベルを"test"とし、x,yの値を折れ線グラフとして表示する
+ラベル名を"test"と定義し、xとyからグラフをプロットする。
+
+plt.savefig("foo.png")
+作ったグラフを"foo.png"として保存
+グラフを"foo.png"という名前で保存する。
+プロットを"foo.png"として保存する
+
+plt.show()
+プロットを表示する
+プロットしたグラフを表示する
+プロット表示(設定の反映)
+
+plt.subplot(2,1,1)
+グラフを2行1列のグラフの1つ目として指定
+2行1列のグラフの1つ目を指定
+複数のグラフを1つにまとめて表示して、これは2行1列の1番目の位置にプロットする
+
+plt.subplot(2,1,2)
+2行1列のグラフの2つ目を指定
+複数のグラフを1つにまとめて表示して、これは2行1列の2番目の位置にプロットする
+グラフを2行1列のグラフの2つ目として指定
+
+plt.title('Title Name')
+グラフのタイトルを'Title Name'と設定する。
+グラフタイトルを'Title Name'とする
+グラフタイトルを'Title Name'とする
+
+plt.title('figure')
+グラフのタイトルを'figure'とする
+
+plt.xlabel('X')
+x軸に'X'という軸ラベルをつける。
+x座標のラベルを'X'とする
+グラフのx軸のラベルを'X'とする
+
+plt.xticks(x, ['A Class', 'B Class', 'C Class'])
+x軸のラベルをそれぞれ'A Class', 'B Class', 'C Class'とする
+グラフのx軸の目盛り文字列をxから['A Class', 'B Class', 'C Class']に変更
+
+plt.ylabel('Y')
+グラフのx軸のラベルを'Y'とする
+y軸に'Y'という軸ラベルをつける。
+y座標のラベルを'Y'とする
+
+plt.yticks(x, ['A Class','B Class','C Class'])
+グラフのy軸の目盛り文字列をxから['A Class', 'B Class', 'C Class']に変更
+y軸のラベルをそれぞれ'A Class', 'B Class', 'C Class'とする
+
+random.seed(0)
+ランダムシードを0に設定する。
+シード値を0として固定
+シード値を0とする
+
+reg = linear_model.LinearRegression()
+線形回帰のインスタンスを生成し、regとする
+
+reg.coef_
+回帰係数を算出
+
+reg.intercept_
+切片を算出
+
+reg.score(X, Y)
+決定係数を算出する
+
+sns.pairplot(student_data_math[['Dalc', 'Walc', 'G1', 'G3']])
+データstudent_data_mathのDalc, Walc, G1, G3について各変数のヒストグラムをすべて表示
+
+sns.set()
+グラフのスタイルをseabornに変更
+グラフのデザインをseabornのスタイルに適用する
+seaboenのデフォルトスタイルを適用する
+
+sp.stats.pearsonr(student_data_math['G1'], student_data_math['G3'])
+データstudent_data_mathのG1, G3について相関係数を算出
+
+student_data_math = pd.read_csv('student-mat.csv')
+'student-mat.csv'のデータを読み込み、student_data_mathとする
+'student-mat.csv'をstudent_data_mathとして読み込む
+
+student_data_math['absences'].describe()
+データstudent_data_mathのabsencesについての要約統計量を取得
+
+student_data_math['absences'].median()
+データstudent_data_mathのabsencesについての中央値を取得
+
+student_data_math['absences'].mode()
+データstudent_data_mathのabsencesについての最頻値を取得
+
+student_data_math['absences'].std()
+データstudent_data_mathのabsencesについての標準偏差を取得
+
+student_data_math['absences'].var()
+データstudent_data_mathのabsencesについての分散を取得
