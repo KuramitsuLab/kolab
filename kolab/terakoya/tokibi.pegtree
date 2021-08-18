@@ -5,11 +5,13 @@ _NPhrase = {^ (_ "|" NPhrase)+ #NChoice }
 
 NPhrase = { NChunk+ #NPhrase } 
 NChunk = (NSuffix _NOrdered? / NTerm) _
-_NOrdered = {^ (_ '/' _  NSuffix)+ #NOrdered }
+_NOrdered = {^ (_ '/' _  NSuffix )+ #NOrdered }
 
 NSuffix = 
   / &THEN '{' NStatement '}'
   / { NTerm (!SUFFIX NTerm)* { SUFFIX _VER? } #NSuffix }
+  / "[" { (!(SUFFIX '|'? ']') .)+  SUFFIX '|'? #NWord } "]"
+
 
 THEN = '{' (BRACE / !(. '}') .)+ [でて、] ']'? '}'
 BRACE = '{' (BRACE / !'}' .)* '}' 
@@ -30,6 +32,7 @@ example NPhrase {心が折れた|やる気が失せた}かも知れない
 example NPhrase {xを{functionを適用して}フィルタした}リスト
 example NPhrase {{それぞれのx}を/{functionに適用して}フィルタした}リスト
 example NPhrase {それぞれのx|xのそれぞれ}をフィルタする
+example NPhrase aを/[降順に]ソートする
 
 NTerm = 
   / '{' NStatement '}' {^ NWord #NClause }?
