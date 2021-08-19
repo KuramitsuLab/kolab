@@ -61,6 +61,15 @@ def write_tsv(datasetset, synonyms, file=sys.stdout):
             except RuntimeError:
                 pass
 
+def parse_value(s):
+    if s.isdecimal():
+        return int(s)
+    else:
+        try:
+            return float(s)
+        except ValueError:
+            return s == 'True'
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         dataset=[]
@@ -70,7 +79,7 @@ if __name__ == '__main__':
                 if '=' not in filename:
                     filename += '=True'
                 key, value = filename.split('=')
-                tokibi.OPTION[key] = int(value) if value.isdigit() else value == 'True'
+                tokibi.OPTION[key] = parse_value(value)
                 continue
             read_terakoya(filename, synonyms, dataset)
         write_tsv(dataset, synonyms)

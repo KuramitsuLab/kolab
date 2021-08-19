@@ -14,6 +14,8 @@ OPTION = {
     '--order': False, # 順序も入れ替える
     '--short': False, # 短い類義語を選ぶ
     '--pyfirst': False, #Pythonを先に出力する (yk使用)
+    '--change-subject': 0.0, # 助詞の「が」をランダムに「は」に変える
+    '--drop': 0.0, # パラメータをドロップする
 }
 
 def verb_emit(base, vpos=None, mode=0):
@@ -130,7 +132,7 @@ class NExpr(object):
         self.emit(buffers)
         ss = [''.join(buffers)]
         c = 0
-        while c < OPTION.get('--try', 2):
+        while c < int(OPTION.get('--try', 2)):
             randomize()
             buffers = []
             self.emit(buffers)
@@ -235,8 +237,10 @@ class NPhrase(NExpr):
         return NPhrase(*(e.apply(dict_or_func) for e in self.subs))
 
     def emit(self, buffers):
+        ratio = float(OPTION.get('--drop', 0.0))
         for p in self.subs:
-            p.emit(buffers)
+            if random.random() >= ratio:
+                p.emit(buffers)
 
 def grouping(e):
     if isinstance(e, NPhrase):
@@ -303,7 +307,12 @@ class NSuffix(NExpr):
     def emit(self, buffers):
         for p in self.subs:
             p.emit(buffers)
-        buffers.append(self.suffix)
+        suffix = self.suffix
+        ratio = float(OPTION.get('--change-subject', 0.0))
+        if random.random() < ratio:
+            if suffix == 'が': suffix = 'は'
+            elif suffix == 'は': suffix = 'が'
+        buffers.append(suffix)
 
 class NLiteral(NExpr):
     w: str
