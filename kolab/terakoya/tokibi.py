@@ -12,7 +12,8 @@ OPTION = {
     '--random': True,
     '--single': False, # ひとつしか選ばない (DAはオフ)
     '--order': False, # 順序も入れ替える
-    '--short': False # 短い類義語を選ぶ
+    '--short': False, # 短い類義語を選ぶ
+    '--pyfirst': False, #Pythonを先に出力する (yk使用)
 }
 
 def verb_emit(base, vpos=None, mode=0):
@@ -64,33 +65,36 @@ def update_synonyms(synonyms, key, value):
         values.append(key2)
     synonyms[key] = encode_synonyms(values)
 
-RandomIndex = 0
+RandomCache = {
+}
 
 def randomize():
-    global RandomIndex
-    if OPTION['--random']:
-        RandomIndex = random.randint(1, 1789)
-    else:
-        RandomIndex = 0
+    global RandomCache
+    RandomCache = {}
 
+def random_cache(key, value):
+    global RandomCache
+    if key in RandomCache:
+        return RandomCache[key]
+    RandomCache[key] = value
+    return value
 
-def random_index(arraysize: int, seed):
+def random_index(arraysize: int):
     if OPTION['--random']:
-        return (RandomIndex + seed) % arraysize
+        return random.randint(0, arraysize-1)
     return 0
 
 def choice(ss: list):
-    return ss[random_index(len(ss), 17)]
-
+    return ss[random_index(len(ss))]
 
 def alt(s: str):
     if '|' in s:
         ss = decode_synonyms(s)
         if OPTION['--random']:
-            return choice(ss)
+            return random_cache(s, choice(ss))
         if OPTION['--short']:
             ss.sort(key=lambda x: len(x))
-            return ss[0]
+            return random_cache(s, ss[0])
         return ss[0]
     return s
 
@@ -122,9 +126,11 @@ class NExpr(object):
         buffers.append(str(self))
 
     def generate(self):
-        ss = []
+        buffers = []
+        self.emit(buffers)
+        ss = [''.join(buffers)]
         c = 0
-        while c < 5:
+        while c < OPTION.get('--try', 2):
             randomize()
             buffers = []
             self.emit(buffers)
