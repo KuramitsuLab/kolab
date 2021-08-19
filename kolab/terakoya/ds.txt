@@ -1,28 +1,52 @@
 
-X = auto.drop('price', axis=1)
-列'price'以外のautoをXとする
+ドロップする=削除する|消す
+データフレーム=データフレーム|表|表データ
+カラム=コラム|列|属性
+インプレースで=置き換えで|書き換えで|破壊的に
 
-adult.groupby('flg-50K').size()
-列'flg-50K'の値ごとのデータの数を表示
+X = df.drop('price', axis=1)
+列'price'以外のdf(データフレーム)をXとする
+df(データフレーム)のカラム'price'をドロップする
 
-auto = auto.assign(price=pd.to_numeric(auto.price))
-autoの列'price'を数値型に変換
+df.drop('price', axis=1, inplace=True)
+[インプレースで]/{df(データフレーム)のカラム'price'}をドロップする
 
-auto = auto.replace('?', np.nan).dropna()
-autoに存在する'?'を欠損値に置換し、欠損値がある行を削除
+データ数=データの数|データ数
 
-auto = auto[['price', 'horsepower', 'width', 'height']]
-autoから列'price', 列'horsepower', 列'width', 列'height'を抽出して、autoとする
+df.groupby('flg-50K').size()
+df(データフレーム)のカラム'flg-50K'をグループ化して、値ごとの[データ数]
+カラム'flg-50K'の値ごとの[データ数]
 
-auto.isin(['?']).sum()
-autoのそれぞれのカラムに存在する'?'の個数の合計値を算出
+df = df.assign(price=pd.to_numeric(df['price']))
+df(データフレーム)のカラム'price'を数値型に変換する
+
+df = df.replace('?', np.nan).dropna()
+dfに存在する'?'をNaNに置換し、欠損値がある行を削除
+
+欠損値=欠損値|NaN
+
+df.replace('?', np.nan)
+df(データフレーム)に[存在する|ある]'?'を欠損値に置換する
+
+df.replace('?', np.nan).dropna()
+df(データフレーム)に[存在する|ある]'?'を欠損値に置換して、欠損値がある行を削除する
+
+df = df[['price', 'horsepower', 'width', 'height']]
+dfから列'price', 列'horsepower', 列'width', 列'height'を抽出して、dfとする
+
+df[['price', 'horsepower', 'width', 'height']]
+df(データフレーム)からカラム'price', 'horsepower', 'width', 'height'を取り出す
+
+df.isin(['?']).sum()
+dfのそれぞれのカラムに存在する'?'の個数の合計値を算出
 
 df = pd.read_csv('./data/lunch_box.csv', sep=',')
-'./data/lunch_box.csv'をカンマ区切りで読み込み、dfとする
+'./data/lunch_box.csv'をカンマ区切りで読み込み、df(データフレーム)とする
 './data/lunch_box.csv'をカンマ区切りで読み込んで、dfとする
 './data/lunch_box.csv'をカンマ区切りで読み込んだものをdfに代入
 './data/lunch_box.csvをカンマ区切りで読み込み、dfとして扱う
 './data/lunch_box.csv'をカンマ区切りで読み、df とする
+df(データフレーム)を'./data/lunch_box.csv'からカンマ区切りで読む
 
 df.columns
 dfの列の名前を取得する。
