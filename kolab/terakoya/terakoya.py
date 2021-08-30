@@ -1,11 +1,15 @@
 import sys
 import tokibi
+from expression import *
+
+OPTIONS = ('bool')
 
 def read_terakoya(filename, synonyms, dataset=None):
     if dataset is None:
         dataset = []
     with open(filename) as f:
         code = None
+        options = OPTIONS
         desc = []
         for line in f.readlines():
             line = line.strip()
@@ -13,20 +17,24 @@ def read_terakoya(filename, synonyms, dataset=None):
                 continue
             if line == '':
                 if code is not None:
-                    dataset.append((code, tuple(desc)))
+                    dataset.append((code, tuple(desc), options))
                 code = None
+                options = OPTIONS
                 desc = []
                 continue
+            line = line.split('#')[0]
             if code is None and ord(line[0])>127 and '=' in line:
-                key, value = [s.strip() for s in line.split('#')[0].split('=')]
+                key, value = [s.strip() for s in line.split('=')]
                 tokibi.update_synonyms(synonyms, key, value)
                 continue
             if code is None:
-                code = line
+                lines = line.split('@')
+                code = lines[0]
+                options = tuple(s.strip() for s in lines[1:])
             else:
                 desc.append(line)
         if code is not None:
-            dataset.append((code, tuple(desc)))
+            dataset.append((code, tuple(desc), options))
     return dataset
 
 def emit_tsv(doc, code, file):
@@ -38,28 +46,48 @@ def emit_tsv(doc, code, file):
 条件 = tokibi.parse('[もし|]X[ならば]|X[とき|場合]|')
 条件2 = tokibi.parse('[もし|]X[ならば]|Xの[とき|場合]|')
 
-def emit(doc, code, file):
-    if doc.endswith('かどうか'):
-        tokibi.randomize()
-        cond = doc[:-4]
-        emit_tsv(cond+tokibi.alt('かどうか|か否か|か|か'), code, file)
-        if cond.endswith('る') or cond.endswith('い') or cond.endswith('た'):
-            doc = tokibi.choice(条件.apply({'X': doc[:-4]}).generate())
+def emit(code, docs, buffers, options):
+    for doc in docs:
+        if doc.endswith('かどうか'):
+            tokibi.randomize()
+            cond = doc[:-4]
+            buffers.append((cond+tokibi.alt('かどうか|か否か|か|か'), code))
+            if cond.endswith('る') or cond.endswith('い') or cond.endswith('た'):
+                doc = tokibi.choice(条件.apply({'X': doc[:-4]}).generate())
+            else:
+                doc = tokibi.choice(条件2.apply({'X': doc[:-4]}).generate())
+            buffers.append((doc, f'if {code}:'))
         else:
-            doc = tokibi.choice(条件2.apply({'X': doc[:-4]}).generate())
-        emit_tsv(doc, f'if {code}:', file)
-    else:
-        emit_tsv(doc, code, file)
+            buffers.append((doc, code))
     
+def dispatch_emit(code, docs, buffers, options):
+    emit(code, docs, buffers, options)
+    if len(options) > 0:
+        symbols = globals()
+        for option in options:
+            fname = f'emit_{option}'
+            if fname in symbols:
+                app = symbols[fname]
+                app(code, docs, buffers, options)
+            else:
+                print(f'undefined {option}')
+
 def write_tsv(datasetset, synonyms, file=sys.stdout):
-    for code, desc in datasetset:
+    for code, desc, options in datasetset:
+        buffers = []
         for d in desc:
             try:
                 docs = tokibi.parse(d, synonyms=synonyms).generate()
-                for doc in docs:
-                    emit(doc, code, file)
+                dispatch_emit(code, docs, buffers, options)
             except RuntimeError:
                 pass
+        if tokibi.OPTION['--pyfirst']:
+            for doc,code in buffers:
+                print(f'{code}\t{doc}', file=file)
+        else:
+            for doc,code in buffers:
+                print(f'{doc}\t{code}', file=file)
+  
 
 def parse_value(s):
     if s.isdecimal():

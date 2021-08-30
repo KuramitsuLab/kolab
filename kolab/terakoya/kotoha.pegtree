@@ -43,6 +43,12 @@ Document = __ '#' _ {
   #NDocument
 }
 
+/* NLP Expression Parser */
+
+ExpressionParser = {
+    ({ (!Expression .)* #NLP } / Expression)*
+} 
+
 /* Programming */
 
 Snipet = Statement EOF
