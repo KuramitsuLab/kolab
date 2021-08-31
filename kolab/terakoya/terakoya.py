@@ -65,10 +65,17 @@ def dispatch_emit(code, docs, buffers, options):
     if len(options) > 0:
         symbols = globals()
         for option in options:
+            local_options = option.split(':')
+            option = local_options[0]
             fname = f'emit_{option}'
             if fname in symbols:
                 app = symbols[fname]
-                app(code, docs, buffers, options)
+                local_buffers = []
+                is_extendable = app(code, docs, local_buffers, tuple(local_options[1:]) + options)
+                buffers.extend(local_buffers)
+                if is_extendable:
+                    docs.extend([x[1] for x in local_buffers])
+                    print('@debug', docs)
             else:
                 print(f'undefined {option}')
 
@@ -77,8 +84,9 @@ def write_tsv(datasetset, synonyms, file=sys.stdout):
         buffers = []
         for d in desc:
             try:
-                docs = tokibi.parse(d, synonyms=synonyms).generate()
-                dispatch_emit(code, docs, buffers, options)
+                exp, mcode, _ = tokibi.parse2(d, code, synonyms=synonyms)
+                docs = exp.generate()
+                dispatch_emit(mcode, docs, buffers, options)
             except RuntimeError:
                 pass
         if tokibi.OPTION['--pyfirst']:

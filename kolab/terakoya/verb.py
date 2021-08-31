@@ -50,7 +50,7 @@ Mecab = {
 }
 
 def detect_vpos(s):
-    toks = [print(tok) for tok in janome.tokenize(s)]
+    #toks = [print(tok) for tok in janome.tokenize(s)]
     toks = [tok for tok in janome.tokenize(s)][::-1]
     vpos = None
     base = None
@@ -67,7 +67,31 @@ def detect_vpos(s):
             continue
         if base is not None:
             prefix = t.surface + prefix
-    print(s, vpos, base, prefix)
+    #print(s, vpos, base, prefix)
+    return vpos, base, prefix
+
+def detect_last_vpos(s):
+    toks = [tok for tok in janome.tokenize(s)][::-1]
+    vpos = None
+    base = None
+    prefix=''
+    for t in toks:
+        pos = t.part_of_speech
+        if base is None and pos.startswith('動詞'):
+            vpos = Mecab.get(t.infl_type, t.infl_type)
+            base = t.base_form
+            continue
+        elif base is None and pos.startswith('形容詞'):
+            vpos = ADJ
+            base = t.base_form
+            continue
+        elif base is None and pos.startswith('名詞'):
+            vpos = NA
+            base = t.base_form
+            continue
+        if base is not None:
+            prefix = t.surface + prefix
+    #print(s, vpos, base, prefix)
     return vpos, base, prefix
 
 # mode
@@ -181,44 +205,44 @@ def varindex(mode):
     print('dedug mode =', mode)
     return 5
 
-def emit_impl(base, vpos, mode):
+def emit_base(base, vpos, mode):
     if mode & みる == みる:
-        base = emit_impl(base, vpos, mode >> VSHIFT)
-        return emit_impl('みる', V1, mode & ~みる)
+        base = emit_base(base, vpos, mode >> VSHIFT)
+        return emit_base('みる', V1, mode & ~みる)
     if mode & させる == させる:
         if vpos == VS or vpos == VZ:
-            return emit_impl(base[:-2]+'させる', V1, mode & ~させる)
-        base = emit_impl(base, vpos, 未然形) + 'させる'
-        return emit_impl(base, V1, mode & ~させる)
+            return emit_base(base[:-2]+'させる', V1, mode & ~させる)
+        base = emit_base(base, vpos, 未然形) + 'させる'
+        return emit_base(base, V1, mode & ~させる)
     if mode & せる == せる:
         if vpos == VS or vpos == VZ:
-            return emit_impl(base[:-2]+'させる', V1, mode & ~させる)
-        base = emit_impl(base, vpos, 未然形) + 'せる'
-        return emit_impl(base, V1, mode & ~せる)
+            return emit_base(base[:-2]+'させる', V1, mode & ~させる)
+        base = emit_base(base, vpos, 未然形) + 'せる'
+        return emit_base(base, V1, mode & ~せる)
     if mode & される == される:
         if vpos == VS or vpos == VZ:
-            return emit_impl(base[:-2]+'される', V1, mode & ~される)
-        base = emit_impl(base, vpos, 未然形) + 'される'
-        return emit_impl(base, V1, mode & ~される)
+            return emit_base(base[:-2]+'される', V1, mode & ~される)
+        base = emit_base(base, vpos, 未然形) + 'される'
+        return emit_base(base, V1, mode & ~される)
     if mode & れる == れる:
         if vpos == VS or vpos == VZ:
-            return emit_impl(base[:-2]+'される', V1, mode & ~れる)
-        base = emit_impl(base, vpos, 未然形) + 'れる'
-        return emit_impl(base, V1, mode & ~れる)
+            return emit_base(base[:-2]+'される', V1, mode & ~れる)
+        base = emit_base(base, vpos, 未然形) + 'れる'
+        return emit_base(base, V1, mode & ~れる)
     if mode & できる == できる:
         if vpos == VS or vpos == VZ:
-            return emit_impl(base[:-2]+'できる', V1, mode & ~できる)
+            return emit_base(base[:-2]+'できる', V1, mode & ~できる)
         if vpos == V1:
-            return emit_impl(base[:-1]+'られる', V1, mode & ~できる)
+            return emit_base(base[:-1]+'られる', V1, mode & ~できる)
         ## 書く -> 書ける
-        base = emit_impl(base, vpos, 仮定形)+'る'
-        return emit_impl(base, V1, mode & ~できる)
+        base = emit_base(base, vpos, 仮定形)+'る'
+        return emit_base(base, V1, mode & ~できる)
     if mode & 丁寧形 == 丁寧形:
-        base = emit_impl(base, vpos, 連用形) + 'ます'
-        return emit_impl(base, 'MASU', mode & ~丁寧形)
+        base = emit_base(base, vpos, 連用形) + 'ます'
+        return emit_base(base, 'MASU', mode & ~丁寧形)
     if mode & 否定形 == 否定形:
-        base = emit_impl(base, vpos, 未然形) + 'ない'
-        return emit_impl(base, ADJ, mode & ~否定形)
+        base = emit_base(base, vpos, 未然形) + 'ない'
+        return emit_base(base, ADJ, mode & ~否定形)
     d = VAR[vpos]
     base = base[:-d[0]]
     return base + d[varindex(mode)]
@@ -235,11 +259,11 @@ def modes(mode):
 def test(s):
     vpos, base, prefix = detect_vpos(s)
     mode = detect_mode(s)
-    print(s, '=>', emit_impl(prefix+base, vpos, mode))
+    print(s, '=>', emit_base(prefix+base, vpos, mode))
 
 if __name__ == '__main__':
     test('彼はごん攻めする')
     test('入力された')
-    print('入力した => ', emit_impl('入力する', VS, れる|過去形|仮定形))
-    print('書かれた => ', emit_impl('書く', VK5, れる|過去形|否定形))
+    print('入力した => ', emit_base('入力する', VS, れる|過去形|仮定形))
+    print('書かれた => ', emit_base('書く', VK5, れる|過去形|否定形))
 

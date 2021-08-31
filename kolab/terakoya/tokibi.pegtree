@@ -37,11 +37,13 @@ example NPhrase aを/[降順に]ソートする
 NTerm = 
   / '{' NStatement '}' {^ NWord #NClause }?
   / NSymbol _NParam?
-  / NLiteral
+  / NLiteral _NParam?
   / ![ }/|] NWord
   / ![ }/|] NPiece
 
-NSymbol = { [A-Za-z_] [A-Za-z_0-9]* #NSymbol }
+NSymbol = 
+  / { [A-Za-z_] [A-Za-z_0-9]* #NSymbol }
+  / "(" { (!")" . )+ #NSymbol } ")"
 _NParam = "(" {^ { (!")" . )+ #NWord } #NParam } ")"
 
 NLiteral = 

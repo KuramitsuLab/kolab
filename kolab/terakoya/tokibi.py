@@ -1,3 +1,4 @@
+import logging
 import sys
 import collections
 import pegtree as pg
@@ -45,8 +46,12 @@ def decode_synonyms(value):
     for s in value.split('|'):
         if '@' in s:
             s, n = s.split('@')
-            for i in range(int(n)):
-                values.append(s)
+            try:
+                for i in range(int(n)):
+                    values.append(s)
+            except Exception as e:
+                print('@debug', value, e)
+                quit()
         else:
             values.append(s)
     return values
@@ -73,6 +78,7 @@ RandomCache = {
 def randomize():
     global RandomCache
     RandomCache = {}
+    return random.random()
 
 def random_cache(key, value):
     global RandomCache
@@ -105,6 +111,12 @@ def alt(s: str):
 def identity(e):
     return e
 
+def back(s): # '<1' を消す
+    loc = s.find('<1')
+    if loc > 0:
+        return back(s[:loc-1] + s[loc+2:])
+    return s
+
 class NExpr(object):
     subs: tuple
     def __init__(self, subs=EMPTY):
@@ -130,13 +142,13 @@ class NExpr(object):
     def generate(self):
         buffers = []
         self.emit(buffers)
-        ss = [''.join(buffers)]
+        ss = [back(''.join(buffers))]
         c = 0
         while c < int(OPTION.get('--try', 2)):
             randomize()
             buffers = []
             self.emit(buffers)
-            s = ''.join(buffers)
+            s = back(''.join(buffers))
             if s not in ss:
                 ss.append(s)
             else:
@@ -385,7 +397,19 @@ class NParam(NExpr):
                 buffers.append(alt(self.unit+'|'))
                 inner.emit(buffers)
             else:
+                r = random.random()
+                if r < 0.3:
+                    buffers.append(alt(self.unit))
                 inner.emit(buffers)
+                if r > 0.7:
+                    buffers.append(alt(self.unit))
+        elif isinstance(inner, NLiteral):
+            r = random.random()
+            if r < 0.2:
+                buffers.append(alt(self.unit))
+            inner.emit(buffers)
+            if r > 0.8:
+                buffers.append(alt(self.unit))
         else:
             inner.emit(buffers)
 
@@ -427,7 +451,8 @@ class TokibiReader(ParseTreeVisitor):
         return ne
 
     def acceptNParam(self, tree):
-        ne = NParam(self.visit(tree[0]), str(tree[1]))
+        prefix = self.parse_synonym(str(tree[1])+'+')
+        ne = NParam(self.visit(tree[0]), prefix)
         return ne
 
     def acceptNOrdered(self, tree):
@@ -441,8 +466,9 @@ class TokibiReader(ParseTreeVisitor):
     def acceptNSymbol(self, tree):
         s = str(tree)
         if s not in self.indexes:
-            self.indexes[s] = len(self.indexes)
-        return NSymbol(self.indexes[s], s)
+            index = len(self.indexes)
+            self.indexes[s] = NSymbol(index, s)
+        return self.indexes[s]
 
     def acceptNLiteral(self, tree):
         s = str(tree)
@@ -459,10 +485,25 @@ class TokibiReader(ParseTreeVisitor):
     def acceptNPiece(self, tree):
         s = str(tree)
         return NWord(s)
+    
+    def parse_synonym(self, s):
+        if '|' in s:
+            return '|'.join([self.parse_synonym(t) for t in s.split('|')])
+        if s.endswith('+'):
+            s = s[:-1]
+            return self.synonyms.get(s, s)
+        if s.endswith('?'):
+            s = s[:-1]
+            return self.synonyms.get(s, s) + '|'
+        if '#' in s:
+            s,suffix = s.split('#')
+            return '|'.join([t+suffix for t in self.synonyms.get(s,s).split('|')])
+        return s
+
 
 tokibi_reader = TokibiReader()
 
-def parse2(s, synonyms=None):
+def parse2(s, code=None, synonyms=None):
     if synonyms is not None:
         tokibi_reader.synonyms = synonyms
     if s.endswith('かどうか'):
@@ -472,7 +513,18 @@ def parse2(s, synonyms=None):
     else:
         e, d = tokibi_reader.parse(s)
     #print(grouping(e[0]))
-    return e, d
+    if code is not None:
+        code = code.strip()
+        for var in d:
+            if not var.isidentifier():
+                if var in code:
+                    symbol = d[var]
+                    new_var = f'e0{symbol.index}'
+                    symbol.w = new_var
+                    code = code.replace(var, new_var)
+                else:
+                    print(f'unfound symbol ({var}) in ({code})', file=sys.stderr)
+    return e, code, d
 
 def parse(s, synonyms=None):
     return parse2(s, synonyms=synonyms)[0]
@@ -521,12 +573,7 @@ if __name__ == '__main__':
             read_terakoya(filename, dataset)
             write_tsv(dataset)
     else:
-        # e = parse('{xを/{functionを 適用して}フィルタした}リスト')
-        # print(e.src())
-        # e = parse('{心が折れた|気持ちが和らぐ}かも知れない')
-        # print(e.src())
-        # xがy内に
-        e = test_parse('xをy個まで購入する')
-        print(e.src())
+        e,c,_ = parse2("(df['remarks'])(カラム)の重複を取り除く", "df['remarks'].unique()")
+        print(c, e.src())
 
 
