@@ -61,7 +61,7 @@ def detect_vpos(s):
             vpos = Mecab.get(t.infl_type, t.infl_type)
             base = t.base_form
             continue
-        elif base is None and pos.startswith('形容詞'):
+        elif base is None and pos.startswith('形容詞') or t.base_form == 'ない':
             vpos = ADJ
             base = t.base_form
             continue
@@ -266,4 +266,5 @@ if __name__ == '__main__':
     test('入力された')
     print('入力した => ', emit_base('入力する', VS, れる|過去形|仮定形))
     print('書かれた => ', emit_base('書く', VK5, れる|過去形|否定形))
+    print(detect_last_vpos('大きくない'))
 

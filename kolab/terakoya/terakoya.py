@@ -61,7 +61,9 @@ def emit(code, docs, buffers, options):
             buffers.append((doc, code))
     
 def dispatch_emit(code, docs, buffers, options):
-    emit(code, docs, buffers, options)
+    if 'option' not in options:
+        # @option は出力しない
+        emit(code, docs, buffers, options)
     if len(options) > 0:
         symbols = globals()
         for option in options:

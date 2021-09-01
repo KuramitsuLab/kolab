@@ -26,6 +26,14 @@ def transform_not(code):
         return code.replace('==', '!=')
     if '!=' in code:
         return code.replace('!=', '==')
+    if ' is ' in code and not 'is not' in code:
+        return code.replace(' is ', ' is not ')
+    if ' in ' in code and not 'not in' in code:
+        return code.replace(' in ', ' not in ')
+    if 'True' in code:
+        return code.replace('True', 'False')
+    if 'False' in code:
+        return code.replace('False', 'True')
     return f'not {code}'
 
 # @not 否定形を作る
@@ -42,7 +50,9 @@ def emit_not(code, docs, results, options):
         if vpos == 'NA':
             doc = doc + 'でない'
         else:
-            doc = prefix + verb.emit_base(base, vpos, verb.否定形)
+            mode = verb.過去形 if doc.endswith('た') else 0
+            doc = prefix + verb.emit_base(base, vpos, verb.否定形|mode)
+        doc = doc.replace('既に', '未だ')
         results.append((doc + alt('か@6|かどうか@3|か否か'), transform_not(mcode)))
     return True
 
@@ -81,18 +91,33 @@ def emit_if(code, docs, results, options):
         doc = remove_whether(doc)
         vpos, base, prefix = detect_vpos(doc)
         mode = verb.否定形 if doc.endswith('ない') else 0
-        random_factor = random.random()
-        if vpos == 'NA' or random_factor < 0.5 :
+        if vpos == 'NA' or random.random() < 0.5 :
             results.append((alt('もし|') + doc + alt('ならば|とき|場合'), f'if {mcode} :'))
         if vpos != 'NA' and random.random() < 0.7:
-            doc = prefix + verb.emit_base(base, vpos, verb.仮定形|mode) + 'ば'
-            results.append((alt('もし|') + doc, f'if {mcode} :'))
+            doc2 = prefix + verb.emit_base(base, vpos, verb.仮定形|mode) + 'ば'
+            results.append((alt('もし|') + doc2, f'if {mcode} :'))
         if vpos != 'NA' and random.random() < 0.7:
-            doc = prefix + verb.emit_base(base, vpos, verb.過去形|mode) + alt('ならば|なら|ら|とき|場合')
-            results.append((alt('もし|') + doc, f'if {mcode} :'))
+            doc2 = prefix + verb.emit_base(base, vpos, verb.過去形|mode) + alt('ならば|なら|ら|とき|場合')
+            results.append((alt('もし|') + doc2, f'if {mcode} :'))
+        if tokibi.OPTION['--partial']:
+            emit_ifandor(mcode, doc, results)
+            emit_ifandor(mcode, doc, results, pre=('かつ、', 'and'))
     if tokibi.OPTION['--partial']:
         emit_andor(code, docs, results, options)
     return False
+
+def emit_ifandor(code, doc, results, pre=('または、', 'or')):
+        vpos, base, prefix = detect_vpos(doc)
+        mode = verb.否定形 if doc.endswith('ない') else 0
+        if vpos == 'NA' or random.random() < 0.5 :
+            results.append((alt(pre[0]) + doc + alt('ならば|とき|場合'), f'{pre[1]} {code} :'))
+        if vpos != 'NA' and random.random() < 0.5:
+            doc2 = prefix + verb.emit_base(base, vpos, verb.仮定形|mode) + 'ば'
+            results.append((alt(pre[0]) + doc2, f'{pre[1]} {code} :'))
+        if vpos != 'NA' and random.random() < 0.5:
+            doc2 = prefix + verb.emit_base(base, vpos, verb.過去形|mode) + alt('ならば|なら|ら|とき|場合')
+            results.append((alt(pre[0]) + doc2, f'{pre[1]} {code} :'))
+
 
 # @while 文を作る
 # 例
@@ -217,6 +242,8 @@ def emit_inplace(code, docs, results, options):
     return False
 
 def emit_dot(code, docs, results, options):
+    if not tokibi.OPTION['--partial']:
+        return False
     for doc in docs:
         mcode, doc = check_modified_code(code, doc)
         vpos, base, prefix = verb.detect_last_vpos(doc)
@@ -232,9 +259,11 @@ def emit_dot(code, docs, results, options):
     return False
 
 def emit_it(code, docs, results, options):
+    if not tokibi.OPTION['--partial']:
+        return False
     loc = code.find('.')
     if loc == -1:
-        return
+        return False
     code = code[loc:]
     it = 'それを' if len(options) == 0 else options[0]
     suffix = it[-1]
@@ -246,6 +275,22 @@ def emit_it(code, docs, results, options):
             if doc not in d:
                 results.append((doc, code))
                 d.add(doc)
+    return False
+
+import re
+
+def emit_option(code, docs, results, options):
+    for doc in docs:
+        mcode, doc = check_modified_code(code, doc)
+        conj = alt('そこで、|そのとき、|さらに、')
+        matched = re.findall('(.*)は、?(.*)(に|と)する', doc)
+        if len(matched) == 3:
+            doc2 = f'{matched[1]}を{matched[0]}{matched[2]}にする'
+            results.append((conj+doc2, f'@option {mcode}'))
+            conj = alt('そこで、|そのとき、|さらに、')
+        if not doc.endswith('にする') and not doc.endswith('とする'):
+            doc = doc + alt('こととする|ことにする|')
+        results.append((conj+doc, f'@option {mcode}'))
     return False
 
 def emit_FIXME(code, docs, results, options):

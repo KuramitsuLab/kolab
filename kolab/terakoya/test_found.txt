@@ -1,0 +1,20 @@
+#
+まず=まず|最初|当初
+
+found = False
+まず、foundを[見つかっていない|発見されていない|見つからなかった|発見されなかった]状態にする
+
+found = True
+まず、foundを[見つかっている|発見されている|見つかった|発見された]状態にする
+
+found == True    @not @if
+foundが[既に|][見つかった|発見された]かどうか
+
+found    　　　　　@not @if @while
+foundが[既に|][見つかった|発見された]かどうか
+
+v in visited     @not @if @while
+既に/vが/visitedに訪問したかどうか
+既に/vが/visitedに訪問しているかどうか
+既に/vが/visitedに到達したかどうか
+既に/vが/visitedに到達しているかどうか
