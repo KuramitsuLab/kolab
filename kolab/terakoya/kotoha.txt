@@ -1,11 +1,5 @@
 # Kotohaから持ってきたもの
 
-用いる = 使う|する|用いる
-プリントする = 表示する|出力する|プリントする
-セパレータ = 区切り記号|区切り文字列|セパレータ
-
-とき=とき|場合
-
 # 演算子
 
 x = y
@@ -49,10 +43,6 @@ xがyと同一かどうか
 
 x is not y
 xがyと同一でないかどうか
-
-含まれる = 含まれる|ある
-含まれない = 含まれない|ない
-内 = 内@2|中@2|
 
 x in y
 xがy内に含まれるかどうか
@@ -106,7 +96,7 @@ x //= y
 xを[切り捨てながら|]y分の1にする
 
 x /= 2
-xを 半分にする
+xを半分にする
 
 x //= 2
 xを[切り捨てながら|]半分にする
@@ -140,7 +130,7 @@ xをyビット、右シフトする
 abs(x)
 xの絶対値
 
-bool(x)
+bool(x)   @not @if @while
 xが真かどうか
 
 complex(x, y)
@@ -156,19 +146,20 @@ divmod(x, y)[1]
 xとyの余り
 
 float(x)
+xを/浮動小数点数に[変換|]する
 xの浮動小数点数
 
 int(x)
+xを/整数に[変換|]する
 {xを変換した}整数値
+xの整数値
 
-表記=表記|表現|の文字列
+表記=表記|表現|文字列
 
 int(s, 2)
 2進数[表記]sから整数に[変換|]する
 s(文字列)を/2進数として整数に[変換|]する
 {2進数[表記]sから変換した}整数
-
-コードポイント = 文字コード|コードポイント
 
 ord(c)
 cのコードポイント
@@ -249,7 +240,7 @@ xの8進数文字列
 
 chr(c)
 c(コードポイント)の文字
-文字コードcを文字に[変換|]する
+c(コードポイント)を文字に[変換|]する
 
 repr(object)
 objectの印字[可能な|できる|]文字列
@@ -260,24 +251,28 @@ xの文字列
 
 # 組み込み関数（リスト）
 
-all(iterable)
+all(iterable)    @not @if @while
 iterableの全てが真かどうか
+iterableが全て真かどうか
 
-any(iterable)
+any(iterable)    @not @if @while
 iterableのいずれかが真かどうか
+iterableのひとつでも真かどうか
 
+
+順序列=順序列|順序付けされた列
+ナンバリングする=番号付けする|順序付けする|順番付けする
 順序=順番|順序
 
 enumerate(x)
-xの[順序]数列
+xをナンバリングする
+xの[順序列]
 xの[順序]を数える
 
 enumerate(x, y)
-{xのyから始まる}[順序]数列
+xを/yからナンバリングする
+xのyから始まる[順序列]
 xの[順序]を/yから数える
-
-_start = x
-startから始める
 
 iter(x)
 xのイテレータ
@@ -287,8 +282,11 @@ xのイテレータ
 len(x)
 xの長さ
 
-len(s)
-文字列sの文字数
+len(x) == 0   @not @if @while
+xが空であるかどうか
+
+len('abc')
+'abc'(文字列)の文字数
 
 list(x)
 xのリスト
@@ -300,12 +298,10 @@ range(x, y)
 xからyまでの数列
 
 range(x, y, z)
-xからyまでの/z間隔の数列
-
-_step = x
-間隔はxにする
+xからyまでのz間隔の数列
 
 reversed(x)
+xを逆順にする
 xの逆順
 
 set()
@@ -313,8 +309,6 @@ set()
 
 set(x)
 xの集合
-
-スライス = 部分列|スライス
 
 slice(x)
 0からxまでのスライス
@@ -325,32 +319,23 @@ xからyまでのスライス
 slice(x, y, z)
 xからyまでのzごとによるスライス
 
-合計 = 合計値|総和|合計
-平均 = 平均値|平均
-
 sum(x)
 x(数列)の合計
 
 sum(x)/len(x)
 x(数列)の平均
 
-タプル=組|タプル
-
 tuple(x)
 xのタプル
 
 zip(x, y)
-列 xと yの各要素のペア
+列xとyの各要素のペア
 xとyをzipする
 
 zip(x, y, z)
 列 x, y, zの各要素のタプル
 
 # 組み込み関数（辞書）
-
-キー = 項目名|キー
-エントリ = 項目|エントリ
-アップデートする = 更新する|アップデートする
 
 dict(x)
 xの辞書
@@ -362,7 +347,7 @@ dict(辞書)のkey(キー)を参照した値
 list(dict)
 dict(辞書)の[キー]一覧
 
-len(dict)  # dictのエントリ数}整数値
+len(dict)
 dict(辞書)の[エントリ]数
 
 dict.clear()
@@ -372,10 +357,11 @@ dict.copy()
 dict(辞書)の[浅い|]コピー
 
 dict.get(key)
-dict(辞書)のkey(キー)の値
+dict(辞書)からkey(キー)の値を得る
+dict(辞書)におけるkey(キー)に対応した値
 
 dict.get(key, x)
-dict(辞書)のkey(キー)の値、もし[存在し|]なければ x
+dict(辞書)のkey(キー)の値、もし[存在し|]なければxを得る
 
 dict.items()
 dict(辞書)の[エントリ]一覧
@@ -392,9 +378,6 @@ dict(辞書)から最後に追加したエントリを取り出す
 dict.setdefault(key, x)
 dict内にkey(エントリ)が[存在し|]なければ、そのエントリをxにする
 
-dict.update()
-dict(辞書)をアップデートする
-
 dict.update(x)
 dict(辞書)をxでアップデートする
 
@@ -409,29 +392,12 @@ dict(辞書)に/dict2(辞書)を[追加する|加える]
 
 # 組み込み関数（バイト列、IO）
 
-_encoding = 'エンコーディング|文字コード'
-_errors = 'エラーポリシー'
-_codepoint = 'コードポイント|文字コード'
-
 bytearray(x)
 xのバイト配列
 
 bytes(x)
 xのバイト列
 
-_errors = errors
-エラー処理をerrors(ポリシ)にする
-
-_encoding = 'utf-8'
-UTF8を用いる
-
-_errors = 'strict'
-エラー処理を厳密にする
-
-_errors = 'ignore'
-エラー処理をしない
-
-_prompt = プロンプト
 input()  
 {入力された}文字列
 
@@ -441,15 +407,12 @@ input(s)
 memoryview(x)
 xのメモリビュー
 
-オープンする = 開く@2|オープンする
-オープンして = 開いて@2|オープンして
-
 open(filename)
-filename(ファイル)をオープンする
-filename(ファイル)を[読む|読み込む]
+filename(ファイル名)をオープンする
+filename(ファイル名)を読み込む
 
 with open(filename) as f:
-filename(ファイル)をオープンし、fとする
+filename(ファイル名)をオープンし、fとする
 
 読み込みモードで=読み込み用に|読み込みモードで
 書き込みモードで=書き込み用に|保存用に|書き込みモードで
@@ -457,25 +420,17 @@ filename(ファイル)をオープンし、fとする
 バイナリモードで=バイナリ用に|バイナリモードで
 
 open(filename, 'r')
-filename(ファイル)を/[読み込みモードで]でオープンする
+filename(ファイル名)を/[読み込みモードで]でオープンする
+filename(ファイル名)を/'r'モードででオープンする
 
 open(filename, 'w')
-filename(ファイル)を/[書き込みモードで]オープンする
+filename(ファイル名)を/[書き込みモードで]オープンする
 
 open(filename, 'a')
-filename(ファイル)を/[追加モードで]オープンする
+filename(ファイル名)を/[追加モードで]オープンする
 
 open(filename, 'b')
-filename(ファイル)を/[バイナリモードで]オープンする
-
-_mode = 'b'
-バイナリモードを用いる
-
-_buffering = -1 
-バッファリングしない
-
-_buffering = x
-バッファリングのサイズはxにする
+filename(ファイル名)を/[バイナリモードで]オープンする
 
 print()
 空行をプリントする
@@ -493,23 +448,10 @@ print(x, end='')
 xを/[改行なく|改行せず]プリントする
 
 print(x, y, end='')
-xと yを[改行なく|改行せず]プリントする
+xとyを[改行なく|改行せず]プリントする
 
 print(x, y, z, end='')
 x、y、zを[改行なく|改行せず][順に|]プリントする
-
-#sep = s  # sをセパレータに用いる
-#end = ''  # 改行がない
-#end = s  # sを改行の代わりに用いる
-
-_file = file
-fileを出力先に用いる
-
-_flush = False
-フラッシュを行わない
-
-_flush = True
-フラッシュを行う
 
 # 組み込み関数（関数）
 
@@ -534,41 +476,47 @@ x(列)[のそれぞれ|の各要素|]を/function(関数)でマップする
 
 delattr(x, attrname)
 x(オブジェクト)の[プロパティ]attrnameを削除する
+x(オブジェクト)のattrname[プロパティ]を削除する
 
 getattr(x, attrname)
 x(オブジェクト)の[プロパティ]attrnameの値
+x(オブジェクト)のattrname[プロパティ]の値
 
-hasattr(x, attrname)
+hasattr(x, attrname)  @not @if @while
 x(オブジェクト)が[プロパティ]attrnameを持つかどうか
+x(オブジェクト)がattrname[プロパティ]を持つかどうか
+x(オブジェクト)に[プロパティ]attrnameがあるかどうか
+x(オブジェクト)にattrname[プロパティ]があるかどうか
 
 setattr(x, attrname, y)
-x(オブジェクト)の[プロパティ]attrnameの値をyにする
+x(オブジェクト)の[プロパティ]attrnameの値をyに[設定する+|する]
+x(オブジェクト)のattrname[プロパティ]の値をyに[設定する+|する]
 
 hash(x)
 xのハッシュ値
 
-isinstance(x, class1)
+isinstance(x, class1)    @not @if
 x(オブジェクト)がclass1[のインスタンス|]かどうか
 
-isinstance(x, (class1, class2))
+isinstance(x, (class1, class2))   @not @if
 x(オブジェクト)がclass1[または]class2[のインスタンス|]かどうか
 
-isinstance(x, int)
+isinstance(x, int)  @not @if
 x(オブジェクト)が整数かどうか
 
-isinstance(x, float)
+isinstance(x, float)  @not @if
 x(オブジェクト)が浮動小数点数かどうか
 
-isinstance(x, str)
+isinstance(x, str)  @not @if
 x(オブジェクト)が文字列かどうか
 
-isinstance(x, list)
+isinstance(x, list)  @not @if
 x(オブジェクト)がリストかどうか
 
-isinstance(x, (list, tuple))
+isinstance(x, (list, tuple))  @not @if
 x(オブジェクト)がリスト[または]タプルかどうか
 
-issubclass(class1, class2)
+issubclass(class1, class2)　　@not @if
 class(クラス)がclass2のサブクラスかどうか
 
 id(x)
@@ -581,27 +529,25 @@ xの[型|クラス|種類]
 # 整数
 
 n.bit_length()  
-nの二進法表記のビット数
+n(整数)のビット[数|長]
 
 n.to_bytes(x)
-{整数nを変換した}xビット長のバイト列
-
-_byteorder = "big"
-ビックエンディアンを用いる
-_byteorder = "little"
-リトルエンディアンを用いる
+n(整数)をxビット長のバイト列に[変換|]する
+n(整数)のxビット長バイト列
 
 int.from_bytes(bytes)
-{バイト列bytesから変換した}整数
+bytes(バイト列)bytesから整数に変換する
 
-x.is_integer() 
+x.is_integer() 　　@not @if
 x(浮動小数点数)が整数かどうか
 
 x.hex()
+x(浮動小数点数)を/16進文字列に[変換|]する
 x(浮動小数点数)の16進文字列表現
 
 float.fromhex(s)
-{16進数のsから構文解析した}浮動点少数
+s(16進数文字列)から浮動小数点数に[変換|]する
+
 
 # 文字列
 
@@ -634,220 +580,152 @@ string.whitespace
 
 s.capitalize()
 s(文字列)をキャピタライズする
-{s(文字列)をキャピタライズした}文字列
 
 s.casefold()
 s(文字列)をケースフォルドする
-{s(文字列)をケースフォルドした}文字列
 
-中央寄せ=センタリング
+センタリングする=中央寄せする|センタリングする
 
 s.center(x)
-s(文字列)を幅xで[中央寄せ]する
-{s(文字列)を幅xで[中央寄せ]した}文字列
+s(文字列)を/幅xでセンタリングする
 
 s.ljust(x)
-s(文字列)を幅xで右寄せする
-{s(文字列)を幅xで右寄せした}文字列
+s(文字列)を/幅xで右寄せする
 
 s.rjust(x)
-s(文字列)を幅xで左寄せする
-{s(文字列)を幅xで左寄せした}文字列
-
-fillchar = c
-c(文字)で埋める
-
-カウントする=数える|カウントする
+s(文字列)を/幅xで左寄せする
 
 s.count(sub)
 s(文字列)内[の|に含まれる|に現れる]sub[の数|]をカウントする
 s(文字列)内のsubの出現回数
 
 s.encode()
-s(文字列)をバイト列に変換する
-{s(文字列)から変換された}バイト列
+s(文字列)をバイト列に[変換|]する
 
 s.encode(enc)
-s(文字列)を/enc(文字コード)でバイト列に変換する
+s(文字列)を/enc(文字コード)でバイト列に[変換|]する
 
 s.encode('shift-jis')
-s(文字列)を/SJISでバイト列に変換する
+s(文字列)を/SJIS[コード|]でバイト列に[変換|]する
 
-エンコーディング=文字コード|エンコーディング
-
-_encoding='utf-8'
-[エンコーディング]は、'utf-8'を用いる
-
-_errors='ignore'
-[発生する|]エラーは無視する
-
-
-接頭辞=始まり|始端|プレフィックス
-始まる=開始する
-
-s.startswith(prefix)
+s.startswith(prefix)  @not @if @while
 s(文字列)がprefixで始まるかどうか
 s(文字列)の[接頭辞]がsuffix[である|]かどうか
 
-接尾辞=始まり|終端|サフィックス
-終わる=終了する
-
-s.endswith(suffix)
+s.endswith(suffix)  @not @if @while
 s(文字列)がsuffixで終わるかどうか
 s(文字列)の[接尾辞]がsuffix[である|]かどうか
 
-置き換える=置換する
-置き換えた=置換した
+タブ=タブ記号|TAB|タブ
 
 s.expandtabs()
 {s(文字列)のタブ}を/空白で置き換える
-{{s(文字列)内のタブ}を/空白で置き換えた}文字列
 
 s.expandtabs(n)
 {s(文字列)内のタブ}を/{n文字の空白}で置き換える
-{{s(文字列)内のタブ}を/{n文字の空白}で置き換えた}文字列
 
-_tabsize = x  # タブは、空白x文字分とする
 
-見つかる = 見つかる|発見される|出現する
-見つかった = 発見された|出現した
-内 = 内|の中|中
-位置@index=位置|インデックス
-
-s.find(sub)
-s(文字列)内でsubを探す
-s(文字列)内の[最初の|]subの位置@index
-{s(文字列)内で/subが/[最初に|]見つかった}位置@index
-
-s.find(sub) >= 0
+s.find(sub) >= 0  @if @while
 {s(文字列)内に/subがある}かどうか
 {s(文字列)内で/subが見つかる}かどうか
 
-s.find(sub) == -1
+s.find(sub) == -1  @if @while
 {s(文字列)内に/subがない}かどうか
 {s(文字列)内で/subが見つからない}かどうか
 
+s.find(sub)
+sub(部分文字列)[の位置|]を/s(文字列)内で探す
+
 s.find(sub, start)
-{{s(文字列)内を/startから探して}subが/[最初に|]見つかった}位置@index
+sub(部分文字列)[の位置|]を/s(文字列)内で/startから探す
 
-s.find(sub, start, end)
-{{s(文字列)内を/startからendまで探して}subが/[最初に|]見つかった}位置@index
-
-s.index(sub)
-{s(文字列)内で/subが[最初に|]見つかった}位置@index
-
-s.index(sub, start)
-{{s(文字列)内を/startから探して}subが/[最初に|]見つかった}位置@index
-
-s.index(sub, start, end)
-{{s(文字列)内を/startからendまで探して}subが/[最初に|]見つかった}位置@index
+s.find(sub, start)
+sub(部分文字列)[の位置|]を/s(文字列)内で/startからendまで探す
 
 s.rfind(sub)
-{s(文字列)内でsubが最後に見つかった}位置@index
+sub(部分文字列)[の位置|]を/s(文字列)内で/[後ろ|末尾|右]から探す
 
 s.rfind(sub, start)
-{{s(文字列)内をstartから探して}subが最後に見つかった}位置@index
+sub(部分文字列)[の位置|]を/s(文字列)内で/[後ろ|末尾|右]からstartまで探す
 
 s.rfind(sub, start, end)
-{{s(文字列)内をstartからendまで探して}subが最後に見つかった}位置@index
+sub(部分文字列)[の位置|]を/s(文字列)内で/endからstartまで探す
+
+s.index(sub)
+{s(文字列)内で/subが[最初に|]見つかった}位置
 
 s.rindex(sub)
-{s(文字列)内でsubが最後に見つかった}位置@index
-
-s.rindex(sub, start)
-{{s(文字列)内をstartから探して}subが最後に 見つかった}位置@index
-
-s.rindex(sub, start, end)
-{{s(文字列)内を/startからendまで探して}subが最後に 見つかった}位置@index
+{s(文字列)内で/subが最後に見つかった}位置
 
 フォーマットする = 整形する|フォーマットする
-フォーマットする = 整形した|フォーマットした
-
 テンプレ=書式|テンプレート|テンプレ
 
 fmt.format(x)
 fmt(テンプレを/xでフォーマットする
-{fmt(テンプレ)を/xでフォーマットした}文字列
 
 fmt.format(x, y)
 fmt(テンプレ)を/{xとy}でフォーマットする
-{fmt(テンプレ)に/{xとy}をフォーマットした}文字列
 
 fmt.format(x, y, z)
 fmt(テンプレ)を/{x, y, z}でフォーマットする
-{fmt(テンプレ)に/{x, y, z}をフォーマットした}文字列
 
 アルファベット = アルファベット|英字
 
-s.isalnum()
+s.isalnum()    @not @if
 s(文字列)が[英数字]かどうか
 
-s.isalpha()
+s.isalpha()    @not @if
 s(文字列)が[アルファベット]かどうか
 
-s.isascii()
+s.isascii()    @not @if
 s(文字列)が[ASCII文字]かどうか
 
-s.isdecimal()
+s.isdecimal()    @not @if
 s(文字列)が数字かどうか
 
-s.isdigit()
+s.isdigit()    @not @if
 s(文字列)が数字かどうか
 
-s.isidentifier()
+s.isidentifier()    @not @if
 s(文字列)が[識別子文字]かどうか
 
-s.islower()
+s.islower()    @not @if
 s(文字列)が[英小文字]かどうか
 
-s.isnumeric()
+s.isnumeric()    @not @if
 s(文字列)が[数字]かどうか
 
-s.isprintable()
+s.isprintable()    @not @if
 s(文字列)が印字[可能|できる]かどうか
 
-s.isspace()
+s.isspace()    @not @if
 s(文字列)が空白かどうか
 
-s.istitle()
+s.istitle()    @not @if
 s(文字列)がタイトルケース文字列かどうか
 
-s.isupper()
+s.isupper()    @not @if
 s(文字列)が英大文字かどうか
 
-ジョインする = 結合する@3|連結する@3|ジョインする
-ジョインした = 結合した@3|連結した@3|ジョインした
-
-s.join(x)
-{[文字列リスト|]x[のそれぞれ|各要素|]}を/s(文字列)でジョインする
-{xの間に{s(文字列)を入れて}ジョインした}文字列
-
-''.join(x)
-{[文字列リスト|]x[のそれぞれ|各要素|]}をジョインする
-{xの間に{s(文字列)を入れて}ジョインした}文字列
+s.join(a)
+{a(リスト)の[それぞれ|各要素]}を/s(文字列)でジョインする
 
 s.join(str(x) for x in a)
-aを文字列に変換してs(文字列)でジョインする
-{aを文字列に変換してs(文字列)でジョインした}文字列
+a(リスト)の[それぞれ|各要素]を文字列に変換し、s(文字列)でジョインする
 
-英大文字=大文字
-英小文字=小文字
+''.join(x)
+a(リスト)の[それぞれ|各要素]を文字列に変換し、ジョインする
 
 s.lower()
-strの[英小文字]
-英[小文字化]したstr
+s(文字列)を[英小文字]化する
 
 s.upper()
-strの英[大文字]
-[英大文字]化したstr
+s(文字列)を[英大文字]化する
 
+除去する = 取り除く|除去する|削除する|消す
 リプレースする = 置き換える|置換する|リプレースする
-
-除去する = 取り除く|除去する|削除する
-除去した = 取り除いた|除去した|削除した
 パーティションする = 区切る|分割する|パーティションする
-
-_chars = '文字集合'
+ジョインする = 結合する@3|連結する@3|ジョインする
 
 余分な=不要な|@5
 先頭=前
@@ -855,83 +733,82 @@ _chars = '文字集合'
 
 s.lstrip()
 s(文字列)の先頭から/[余分な]空白を除去する
-{s(文字列)の先頭から/[余分な]空白を除去した}文字列
 
 s.lstrip(chars)
 s(文字列)の先頭から/charsを除去する
-{s(文字列)の先頭から/charsを除去した}文字列
 
 s.rstrip()
 s(文字列)の末尾から/空白を除去する
-{s(文字列)の末尾から/空白を除去した}文字列
 
 s.rstrip(chars)
 s(文字列)の末尾から/charsを除去する
-{s(文字列)の末尾から/charsを除去した}文字列
 
 s.strip()
 s(文字列)の先頭と末尾から/[余分な]空白を除去する
-{s(文字列)の先頭と末尾から/[余分な]空白を除去した}文字列
+s(文字列)から/[余分な]空白を除去する
 
 s.strip(chars)
 s(文字列)の先頭と末尾から/charsを除去する
-{s(文字列)の先頭と末尾から/charsを除去した}文字列
 
 s.partition(sep)
-{s(文字列)を/sepでパーティションした}タプル
-
-s.partition(sep)
-{s(文字列)を/末尾から/sepでパーティションした}タプル
+s(文字列)を/sepでパーティションする
 
 s.removeprefix(prefix)
-{s(文字列)の先頭から/prefixを取り除いた}文字列
+s(文字列)から接頭辞prefixを除去する
+s(文字列)の先頭からprefix(文字列)を除去する
 
 s.removesuffix(suffix)
-{s(文字列)の末尾から/suffixを取り除いた}文字列
+s(文字列)から接尾辞suffixを除去する
+s(文字列)の末尾からsuffixを除去する
 
 s.replace(sub, s2)
-s(文字列)[内]のsubを[全て|]/s2に置き換える
-{s(文字列)[内]のsubを[全て|]/s2に置き換えた}文字列
+s(文字列)[内]のsubを[全て|]/s2にリプレースする
 
 s.replace(sub, '')
-s(文字列)[内]のsubを/[全て|]取り除く
-{s(文字列)[内]のsubを/[全て|]取り除いた}文字列
+s(文字列)[内]のsubを/[全て|]除去する
 
 スプリットする = 分割する|分ける|区切る|スプリットする
-スプリットした = 分割した|分けた|区切った|スプリットした
-区切り = 区切り|区切り記号|
+右スプリットする = 右分割する|右から分ける|右から区切る|右スプリットする
+
+s.split()
+s(文字列)を/空白でスプリットする
+s(文字列)を/{空白で区切って}リストにする
 
 s.split(sep)
-s(文字列)を/[区切り]sepでスプリットする
+s(文字列)を/sep(セパレータ)でスプリットする
 s(文字列)を/{sepで区切って}リストにする
-{s(文字列)を/[区切り]sepでスプリットした}文字列リスト
 
 s.rsplit(sep)
-s(文字列)を/[区切り]sepで[右|後ろ]から スプリットする
-#{s(文字列)を/[区切り]sepで[右|後ろ]から　スプリットした}文字列リスト
+s(文字列)を/sep(セパレータ)で右スプリットする
+
+s.split()[0]
+s(文字列)を空白で区切った最初の[文字列|部分]
+
+s.split()[-1]
+s(文字列)を空白で区切った最後の[文字列|部分]
 
 s.split(sep)[0]
-s(文字列)の[区切り]sepより前の[文字列|部分]
+s(文字列)をsep(セパレータ)で区切った最初の[文字列|部分]
 
 s.split(sep)[-1]
-s(文字列)の[区切り]sepより後の[文字列|部分]
+s(文字列)をsep(セパレータ)で区切った最後の[文字列|部分]
 
-_maxsplit = '最大分割回数'
+maxsplit = x　　@option
+最大分割回数はxとする
 
-_convtable = '変換表'
+翻訳する=変換する@3|変換する
 
-s.translate(convtable)
-s(文字列)[の文字|の各文字|のそれぞれの文字]を/[変換表|]convtableで変換する
-{s(文字列)[の文字]を/[変換表|]convtableで変換した}文字列
+s.translate(ct)
+s(文字列)[の文字|]を/ct(変換表)で翻訳する
 
 s.zfill(x)  
 s(文字列)の[長さ|大きさ|サイズ]をxにする
-{s(文字列)を/{幅xになる}ように'0'文字で埋めた}文字列
+s(文字列)を/{[幅|長さ]xになる}ように'0'文字で埋める
 
 
 ##
 
-整数乱数=ランダムな整数
+整数乱数=ランダムな整数|ランダム整数
 サンプリングする = サンプルを選ぶ|サンプリングする
 乱数シード = 乱数生成|乱数シード
 
@@ -939,16 +816,17 @@ random.random()
 乱数[を生成する]
 
 random.choice(list)
-listから[ひとつ]/ランダムに選ぶ
+list(リスト)から[ひとつ]ランダムに選ぶ
 
 random.shuffle(list)
-listを/[ランダムに|]シャッフルする
+list(リスト)を/[ランダムに|]シャッフルする
 
 random.sample(list)
-listからサンプリングする
+list(リスト)からサンプリングする
 
 random.sample(list, n)
-listからn個、サンプリングする
+list(リスト)からn個、サンプリングする
+list(リスト)からn個、ランダムに選ぶ
 
 random.randrange(x)
 0からx[未満]までの整数乱数
@@ -986,10 +864,10 @@ math.floor(x)
 xの切り捨て整数値
 
 math.frexp(x)[0]
-xの仮数
+xの仮数部
 
 math.frexp(x)[1]
-指数
+xの指数部
 
 math.gcd(x, y)
 xとyの最大公約数
@@ -997,18 +875,20 @@ xとyの最大公約数
 math.lcm(x, y)
 xとyの最小公倍数
 
-math.isclose(x, y)
-xとyが[近い|近似できる|ほぼ等しい|等しいとみなせる]かどうか
-xがyに[近い|近似できる|ほぼ等しい|等しいとみなせる]かどうか
+math.isclose(x, y)  @not @if @while
+xとyが[近い|十分に近い|近似できる|ほぼ等しい|等しいとみなせる]かどうか
+xがyに[近い|十分に近い|近似できる|ほぼ等しい|等しいとみなせる]かどうか
 
-math.isfinite(x)
+math.isfinite(x)  @not @if @while
 xが有限かどうか
 
-math.isinf(x)
+math.isinf(x)   @not @if @while
 xが無限大かどうか
 
-math.isnan(x)
-xがNaNかどうか
+非数=NaN|非数
+
+math.isnan(x)  @not @if @while
+xが非数かどうか
 
 math.modf(x)
 xの小数部と整数部
@@ -1019,70 +899,70 @@ xの小数部
 math.modf(x)[1]
 xの整数部
 
-math.remainder(x, y)
+math.remainder(x, y)   @calc
 xをyで割った[剰余|余り]
 
-math.exp(x)
+math.exp(x)  @calc
 eのx乗
 
-math.log(x)
+math.log(x)  @calc
 xの自然対数
 
-math.log(x, y)
-{yを底とするx]の対数
+math.log(x, y)  @calc
+{yを底とする}xの対数
 
-math.log2(x)
+math.log2(x)   @calc
 {2を底とする}xの対数
 
-math.log10(x)
+math.log10(x)  @calc
 xの常用対数
 
-math.sqrt(x)
+math.sqrt(x)  @calc
 xの平方根
 
-math.cos(x)
+math.cos(x)  @calc
 xの[余弦|コサイン]
 
-math.dist(x)
+math.dist(x)  @calc
 xのユークリッド距離
 
-math.hypot(x, y)
+math.hypot(x, y)   @calc
 xとyのノルム
 
-math.sin(x)
+math.sin(x)  @calc
 xの[正弦|サイン]
 
-math.tan(x)
+math.tan(x)   @calc
 xの[正接|タンジェント]
 
-math.degrees(x)
+math.degrees(x)   @calc
 xの角度
 
-math.radians(x)
+math.radians(x)   @calc
 xのラジアン
 
-math.acosh(x)
+math.acosh(x)   @calc
 xの逆双曲線余弦
 
-math.asinh(x)
+math.asinh(x)  @calc
 xの逆双曲線正弦
 
-math.atanh(x)
+math.atanh(x)   @calc
 xの逆双曲線正接
 
-math.cosh(x)
+math.cosh(x)   @calc
 xの双曲線余弦
 
-math.sinh(x)
+math.sinh(x)  @calc
 xの双曲線正弦
 
-math.tanh(x)
+math.tanh(x)   @calc
 xの双曲線正接
 
-math.gamma(x)
+math.gamma(x)  @calc
 xのガンマ関数
 
-math.lgamma(x)
+math.lgamma(x)  @calc
 xのガンマ関数の絶対値の自然対数
 
 math.pi
@@ -1091,7 +971,7 @@ math.pi
 math.e
 ネイピア数|自然対数の底
 
-math.inf
+math.inf  @calc
 無限大|∞
 
 math.nan
@@ -1100,28 +980,35 @@ NaN|非数|数でない
 # 正規表現
 
 re.search(x, y)
-{[文字列|]yに[正規表現|]xがマッチする}最初の位置
+{y(文字列)にx(正規表現)がマッチする}最初の位置
 
-re.match(x, y)
-[文字列|]yに/[正規表現|]xがマッチするかどうか
+re.match(x, y)    @not @if
+y(文字列)に/x(正規表現)がマッチするかどうか
 
-re.fullmatch(x, y)
-[正規表現|]xが/y全体にマッチするかどうか
+re.fullmatch(x, y)  @not @if
+x(正規表現)が/y(文字列)全体にマッチするかどうか
 
 re.split(x, y)
-[正規表現|]xを用いて、yをスプリットする
+y(文字列)に[対し|おいて|ついて]、x(正規表現)でスプリットする
+x(正規表現)でy(文字列)をスプリットする
+
+箇所=部分|部分文字列|箇所
 
 re.sub(x, y, z)
-[正規表現|]xにマッチした}{y[の部分|]をzに置き換える
+y(文字列)に[対し|おいて|ついて]、x(正規表現)でマッチした[箇所]をzにリプレースする
+x(正規表現)でy(文字列)のマッチした[箇所]をzにリプレースする
+{x(正規表現)にマッチした}{yの[箇所]}をzにリプレースする
 
 re.subn(x, y, z)
-{[正規表現|]xにマッチした}y[の部分|]をzに置き換える
+y(文字列)に[対し|おいて|ついて]、x(正規表現)にマッチした[箇所]をzにリプレースする
+{x(正規表現)でマッチした}{yの[箇所]}をzにリプレースする
 
 re.findall(x, y)
-[正規表現|]xにマッチした文字列リスト
+y(文字列)に[対し|おいて|ついて]、x(正規表現)でマッチした[箇所]を[リストにする|抽出する]
+{x(正規表現)にマッチした}{yの[箇所]}を[リストにする|抽出する]
 
 re.compile(x)
-xを正規表現に コンパイルする
+x(正規表現)をコンパイルする
 
 # sys
 
@@ -1135,8 +1022,9 @@ sys.exit(1)
 プログラムを異常終了する
 
 sys.setrecursionlimit(1000000)
+再帰の上限を1000000にする
 再帰エラーを防ぎたい
-再帰の上限をあげる
+再帰の上限を上げる
 
 sys.argv[0]
 スクリプト名
@@ -1161,8 +1049,8 @@ sys.stdout
 sys.stdout.flush() 
 標準出力をフラッシュする
 
-sys.version
-Pythonのバージョン[を調べる]
+sys.version  @check
+Pythonのバージョン
 
 sys.float_info.max
 浮動小数点数の最大値
@@ -1174,47 +1062,36 @@ sys.float_info.epsilon
 計算機イプシロン
 
 ## os
-os.path.join(dst_dir, os.path.basename(url))
 
-新規に=新しく
-ディレクトリ=フォルダ
-ファイルパス@=ファイル名|ファイルパス|
+プラットホーム依存なしに=安全に|プラットホーム依存なしに|プラットホーム依存せずに|
+
+新規に=新しく|新たに|新規に
+ディレクトリ=ディレクトリ|フォルダ
+ファイルパス=ファイルパス|パス
 
 os.mkdir('dir/')
-[新規に]/{[ファイルパス@]'dir/'のディレクトリ}を作る
+[新規に]/{'dir/'のディレクトリ}を作る
 
 os.makedirs('dir/', exist_ok=True)
-[ファイルパス@]'dir/'のディレクトリを[再帰的に|階層的に]作る
+'dir/'のディレクトリを[再帰的に|階層的に]作る
 
 os.listdir('dir/')
-[ファイルパス@]'dir/'のファイル一覧
+'dir/'(ファイルパス)のファイル一覧
 
-os.path.exists(p)
-[ファイルパス@] pが[存在する|ある]かどうか
+os.path.exists(p)       @not @if
+p(ファイルパス)が[存在する]かどうか
 
-if not os.path.exists(p):
-[もし|][ファイルパス@] pが[存在しない|ない][ならば]
-[ファイルパス@] pが[存在しない|ない][とき]
+os.path.isdir(p)        @not @if
+p(ファイルパス)がディレクトリかどうか
 
-os.path.isdir(p)
-[ファイルパス@]pがディレクトリ[である|]かどうか
-
-if not os.path.isdir(p):
-[もし|][ファイルパス@]pがディレクトリでない[ならば]
-[ファイルパス@]pがディレクトリでない[とき]
-
-os.path.isfile(p)
-[ファイルパス@]pがファイル[である|]かどうか
-
-if not os.path.isfile(p):
-[もし|][ファイルパス@]pがファイルでない[ならば]
-[ファイルパス@]pがファイルでない[とき]
+os.path.isfile(p)       @not @if
+p(ファイルパス)がファイルかどうか
 
 os.path.getsize('file.txt')
-[ファイルパス@]'file.txt'の[ファイルサイズ|バイト数|大きさ]
+'file.txt'(ファイル名)の[ファイルサイズ|バイト数|大きさ]
 
 os.path.join(p, p2)
-[ファイルパス@]pとp2を結合する
+{p(ファイルパス)とp2}を/[プラットホーム依存なしに]結合する
 
 # #root, ext = os.path.splitext(f)
 
