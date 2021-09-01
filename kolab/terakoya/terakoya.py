@@ -74,8 +74,7 @@ def dispatch_emit(code, docs, buffers, options):
                 is_extendable = app(code, docs, local_buffers, tuple(local_options[1:]) + options)
                 buffers.extend(local_buffers)
                 if is_extendable:
-                    docs.extend([x[1] for x in local_buffers])
-                    print('@debug', docs)
+                    docs.extend([f'{x[1]}#{x[0]}' for x in local_buffers])
             else:
                 print(f'undefined {option}')
 

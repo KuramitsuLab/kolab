@@ -1,6 +1,6 @@
 # 基本定義
 
-内=内|中|      #例. データフレーム[内]の
+内=内|中|      # 例. データフレーム[内]の
 存在する=ある@3|存在する
 ファイル名=ファイル名@3|ファイル@2|ファイルパス@2|パス
 
@@ -35,17 +35,17 @@ pd.read_csv('file.csv', sep='\t') @let:df
 
 を選択する=を選択する|を抽出する|@5
 
-df.head() @check @it:その
+df.head() @check @dot @it:その
 df(データフレーム)の[最初の|先頭の|先頭|上|]5行
 [とりあえず|]df(データフレーム)の内容を確認する
 
-df.head(10) @check @it:その
+df.head(10) @check @dot @it:その
 df(データフレーム)の[最初の|先頭の|先頭|上|]10行
 
-df.tail() @check @it:その
+df.tail() @check @dot @it:その
 df(データフレーム)の[最後の|末尾の|末尾|下]5行
 
-df.tail(10) @check @it:その
+df.tail(10) @check @dot @it:その
 df(データフレーム)の[最初の|末尾の|末尾|下]10行
 
 df[100:106] @check @dot
@@ -68,7 +68,6 @@ df(データフレーム)のカラム'name'、'age'、'GPA'[を選択する]
 
 df[['name','age','GPA', 'addr']] @check @dot
 df(データフレーム)のカラム'name'、'age'、'GPA'、'addr'[を選択する]
-
 
 # ドロップ系
 
@@ -102,8 +101,6 @@ df(データフレーム)の'flg-50K'(カラム)をグループ化して、値�
 
 df.assign(price=pd.to_numeric(df['price'])) @FIXME
 df(データフレーム)の('price')(カラム)を数値型に変換する
-
-
 
 df.columns
 dfの列の名前を取得する

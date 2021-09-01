@@ -17,6 +17,7 @@ OPTION = {
     '--pyfirst': False, #Pythonを先に出力する (yk使用)
     '--change-subject': 0.0, # 助詞の「が」をランダムに「は」に変える
     '--drop': 0.0, # パラメータをドロップする
+    '--partial': True, #不完全なコードでも出力する
 }
 
 def verb_emit(base, vpos=None, mode=0):
