@@ -1,0 +1,132 @@
+
+# インポート
+
+from matplotlib import pyplot as plt
+マットプロットリブを使用する
+[Matplotlib|Matplotlibライブラリ]を[pltとして|]インポートする
+グラフ描画用のライブラリをインポートする
+Matplotlibライブラリを用意する
+
+import seaborn as sns
+[Seabornライブラリ|Seaborn]を[snsとして|]インポートする
+Seabornライブラリを用意する
+シーボンを使用する
+可視化用のライブラリをインポートする
+
+sns.set(font="IPAexGothic",style="white")
+グラフ内で日本語を表示できるようにする
+グラフの[日本語表示|日本語フォント]を設定する
+
+# 設定系
+
+に設定する=に設定する|に指定する|にセットする|に変更する|にする|と設定する|とセットする|と指定する|とする
+
+グラフタイトル=グラフのタイトル|タイトル|グラフの題名
+
+plt.title('figure')
+[グラフタイトル]を'figure'[に設定する]
+
+plt.figure(figsize=(20, 6))
+グラフの[サイズ|大きさ]を[横20縦6|20x6][に設定する]
+
+付ける=付ける@3|つける|加える
+
+軸ラベル=軸ラベル|ラベル
+
+x軸=x軸|グラフのx軸|x座標
+y軸=y軸|グラフのy軸|y座標
+z軸=z軸|グラフのz軸|z座標
+
+plt.xlabel('X')
+x軸の軸ラベルを'X'[に設定する]
+x軸に/{'X'という}軸ラベルを付ける
+x軸に/'X'(軸ラベル)を付ける
+
+plt.ylabel('Y')
+y軸の軸ラベルを'Y'[に設定する]
+y軸に/{'Y'という}軸ラベルを付ける
+y軸に/'Y'(軸ラベル)を付ける
+
+plt.grid(True)
+グラフに/グリッドを付ける
+
+plt.legend()
+[グラフ内に|]凡例を付ける
+
+plt.legend(loc = 'best')
+凡例を[グラフ内の|]最適な位置に付ける
+
+plt.subplot(x, y, 2) @FIXME
+x行y列の2つ目のグラフ指定
+
+
+# 描画
+
+プロットする=表示する|描画する@3|描写する|描く|プロットする@3
+
+として、=として、|と設定して、|と指定して、
+
+plt.scatter(x, y)
+xとyの散布図を[プロットする]
+
+plt.plot(x, y, label="test")
+ラベルを"test"として、xとyの[折れ線|]グラフを[プロットする]
+
+plt.plot(x, y, color="#0F0F0F")
+[グラフの|]色を"#0F0F0F"(カラーコード)として、xとyの[折れ線|]グラフを[プロットする]
+
+plt.plot(x, y, color=(0,0,1))
+[グラフの|]色を(0,0,1)(RGB値)として、xとyの[折れ線|]グラフを[プロットする]
+
+plt.hist(x)
+xのヒストグラムをプロットする
+
+plt.hist(x, bins=60)
+[ビン|ビンの数|区間|区関の数]を60として、xのヒストグラムをプロットする
+
+plt.hist(x, range = (20, 80))
+[値の|][レンジ|範囲]を20から80として、xのヒストグラムをプロットする
+
+plt.hist(df['absences'])
+df(データフレーム)の'absences'(カラム)についてのヒストグラムをプロットする
+
+plt.boxplot(df['absences'])
+df(データフレーム)の'absences'(カラム)についての箱ひげ図をプロットする
+
+plt.boxplot([df['G1'], df['G2'], df['G3']])
+df(データフレーム)の'G1'(カラム)と'G2'(カラム)と'G3'(カラム)についての箱ひげ図をプロットする
+
+sns.pairplot(df[['G1', 'G2', 'G3']])
+df(データフレーム)の'G1'(カラム)と'G2'(カラム)と'G3'(カラム)について関係性を[一気に|一度に]プロットする
+
+plt.bar(x, y)
+x軸をxとしたyの棒グラフをプロットする
+
+plt.bar(x, y, width = 0.5)
+グラフ幅を0.5として、x軸をxとしたyの棒グラフをプロットする
+
+plt.bar(x, y, align='center')
+棒グラフの位置を真ん中として、x軸をxとしたyの棒グラフをプロットする
+
+plt.xticks(x, ['A Class', 'B Class', 'C Class'])
+x軸のラベルをxから'A Class'、'B Class'、'C Class'へ変更する
+
+plt.barh(y, x, align = 'center')
+棒グラフの位置を真ん中として、y軸をyとしたxの棒グラフをプロットする
+
+plt.yticks(y, ['A Class','B Class','C Class'])
+y軸のラベルをyから'A Class'、'B Class'、'C Class'へ変更する
+
+plt.pie(x)
+xの円グラフをプロットする
+
+# 出力・保存
+
+プロット = グラフ@4|プロット@2|図
+
+plt.savefig("foo.png")
+プロットを/"foo.png"として保存する
+プロットを/{"foo.png"という}名前で保存する
+
+plt.show()
+プロットを[描画する|表示する]
