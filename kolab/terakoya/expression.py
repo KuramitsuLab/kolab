@@ -165,7 +165,7 @@ def emit_get(code, docs, results, options):
         mcode, doc = check_modified_code(code, doc)
         vpos, _, _ = detect_vpos(doc)
         if vpos == 'NA':
-            results.append((doc+'を'+alt('取得する|得る'), mcode))
+            results.append((doc+'を'+alt('取得する|得る|抽出する'), mcode))
     return True
 
 # @calc  値 -> 値を算出する
