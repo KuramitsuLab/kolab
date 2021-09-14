@@ -1,27 +1,153 @@
 
-# インポート
+# option
 
-from matplotlib import pyplot as plt
-マットプロットリブを使用する
-[Matplotlib|Matplotlibライブラリ]を[pltとして|]インポートする
-グラフ描画用のライブラリをインポートする
-Matplotlibライブラリを用意する
+alpha = 0.5   @option
+[透過度|透明度][は|を]0.5とする
 
-import seaborn as sns
-[Seabornライブラリ|Seaborn]を[snsとして|]インポートする
-Seabornライブラリを用意する
-シーボンを使用する
-可視化用のライブラリをインポートする
+labels = label   @option
+グラフのラベルをlabelとする
 
-sns.set(font="IPAexGothic",style="white")
-グラフ内で日本語を表示できるようにする
-グラフの[日本語表示|日本語フォント]を設定する
+グラフの色 = グラフの色|グラフカラー
+
+color = 'red'   @option
+グラフの色[は|を]赤[|色]とする
+
+color = 'blue'   @option
+グラフの色[は|を]青[|色]とする
+
+color = 'yellow'   @option
+グラフの色[は|を]黄色とする
+
+color = 'gray'   @option
+グラフの色[は|を]グレーとする
+
+color = 'navy'   @option
+グラフの色[は|を][紺色|ネイビー]とする
+
+color = 'greenyellow'   @option
+グラフの色[は|を]黄緑[|色]とする
+
+color = 'purple'   @option
+グラフの色[は|を]紫[|色]とする
+
+color = 'cyan'   @option
+グラフの色[は|を]シアンとする
+
+color = 'magenta'   @option
+グラフの色[は|を]マゼンタとする
+
+ラインスタイル=ラインスタイル|線の見た目
+
+linestyle = 'dashed'   @option
+ラインスタイル[は|を]破線とする
+
+linestyle = 'dashbot'   @option
+ラインスタイル[は|を]一点鎖線とする
+
+linestyle = 'dotted'   @option
+ラインスタイル[は|を]点線とする
+
+マーカースタイル=マーカーの種類|マーカースタイル|マーカーの形
+
+marker = '.'   @option
+ラインスタイル[は|を]点とする
+
+marker = 'o'   @option
+ラインスタイル[は|を]円とする
+
+marker = '*'   @option
+ラインスタイル[は|を]星とする
+
+marker = 'h'   @option
+ラインスタイル[は|を]六角形とする
+
+marker = 'x'   @option
+ラインスタイル[は|を]バツ印とする
+
+marker = 'D'   @option
+ラインスタイル[は|を][ダイヤモンド|ひし形]とする
+
+marker = 's'   @option
+ラインスタイル[は|を]四角形とする
+
+マーカーの大きさ=マーカーの大きさ|マーカーサイズ
+
+markersize = 16
+マーカーの大きさ[は|を]16とする
+
+マーカーの色 = マーカーの色|マーカーカラー
+
+markerfacecolor = 'red'   @option
+マーカーの色[は|を]赤[|色]とする
+
+markerfacecolor = 'blue'   @option
+マーカーの色[は|を]青[|色]とする
+
+markerfacecolor = 'yellow'   @option
+マーカーの色[は|を]黄色とする
+
+markerfacecolor = 'gray'   @option
+マーカーの色[は|を]グレーとする
+
+markerfacecolor = 'navy'   @option
+マーカーの色[は|を][紺色|ネイビー]とする
+
+markerfacecolor = 'greenyellow'   @option
+マーカーの色[は|を]黄緑[|色]とする
+
+markerfacecolor = 'purple'   @option
+マーカーの色[は|を]紫[|色]とする
+
+markerfacecolor = 'cyan'   @option
+マーカーの色[は|を]シアンとする
+
+markerfacecolor = 'magenta'   @option
+マーカーの色[は|を]マゼンタとする
+
+マーカーのエッジの大きさ=マーカーのエッジの大きさ|マーカーのエッジサイズ
+
+markeredgewidth = 4
+マーカーのエッジの大きさ[は|を]4とする
+
+マーカーのエッジの色 = マーカーのエッジの色|マーカーのエッジカラー
+
+markeredgecolor = 'red'   @option
+マーカーのエッジの色[は|を]赤[|色]とする
+
+markeredgecolor = 'blue'   @option
+マーカーのエッジの色[は|を]青[|色]とする
+
+markeredgecolor = 'yellow'   @option
+マーカーのエッジの色[は|を]黄色とする
+
+markeredgecolor = 'gray'   @option
+マーカーのエッジの色[は|を]グレーとする
+
+markeredgecolor = 'navy'   @option
+マーカーのエッジの色[は|を][紺色|ネイビー]とする
+
+markeredgecolor = 'greenyellow'   @option
+マーカーのエッジの色[は|を]黄緑[|色]とする
+
+markeredgecolor = 'purple'   @option
+マーカーのエッジの色[は|を]紫[|色]とする
+
+markeredgecolor = 'cyan'   @option
+マーカーのエッジの色[は|を]シアンとする
+
+markeredgecolor = 'magenta'   @option
+マーカーのエッジの色[は|を]マゼンタとする
+
 
 # 設定系
 
 に設定する=に設定する|に指定する|にセットする|に変更する|にする|と設定する|とセットする|と指定する|とする
 
 グラフタイトル=グラフのタイトル|タイトル|グラフの題名
+
+sns.set(font="IPAexGothic",style="white")
+グラフ内で日本語を表示できるようにする
+グラフの[日本語表示|日本語フォント]を設定する
 
 plt.title('figure')
 [グラフタイトル]を'figure'[に設定する]
@@ -101,6 +227,7 @@ df(データフレーム)の'G1'(カラム)と'G2'(カラム)と'G3'(カラム)�
 
 plt.bar(x, y)
 x軸をxとしたyの棒グラフをプロットする
+軸をxとして、yの縦向きの棒グラフをプロットする
 
 plt.bar(x, y, width = 0.5)
 グラフ幅を0.5として、x軸をxとしたyの棒グラフをプロットする
@@ -113,12 +240,20 @@ x軸のラベルをxから'A Class'、'B Class'、'C Class'へ変更する
 
 plt.barh(y, x, align = 'center')
 棒グラフの位置を真ん中として、y軸をyとしたxの棒グラフをプロットする
+軸をyとして、xの横向きの棒グラフをプロットする
 
 plt.yticks(y, ['A Class','B Class','C Class'])
 y軸のラベルをyから'A Class'、'B Class'、'C Class'へ変更する
 
 plt.pie(x)
 xの円グラフをプロットする
+
+plt.axis('equal')
+円グラフを真円にする
+
+autopct = '%.2f%%'   @option
+円グラフの構成割合を小数点以下2桁まで表示する
+
 
 # 出力・保存
 
