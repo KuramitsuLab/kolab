@@ -279,19 +279,48 @@ def emit_it(code, docs, results, options):
 
 import re
 
+#OPTION='<Z>　'  #fixme 直してね
+OPTION=''  #fixme 直してね
+CONJ='そこで、'
+
 def emit_option(code, docs, results, options):
     for doc in docs:
         mcode, doc = check_modified_code(code, doc)
-        conj = alt('そこで、|そのとき、|さらに、')
+        conj = alt(CONJ)
+        # 活性化関数はreluにする
         matched = re.findall('(.*)は、?(.*)(に|と)する', doc)
-        if len(matched) == 3:
-            doc2 = f'{matched[1]}を{matched[0]}{matched[2]}にする'
-            results.append((conj+doc2, f'@option {mcode}'))
-            conj = alt('そこで、|そのとき、|さらに、')
-        if not doc.endswith('にする') and not doc.endswith('とする'):
-            doc = doc + alt('こととする|ことにする|')
-        results.append((conj+doc, f'@option {mcode}'))
-    return False
+        if len(matched)>0:
+            #print(doc, matched)
+            emit_option_let_A_B(mcode, matched[0][1], matched[0][0], results)
+        # 活性化関数はreluを用いる
+        matched = re.findall('(.*)は、?(.*)を(用いる|使用する|使う)', doc)
+        if len(matched)>0:
+            #print(doc, matched)
+            A = matched[0][0]
+            B = matched[0][1]
+            emit_option_using_B(mcode, A, B, results)
+            emit_option_let_A_B(mcode, B, A, results)
+        # if not doc.endswith('にする') and not doc.endswith('とする'):
+        #     doc = doc + alt('こととする|ことにする|')
+        results.append((conj+doc, f'{OPTION}{mcode}'))
+
+def emit_option_using_B(code, A, B, results):
+    if random.random() < .8:
+        conj = alt(CONJ)
+        doc = f'{A}は{B}' + alt('である|とする|にする|')
+        results.append((conj+doc, f'{OPTION}{code}'))
+    if random.random() < .8:
+        conj = alt(CONJ)
+        doc = f'{A}として{B}を' + alt('用いる|使用する|使う')
+        results.append((conj+doc, f'{OPTION}{code}'))
+
+def emit_option_let_A_B(code, A, B, results):
+    if random.random() < .5:
+        conj = alt(CONJ)
+        doc = f'{A}を{B}' + alt('にする|とする')
+        results.append((conj+doc, f'{OPTION}{code}'))
+
+
 
 def emit_FIXME(code, docs, results, options):
     pass
