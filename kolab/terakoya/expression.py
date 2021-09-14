@@ -165,7 +165,7 @@ def emit_get(code, docs, results, options):
         mcode, doc = check_modified_code(code, doc)
         vpos, _, _ = detect_vpos(doc)
         if vpos == 'NA':
-            results.append((doc+'を'+alt('表示する|確認する|調べる|見る'), mcode))
+            results.append((doc+'を'+alt('取得する|得る|抽出する'), mcode))
     return True
 
 # @calc  値 -> 値を算出する
@@ -176,7 +176,7 @@ def emit_calc(code, docs, results, options):
         mcode, doc = check_modified_code(code, doc)
         vpos, _, _ = detect_vpos(doc)
         if vpos == 'NA':
-            results.append((doc+'を'+alt('表示する|確認する|調べる|見る'), mcode))
+            results.append((doc+'を'+alt('算出する|求める|計算する'), mcode))
     return True
 
 # @check  値 -> 値を算出する
@@ -206,7 +206,7 @@ def emit_let(code, docs, results, options):
                 suffix = verb.emit_base(base, vpos, verb.接続形)+'、' + suffix
         else:
             suffix = base+f'を'+suffix
-        results.append((prefix+suffix, f'{name} = {code}'))
+        results.append((prefix+suffix, f'{name} = {mcode}'))
     return False
 
 def emit_let_self(code, docs, results, options):
