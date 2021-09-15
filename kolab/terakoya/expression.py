@@ -193,7 +193,7 @@ def emit_check(code, docs, results, options):
 # @let
 
 def emit_let(code, docs, results, options):
-    name = 'newname' if len(options) == 0 else options[0]        
+    name = 'newname' if options[0] == '' else options[0]
     for doc in docs:
         mcode, doc = check_modified_code(code, doc)
         vpos, base, prefix = verb.detect_last_vpos(doc)
@@ -210,7 +210,7 @@ def emit_let(code, docs, results, options):
     return False
 
 def emit_let_self(code, docs, results, options):
-    emit_let(code, docs, results, options)
+    # emit_let(code, docs, results, options)
     name = code.split('.')[0]
     for doc in docs:
         mcode, doc = check_modified_code(code, doc)
@@ -237,7 +237,13 @@ def emit_inplace(code, docs, results, options):
                 suffix = verb.emit_base(base, vpos, verb.連用形)+'、' + suffix
             else:
                 suffix = verb.emit_base(base, vpos, verb.接続形)+'、' + suffix
-            mcode = mcode[:-1] + ', inplace=True)'
+            
+            if mcode[-2] == '(':
+                # e.g.: df.dropna()
+                mcode = mcode[:-1] + 'inplace=True)'
+            else:
+                # e.g.: df.drop('price', axis=1)
+                mcode = mcode[:-1] + ', inplace=True)'
             results.append((prefix+suffix, mcode))
     return False
 
