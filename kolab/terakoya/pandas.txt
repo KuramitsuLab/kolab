@@ -34,7 +34,7 @@ encoding = 'shift_jis'   @option
 シフトJISを用いる
 
 header = None   @option
-ヘッダー[は|を]指定しない
+ヘッダーを指定しない
 
 color = 'red'   @option
 色を'red'とする
@@ -48,16 +48,20 @@ fontsize = 20   @option
 読み込む=読み込む|読む
 
 pd.read_excel('file.xlsx') @let:df
-エクセルファイル'file.xlsx'から読み込む
+エクセルファイル'file.xlsx'を[データフレームとして|]読み込む
+エクセルファイル'file.xlsx'から[データフレームを|]読み込む
 
-pd.read_excel('data/src/sample.xlsx', sheet_name=0)   @let:df
+pd.read_excel('file.xlsx', sheet_name=0)   @let:df
+エクセルファイル'file.xlsx'の0番目のシートを[データフレームとして|]読み込む
 エクセルファイル'file.xlsx'の0番目のシートから[データフレームを|]読み込む
 
-pd.read_excel('data/src/sample.xlsx', sheet_name='sheet1')   @let:df
-エクセルファイル'file.xlsx'の'sheet1'から[データフレームを|]読み込む
+pd.read_excel('file.xlsx', sheet_name='sheet1')   @let:df
+エクセルファイル'file.xlsx'の'sheet1'(シート名)を[データフレームとして|]読み込む
+エクセルファイル'file.xlsx'の'sheet1'(シート名)から[データフレームを|]読み込む
 
-pd.read_excel('data/src/sample.xlsx', sheet_name=None)   @let:df
-エクセルファイル'file.xlsx'の全てのシートを読み込む
+pd.read_excel('file.xlsx', sheet_name=None)   @let:df
+エクセルファイル'file.xlsx'の全てのシートを[データフレームとして|]読み込む
+エクセルファイル'file.xlsx'の全てのシートから[データフレームを|]読み込む
 
 pd.read_csv('file.csv') @let:df
 'file.csv'を読み込む
@@ -65,8 +69,8 @@ pd.read_csv('file.csv') @let:df
 
 pd.read_csv('file.csv', sep=',') @let:df
 'file.csv'を/カンマ区切りで読み込む
-データフレームを/'file.csv'(ファイル名)から/カンマ区切りで読み込む
 'file.csv'を/','区切りで読み込む
+データフレームを/'file.csv'(ファイル名)から/カンマ区切りで読み込む
 データフレームを/'file.csv'(ファイル名)から/','区切りで読み込む
 
 pd.read_csv('file.csv', sep='\t') @let:df
@@ -77,21 +81,23 @@ pd.read_csv('file.csv', header=None) @let:df
 [ヘッダーなしで|列名を指定せずに|ヘッダーを指定せずに]'file.csv'(ファイル名)を読み込む
 
 pd.read_csv('file.csv', index_col=0) @let:df
-[列番号0|先頭の列]をインデックスとして'file.csv'(ファイル名)を読み込む
+[列番号0|先頭の列]をインデックスとして、'file.csv'(ファイル名)を読み込む
 
-pd.read_csv('file.csv', encoding="shift_jis") @let:df
-エンコーディングを[shift_jis|シフトJIS]として'file.csv'(ファイル名)を読み込む
+pd.read_csv('file.csv', encoding='shift_jis') @let:df
+エンコーディングを[shift_jis|シフトJIS]として、'file.csv'(ファイル名)を読み込む
 文字コードが[shift_jis|シフトJIS]のファイル'file.csv'を読み込む
+
 
 # write
 
 書き込む=書き込む|書き出す
 
-df.to_excel('output.xlsx')
+df.to_excel('out.xlsx')
 df(データフレーム)をエクセルファイル'out.xlsx'に書き込む
 
 df.to_csv('out.csv')
 df(データフレーム)を'out.csv'(ファイル名)に書き込む
+
 
 # 確認系
 
@@ -148,34 +154,35 @@ df(データフレーム)の[オブジェクトデータ|数値データ以外]�
 
 df['age'].describe()     @check @it:その
 df(データフレーム)の'age'についての要約統計量
+(df['age'])の要約統計量
 
 df['age'].mean()      @get @it:その
 df(データフレーム)の'age'についての平均値 #を取得
-(df['age'])(カラム)の平均値
+(df['age'])の平均値
 
 df['age'].median()      @get @it:その
 df(データフレーム)の'age'についての中央値 #を取得
-(df['age'])(カラム)の中央値
+(df['age'])の中央値
 
 df['age'].mode()      @get @it:その
 df(データフレーム)の'age'についての最頻値 #を取得
-(df['age'])(カラム)の最頻値
+(df['age'])の最頻値
 
 df['age'].std()     @get @it:その
 df(データフレーム)の'age'(カラム)についての標準偏差
-(df['age'])(カラム)の標準偏差
+(df['age'])の標準偏差
 
 df['age'].var()     @get @it:その
 df(データフレーム)の'age'(カラム)についての分散
-(df['age'])(カラム)の分散
+(df['age'])の分散
 
-df.columns   @check @let:columns @it:その
+df.columns   @let:columns @check @it:その
 df(データフレーム)のカラム名
 
-df.index   @check @let:idx @it:その
+df.index   @let:idx @check @it:その
 df(データフレーム)のインデックス名
 
-df.values   @check @let:val @it:その
+df.values   @let:val @check @it:その
 df(データフレーム)の[バリュー|要素]
 
 df['G3'].values   @check
@@ -219,6 +226,7 @@ df(データフレーム)のインデックスを[振り直す|リセットす�
 
 df.reset_index(drop=True)   @let_self @inplace @let:df_r @it:その
 df(データフレーム)の元のインデックスを[振り直す|リセットする]
+df(データフレーム)の[振り直|リセット]して、元のインデックスを削除する
 
 
 # datetime
@@ -229,34 +237,34 @@ df(データフレーム)の'date'(カラム)を[datetime型|年月日の形式|
 pd.to_datetime(df['date'], format='%Y-%m-%d')
 フォーマットを指定して、df(データフレーム)の'date'(カラム)を[datetime型|年月日の形式|日付型]に変換する
 
-df['date'].dt.year     @get @it:その
+df['date'].dt.year     @check @let: df['year'] @it:その
 df(データフレーム)の'date'(カラム)の年
 
-df['date'].dt.month     @get @it:その
+df['date'].dt.month     @check @let: df['month'] @it:その
 df(データフレーム)の'date'(カラム)の月
 
-df['date'].dt.day     @get @it:その
+df['date'].dt.day     @check @let: df['day'] @it:その
 df(データフレーム)の'date'(カラム)の日にち
 
-df['date'].dt.hour     @get @it:その
+df['date'].dt.hour     @check @let: df['hour'] @it:その
 df(データフレーム)の'date'(カラム)の時間
 
-df['date'].dt.minute     @get @it:その
+df['date'].dt.minute     @check @let: df['minute'] @it:その
 df(データフレーム)の'date'(カラム)の分
 
-df['date'].dt.second     @get @it:その
+df['date'].dt.second     @check @let: df['second'] @it:その
 df(データフレーム)の'date'(カラム)の秒
 
-df['date'].dt.weekday_name     @get @it:その
+df['date'].dt.weekday_name     @check @let: df['weekday'] @it:その
 df(データフレーム)の'date'(カラム)の曜日
 
-df['date'].dt.dayofweek     @get @it:その
+df['date'].dt.dayofweek     @check @let: df['dayofweek'] @it:その
 df(データフレーム)の'date'(カラム)の曜日の数値型
 
 
 # 演算処理系
 
-df['temperature'].diff(periods=1)   @calc
+df['temperature'].diff(periods=1)   @let: df['diff'] @calc
 df(データフレーム)の'temperature'(カラム)[内]の前後の行の差分
 
 df.corr()    @check @it:その
@@ -297,8 +305,8 @@ df(データフレーム)の'city'(カラム)が'Tokyo'[もしくは|または|�
 
 ドロップする=削除する|消す|落とす|ドロップする
 
-df.drop(['b'])   @let_self @let:df_d @inplace
-df(データフレーム)の'b'(インデックス)をドロップする
+df.drop(0)   @let_self @let:df_d @inplace
+df(データフレーム)の0行目をドロップする
 
 df.drop('price', axis=1)   @let_self @let:df_d @inplace
 df(データフレーム)の'price'(カラム)をドロップする
@@ -379,7 +387,7 @@ df.duplicated().sum()    @check
 df(データフレーム)[内]の重複した[行の数|行数]
 
 df[df.duplicated()]    @get
-df(データフレーム)[内]の重複しているデータ[|を抽出する]
+df(データフレーム)[内]の重複しているデータ
 
 df.duplicated(subset='state')    @check
 df(データフレーム)[内]の'state'(カラム)に重複があるか
@@ -400,16 +408,16 @@ df(データフレーム)[内]の'state'(カラム)に重複がある行をド�
 # ビン (TODO:なんか冗長)
 
 pd.cut(df['birth_year'], data_bins)  @let:df_cut
-df(データフレーム)の'birth_year'(カラム)を境界値をdata_bins(リスト)として[ビン|]分割する
+境界値をdata_bins(リスト)として、df(データフレーム)の'birth_year'(カラム)を[ビン|]分割する
 
 pd.cut(df['birth_year'], bins_num)  @let:df_cut
-df(データフレーム)の'birth_year'(カラム)を[分割数|ビン数]をbins_num(整数値)として[ビン|]分割する
+[分割数|ビン数]をbins_numとして、df(データフレーム)の'birth_year'(カラム)を[ビン|]分割する
 
 pd.cut(df['birth_year'], bins_num, label=group_names)  @let:df_cut
-ビンの[名前|ラベル]をgroup_names(リスト)として、df(データフレーム)の'birth_year'(カラム)を[分割数|ビン数]をbins_num(整数値)として[ビン|]分割する
+[分割数|ビン数]をbins_num、ビンの[名前|ラベル]をgroup_names(リスト)として、df(データフレーム)の'birth_year'(カラム)を[ビン|]分割する
 
 pd.cut(df['birth_year'], bins_num, label=False)  @let:df_cut
-ビンの[名前|ラベル]を[インデックス|整数値|0始まりの連番]として、df(データフレーム)の'birth_year'(カラム)を[分割数|ビン数]をbins_num(整数値)として[ビン|]分割する
+[分割数|ビン数]をbins_num、ビンの[名前|ラベル]を[インデックス|整数値|0始まりの連番]として、df(データフレーム)の'birth_year'(カラム)を[ビン|]分割する
 
 pd.qcut(df['birth_year'], 2)  @let:df_cut
 df(データフレーム)の'birth_year'(カラム)を中央値で[ビン|]分割する
@@ -418,7 +426,7 @@ pd.qcut(df['birth_year'], 4)  @let:df_cut
 df(データフレーム)の'birth_year'(カラム)を四分位数ごとで[ビン|]分割する
 
 pd.qcut(df['birth_year'], bins_num)  @let:df_cut
-df(データフレーム)の'birth_year'(カラム)を[分割数|ビン数]をbins_num(整数値)として[ビンに含まれる個数|要素数]が等しくなるように[ビン|]分割する
+[分割数|ビン数]をbins_numとして、df(データフレーム)の'birth_year'(カラム)を[ビンに含まれる個数|要素数]が等しくなるように[ビン|]分割する
 
 
 # グループ化
@@ -437,6 +445,7 @@ df(データフレーム)の'weather'(カラム)ごとに'temperature'(カラム
 df.groupby(['week'])['soldout'].count()   @calc
 df(データフレーム)の'week'(カラム)ごとに'soldout'(カラム)の[数|個数]
 
+
 # ソート
 
 ソートする=並び替える|ソートする
@@ -450,13 +459,15 @@ df(データフレーム)の'sales'(カラム)と'temperature'(カラム)を[降
 df.sort_values('sales')   @inplace @let_self @let:df_s
 df(データフレーム)の'sales'(カラム)を[昇順に|]ソートする
 
+
 # null判定
 
 df.isnull().sum()   @calc @check
-df(データフレーム)[内]の[NaN|null|欠損値]の[数|合計]
+df(データフレーム)[内]の欠損値の[数|合計]
 
 df.isin(['?']).sum()   @calc @check
 df(データフレーム)[内][のそれぞれのカラム]に[存在する]'?'の個数の合計値
+
 
 # ダミー処理
 
