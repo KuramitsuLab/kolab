@@ -381,7 +381,7 @@ df.unstack()
 # 重複
 
 df.duplicated()   @check
-df(データフレーム)に重複があるか
+df(データフレーム)に重複があるかどうか
 
 df.duplicated().sum()    @check
 df(データフレーム)[内]の重複した[行の数|行数]
@@ -390,10 +390,10 @@ df[df.duplicated()]    @get
 df(データフレーム)[内]の重複しているデータ
 
 df.duplicated(subset='state')    @check
-df(データフレーム)[内]の'state'(カラム)に重複があるか
+df(データフレーム)[内]の'state'(カラム)に重複があるかどうか
 
 df.duplicated(subset=['state', 'point'])    @check
-df(データフレーム)[内]の'state'(カラム)と'point'(カラム)に重複があるか
+df(データフレーム)[内]の'state'(カラム)と'point'(カラム)に重複があるかどうか
 
 df.drop_duplicates()   @let:df_d @let_self @inplace
 df(データフレーム)[内]の重複している行をドロップする
