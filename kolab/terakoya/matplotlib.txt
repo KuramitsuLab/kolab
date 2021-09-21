@@ -145,7 +145,7 @@ markeredgecolor = 'magenta'   @option
 
 グラフタイトル=グラフのタイトル|タイトル|グラフの題名
 
-sns.set(font="IPAexGothic",style="white")
+sns.set(font='IPAexGothic', style='white')
 グラフ内で日本語を表示できるようにする
 グラフの[日本語表示|日本語フォント]を設定する
 
@@ -195,11 +195,11 @@ x行y列の2つ目のグラフ指定
 plt.scatter(x, y)
 xとyの散布図を[プロットする]
 
-plt.plot(x, y, label="test")
-ラベルを"test"として、xとyの[折れ線|]グラフを[プロットする]
+plt.plot(x, y, label='test')
+ラベルを'test'として、xとyの[折れ線|]グラフを[プロットする]
 
-plt.plot(x, y, color="#0F0F0F")
-[グラフの|]色を"#0F0F0F"(カラーコード)として、xとyの[折れ線|]グラフを[プロットする]
+plt.plot(x, y, color='#0F0F0F')
+[グラフの|]色を'#0F0F0F'(カラーコード)として、xとyの[折れ線|]グラフを[プロットする]
 
 plt.plot(x, y, color=(0,0,1))
 [グラフの|]色を(0,0,1)(RGB値)として、xとyの[折れ線|]グラフを[プロットする]
@@ -259,9 +259,9 @@ autopct = '%.2f%%'   @option
 
 プロット = グラフ@4|プロット@2|図
 
-plt.savefig("foo.png")
-プロットを/"foo.png"として保存する
-プロットを/{"foo.png"という}名前で保存する
+plt.savefig('foo.png')
+プロットを/'foo.png'として保存する
+プロットを/{'foo.png'という}名前で保存する
 
 plt.show()
 プロットを[描画する|表示する]
