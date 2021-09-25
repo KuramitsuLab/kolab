@@ -1,0 +1,1386 @@
+# Python 基本文法
+
+# 演算子
+
+x = y
+yをxに代入する
+xをyとする
+xはyである
+
+スワップする=スワップする|入れ替える
+
+x, y = y, x
+xとy[の値|]をスワップする
+
+x = y = 1
+xとyの両方とも1とする
+xとyの両方に1を代入する
+
+x,y = 1,2
+xとyをそれぞれ1と2とする
+xとyにそれぞれ1と2を代入する
+
+x,y,z = 1,2,3
+x,y,zをそれぞれ1,2,3とする
+x,y,zにそれぞれ1,2,3を代入する
+
+x + y
+xにyを[加える|加算する|足す]
+
+x - y
+xからyを[引く|減算する|減ずる]
+
+x * y
+xにyを[掛ける|かける|乗算する]
+
+x / y
+xをyで[割る|除する|除算する]
+
+x // y
+xをyで[割って|除して|除算して]切り捨てる
+xをyで[整数除算する]
+
+x % y
+xをyで[割った|除した|除算した]余り
+
+x % 2 == 0  @not @if @while
+xが偶数かどうか
+
+x % 2 == 1  @not @if @while
+xが奇数かどうか
+
+x % y == 0  @not @if @while
+xがyの倍数かどうか
+
+x == y   @not @if @while
+xがyに等しいかどうか
+xがyかどうか
+
+同一 = 同じ|同一
+
+x is y   @not @if @while
+xがyと同一[オブジェクト|]かどうか
+xとyは同一[オブジェクト|]かどうか
+
+x in y   @not @if @while
+xがy内に含まれるかどうか
+
+x < y  @not @if @while
+xがyより小さいかどうか
+
+x <= y  @not @if @while
+xがy以下かどうか
+xがyより小さいか等しいかどうか
+
+x > y  @not @if @while
+xがyより大きいかどうか
+
+x >= y  @not @if @while
+xがy以上かどうか
+xがyより大きいか等しいかどうか
+
+x > 0   @not  @if @while
+xが正の[数|整数]かどうか
+
+x < 0   @not  @if @while
+xが負の[数|整数]かどうか
+
+-9 <= x <= 9   @if @while
+xが一桁の[数|整数]かどうか
+xが-9以上、9以下かどうか
+
+0 <= x <= 9   @if @while
+xが一桁の正の[数|整数]かどうか
+
+x == 1 or x == 2    @if @while
+xが1、もしくは2かどうか
+
+x == 1 or x == 2 or x ==3    @if @while
+xが1、もしくは2、もしくは3に等しいかどうか
+
+x ** y
+xのy乗
+
+x | y  @calc
+xとyの論理和
+
+x ^ y  @calc
+xと yの排他的論理和
+
+x & y  @calc
+xと yの論理積
+
+x << n @calc
+xをnビット[分|だけ|][左に|左]シフトする
+xのnビット左シフト
+
+x >> n @calc
+xをnビット[分|だけ|][右に|右]シフトする
+xのnビット右シフト
+
+~x
+xをビット反転する
+xのビット反転
+
+## インクリメンタル演算子
+
+x += y
+xを y[だけ|]増やす
+
+x += 1
+xを 1つ 増やす
+
+x -= y
+xを y[だけ|]減らす
+
+x -= 1
+xを 1つ 減らす
+
+x *= y
+xを y倍にする
+
+x /= y
+xを y分の1にする
+
+x //= y
+xを[切り捨てながら|]y分の1にする
+
+x /= 2
+xを半分にする
+
+x //= 2
+xを[切り捨てながら|]半分にする
+
+x **= y
+xをy乗にする
+
+x %= y
+{xをyで割った}余りにする
+xをyの剰余にする
+
+x |= y
+xをyとの論理和にする
+
+x &= y
+xをyとの論理積にする
+
+x ^= y
+xをyとの排他論理和にする
+
+x <<= y
+xをyビット[分|だけ|][左に|左]シフトする
+
+x >>= y
+xをyビット[分|だけ|][右に|右]シフトする
+
+# インデックス、スライス
+
+a[0]
+a(リスト)の[先頭]の要素
+a(リスト)の0番目の要素
+
+s[0]
+s(文字列)の[先頭]の文字
+s(文字列)の0番目の文字
+
+a[-1]
+a(リスト)の[末尾]の要素
+
+s[-1]
+s(文字列)の[末尾]の文字
+
+a[1:]
+a(リスト)の[先頭]から1要素を除く
+
+s[1:]
+s(文字列)の[先頭]から1文字を除く
+
+a[:-n]
+a(リスト)の[末尾]からn要素を除く
+
+s[:-n]
+s(文字列)の[末尾]からn文字を除く
+
+a[1:n]
+a(リスト)の1番目からn番目の部分[リスト|]を取り出す
+a(リスト)の1番目からn番目までの部分[リスト|]
+
+s[1:n]
+s(文字列)の1文字目からn文字目までの部分[文字列|]を取り出す
+s(文字列)の1番目からn番目までの部分[文字列|]
+
+a[::-1]
+a(リスト)を逆順にする
+
+s[::-1]
+s(文字列)を逆順にする
+
+# 組み込み関数（計算）
+
+abs(x)
+xの絶対値
+
+bool(x)   @not @if @while
+xが真かどうか
+
+complex(x, y)
+x, yの複素数
+
+divmod(x, y)
+xとyの商と余り
+
+divmod(x, y)[0]
+xとyの商
+
+divmod(x, y)[1]
+xとyの余り
+
+float(x)
+xを/浮動小数点数に[変換|]する
+xを浮動小数点数化する
+xの浮動小数点数
+
+int(x)
+xを/整数に[変換|]する
+xを整数化する
+{xを変換した}整数値
+xの整数値
+
+表記=表記|表現|文字列
+
+int(s, 2)
+s(2進数)から整数に[変換|]する
+s(文字列)を/2進数として整数に[変換|]する
+{2進数[表記]sから変換した}整数
+
+ord(c)
+cのコードポイント
+
+大きな方 = 大きな値|大きな方|最大値
+小さな方 = 小さな値|小さな方|最小値
+
+max(x)
+x(数列)の最大値
+
+max(x, y)
+xとyの大きな方
+
+max(x, y, z)
+x, y, zの最大値
+
+min(x)
+x(数列)の最小値
+
+min(x, y)
+xとyの小さな方
+
+min(x, y, z)
+x, y, zの最小値
+
+pow(x, y)
+xのy乗
+
+pow(x, y, z)
+{xのy乗をzで剰余した}値
+
+round(x)
+xを丸める
+{xを丸めた}整数
+
+少数部=少数
+
+round(x, n)
+xを少数部n桁[まで|で]丸める
+
+の少数部=の少数|の少数部|
+
+math.trunc(x)
+x[の少数部]を切り捨てる
+
+math.floor(x)
+x[の少数部]を切り上げる
+x以下の最大[な|の]整数
+
+math.ceil(x)
+x[の少数部]を切り捨てる
+x以上の最小[な|の]整数
+
+# 組み込み関数（文字列）
+
+ascii(x)
+xを印字できる文字列にする
+xの印字可能な文字列
+
+bin(x)
+xを2進数[表記]にする
+xの2進数文字列
+
+hex(x)
+xを16進数[表記]にする
+xの16進数文字列
+
+oct(x)
+xを8進数[表記]にする
+xの8進数文字列
+
+chr(c)
+c(コードポイント)の文字
+c(コードポイント)を文字に[変換|]する
+
+repr(object)
+objectの印字[可能な|できる|]文字列
+
+str(x)
+xを文字列に[変換|]する
+xの文字列
+
+# 組み込み関数（リスト）
+
+all(iterable)    @not @if @while
+iterableの全てが真かどうか
+iterableが全て真かどうか
+
+any(iterable)    @not @if @while
+iterableのいずれかが真かどうか
+iterableのひとつでも真かどうか
+
+
+順序列=順序列|順序付けされた列
+ナンバリングする=番号付けする|順序付けする|順番付けする
+順序=順番|順序
+
+enumerate(x)
+xをナンバリングする
+xの[順序列]
+xの[順序]を数える
+
+enumerate(x, y)
+xを/yからナンバリングする
+xのyから始まる[順序列]
+xの[順序]を/yから数える
+
+iter(x)
+xのイテレータ
+
+長さ = 長さ|要素数|サイズ|長さ
+
+len(x)
+xの長さ
+
+len(x) == 0   @not @if @while
+xが空であるかどうか
+
+len('abc')
+'abc'(文字列)の文字数
+
+list(x)
+xのリスト
+
+range(x)
+0からxまでの数列
+
+range(x, y)
+xからyまでの数列
+
+range(x, y, z)
+xからyまでのz間隔の数列
+
+reversed(x)
+xを逆順にする
+xの逆順
+
+set()
+空集合
+
+set(x)
+xの集合
+
+slice(x)
+0からxまでのスライス
+
+slice(x, y)
+xからyまでのスライス
+
+slice(x, y, z)
+xからyまでのzごとによるスライス
+
+sum(x)
+x(数列)の合計
+
+sum(x)/len(x)
+x(数列)の平均
+
+tuple(x)
+xのタプル
+
+zip(x, y)
+列xとyの各要素のペア
+xとyをzipする
+
+zip(x, y, z)
+列 x, y, zの各要素のタプル
+
+# 組み込み関数（辞書）
+
+dict(x)
+xの辞書
+
+dict[key]
+dict(辞書)のkey(キー)の値
+dict(辞書)のkey(キー)を参照した値
+
+list(dict)
+dict(辞書)の[キー]一覧
+
+len(dict)
+dict(辞書)の[エントリ]数
+
+dict.clear()
+dict(辞書)の全[エントリ]を消去する
+
+dict.copy()
+dict(辞書)の[浅い|]コピー
+
+dict.get(key)
+dict(辞書)からkey(キー)の値を得る
+dict(辞書)におけるkey(キー)に対応した値
+
+dict.get(key, x)
+dict(辞書)のkey(キー)の値、もし[存在し|]なければxを得る
+
+dict.items()
+dict(辞書)の[エントリ]一覧
+
+dict.keys()
+dict(辞書)の[キー]一覧
+
+dict.pop(key)
+dict(辞書)のkey(キー)を取り出す
+
+dict.popitem()
+dict(辞書)から最後に追加したエントリを取り出す
+
+dict.setdefault(key, x)
+dict内にkey(エントリ)が[存在し|]なければ、そのエントリをxにする
+
+dict.update(x)
+dict(辞書)をxでアップデートする
+
+dict.values()
+dict(辞書)の値一覧
+
+dict | dict2
+dict(辞書)とdict2をマージする
+
+dict |= dict2
+dict(辞書)に/dict2(辞書)を[追加する|加える]
+
+# 組み込み関数（バイト列、IO）
+
+bytearray(x)
+xのバイト配列
+
+bytes(x)
+xのバイト列
+
+input()  
+{入力された}文字列
+
+input(s)  
+{s(プロンプト)に対し、入力された}文字列
+
+memoryview(x)
+xのメモリビュー
+
+open(filename)
+filename(ファイル名)をオープンする
+filename(ファイル名)を読み込む
+
+with open(filename) as f:
+filename(ファイル名)をオープンし、fとする
+
+読み込みモードで=読み込み用に|読み込みモードで
+書き込みモードで=書き込み用に|保存用に|書き込みモードで
+追加モードで=追加用に|追加モードで
+バイナリモードで=バイナリ用に|バイナリモードで
+
+open(filename, 'r')
+filename(ファイル名)を/[読み込みモードで]でオープンする
+filename(ファイル名)を/'r'モードででオープンする
+
+open(filename, 'w')
+filename(ファイル名)を/[書き込みモードで]オープンする
+
+open(filename, 'a')
+filename(ファイル名)を/[追加モードで]オープンする
+
+open(filename, 'b')
+filename(ファイル名)を/[バイナリモードで]オープンする
+
+print()
+空行をプリントする
+
+print(x)
+xをプリントする
+
+print(x, y)
+xと yを/[順に|]プリントする
+
+print(x, y, z)
+x、y、zを/[順に|]プリントする
+
+print(x, end='')
+xを/[改行なく|改行せず]プリントする
+
+print(x, y, end='')
+xとyを[改行なく|改行せず]プリントする
+
+print(x, y, z, end='')
+x、y、zを[改行なく|改行せず][順に|]プリントする
+
+# 組み込み関数（関数）
+
+callable(x)
+xが関数かどうか
+
+eval(s)
+{式sを評価した}結果
+
+globals()
+グローバル変数の一覧 
+
+filter(function, x)
+x(列)[のそれぞれ|の各要素|]を/function(関数)でフィルタする
+
+map(function, x)
+x(列)[のそれぞれ|の各要素|]を/function(関数)でマップする
+
+# 組み込み関数（オブジェクト）
+
+プロパティ=プロパティ@3|属性|フィールド
+
+delattr(x, attrname)
+x(オブジェクト)の[プロパティ]attrnameを削除する
+x(オブジェクト)のattrname[プロパティ]を削除する
+
+getattr(x, attrname)
+x(オブジェクト)の[プロパティ]attrnameの値
+x(オブジェクト)のattrname[プロパティ]の値
+
+hasattr(x, attrname)  @not @if @while
+x(オブジェクト)が[プロパティ]attrnameを持つかどうか
+x(オブジェクト)がattrname[プロパティ]を持つかどうか
+x(オブジェクト)に[プロパティ]attrnameがあるかどうか
+x(オブジェクト)にattrname[プロパティ]があるかどうか
+
+setattr(x, attrname, y)
+x(オブジェクト)の[プロパティ]attrnameの値をyに[設定する+|する]
+x(オブジェクト)のattrname[プロパティ]の値をyに[設定する+|する]
+
+hash(x)
+xのハッシュ値
+
+isinstance(x, class1)    @not @if
+x(オブジェクト)がclass1[のインスタンス|]かどうか
+
+isinstance(x, (class1, class2))   @not @if
+x(オブジェクト)がclass1[または]class2[のインスタンス|]かどうか
+
+isinstance(x, int)  @not @if
+x(オブジェクト)が整数かどうか
+
+isinstance(x, float)  @not @if
+x(オブジェクト)が浮動小数点数かどうか
+
+isinstance(x, str)  @not @if
+x(オブジェクト)が文字列かどうか
+
+isinstance(x, list)  @not @if
+x(オブジェクト)がリストかどうか
+
+isinstance(x, (list, tuple))  @not @if
+x(オブジェクト)がリスト[または]タプルかどうか
+
+issubclass(class1, class2)　　@not @if
+class(クラス)がclass2のサブクラスかどうか
+
+id(x)
+xのオブジェクト[識別子|ID]
+xの[ユニークな識別値|ポインタ]
+
+type(x)
+xの[型|クラス|種類]
+
+# 整数
+
+n.bit_length()  
+n(整数)のビット[数|長]
+
+n.to_bytes(x)
+n(整数)をxビット長のバイト列に[変換|]する
+n(整数)のxビット長バイト列
+
+int.from_bytes(bytes)
+bytes(バイト列)bytesから整数に変換する
+
+x.is_integer() 　　@not @if
+x(浮動小数点数)が整数かどうか
+
+x.hex()
+x(浮動小数点数)を/16進文字列に[変換|]する
+x(浮動小数点数)の16進文字列表現
+
+float.fromhex(s)
+s(16進数文字列)から浮動小数点数に[変換|]する
+
+# リスト
+要素=要素|値
+
+x in s  @if @while
+s(リスト)内のある要素がxと等しいかどうか
+
+x not in s  @if @while
+s(リスト)内の任意の要素がxと等しくないかどうか
+
+s + t
+s(リスト)とt(リスト)を結合する
+2つのリストを結合する
+
+s * n
+s(リスト)[自身|]をn回結合する
+s(リスト)[自身|]をn倍する
+
+s[i]
+s(リスト)のi番目の要素
+s(リスト)の要素i
+
+s[i:j]
+s(リスト)のiからj番目までの[スライス+|部分リスト]
+
+s[i:j:k]
+s(リスト)のiからjまで、k毎の[スライス+|部分リスト]
+
+len(s)
+リスト(s)の長さ
+
+min(s)
+s(リスト)内の最小の要素
+
+max(s)
+s(リスト)内の最大の要素
+
+s.index(x)
+s(リスト)内でx(要素)が最初に出現する位置
+
+s.count(x)
+s(リスト)内にx(要素)が出現する回数
+
+s[i] = x
+s(リスト)の要素iをxと入れ替える
+
+s[i:j] = t
+s(リスト)のiからj番目までのスライスをt(イテレータ)の内容に入れ替える
+
+del s[i:j]
+s(リスト)のiからj番目までを削除する
+
+s.append(x)
+xをs(リスト)の最後に加える
+
+s.clear()
+s(リスト)から全ての要素を取り除く
+
+s.copy()
+s(リスト)を[浅く|]コピーする
+s(リスト)の[浅い|]コピーを作成する
+
+s.extend(t)
+s(リスト)の最後にt(リスト)[の内容|]を[加える|拡張する]
+
+s *= n
+s(リスト)をその内容をn回繰り返したもので更新する
+
+s.insert(i, x)
+s(リスト)のi番目にxを挿入する
+
+s.pop()
+s(リスト)から最後の要素を取り出す
+
+s.pop(i)
+s(リスト)からi番目の要素を取り出す
+
+s.remove(x)
+s(リスト)から最初のxを取り除く
+
+s.reverse()
+s(リスト)をインプレースに逆転する
+
+# 集合
+
+len(s)
+s(集合)の要素数
+s(集合)の濃度
+
+x in s  @not @if @while
+x がs(集合)のメンバーに含まれるかどうか
+
+x in s  @if @while
+x ∈ s
+
+x not in s  @if @while
+x ∉ s
+
+s.isdisjoint(a) @not @if @while
+s(集合)がaと共通の要素を持たないかどうか
+s(集合)がaと交わりを持たないかどうか
+s(集合)がaと互いに素かどうか
+s(集合)とaが互いに素かどうか
+
+s.issubset(a)  @not @if @while
+s(集合)がaの[部分集合|下位集合|サブセット]かどうか
+s(集合)の全ての要素がotherに含まれるかどうか
+s ⊆ a
+
+s < a   @not @if @while
+s(集合)がa(集合)の真[部分集合|下位集合|サブセット]であるかどうか
+s ⊂ a
+
+
+s.issuperset(a)   @not @if @while
+a(集合)の全ての要素がs(集合)に含まれるかどうか
+s(集合)がa(集合)の[上位集合|スーパーセット]かどうか
+s ⊇ a
+
+s > a　@not @if @while
+s(集合)がa(集合)の真[上位集合|スーパーセット]であるかどうか
+s ⊃ a
+
+s.union(a)
+s(集合)と集合(a)の全ての要素からなる集合
+s(集合)とaのユニオン
+s ∪ a
+
+s.intersection(a)
+s(集合)とaに共通する要素からなる集合
+s(集合)とaの[インターセクション|共通部分|共通部分|交差|積集合]
+s ∩ a
+
+s.difference(a)
+s(集合)に含まれ、aに含まれない集合
+s(集合)からaを引いた[差集合|差]
+s(集合)におけるaの補集合
+s ＼ a
+
+s - a
+s(集合)からa(集合)を引いた[差集合|差]
+
+s.symmetric_difference(a)
+s(集合)とa(集合)のいずれか一方だけの集合
+s(集合)とa(集合)との対称差
+
+s.copy()
+s(集合)の浅いコピー
+
+s.update(a)
+s(集合)にa(リスト)を追加する
+
+s.intersection_update(a)
+s(集合)とaの共通要素だけに[更新|]する
+
+s.difference_update(a)
+s(集合)からa[の要素|]を取り除く
+
+s.symmetric_difference_update(a)
+s(集合)をsとaのどちらかに[だけ|のみ|のみの要素]に[更新|]する
+
+s.add(elem)
+s(集合)にelem(要素)を[追加する|加える]
+
+s.remove(elem)
+s(集合)からelem(要素)を取り除く
+
+s.discard(elem)
+s(集合)からelem(要素)を[エラーなく]取り除く
+
+s.pop()
+s(集合)から任意の要素を取り出す
+
+s.clear()
+s(集合)から全ての要素を取り除く
+s(集合)を[空|空集合]にする
+
+len(s) == 0  @not @if @while
+集合(s)が[空|空集合]かどうか
+
+
+# 文字列
+
+string.ascii_letters
+全[アルファベット][集合|]
+
+string.ascii_lowercase
+全[英小文字][集合|]
+
+string.ascii_uppercase
+全[英大文字][集合|]
+
+string.digits
+全[数字][集合|]
+
+string.hexdigits
+全[16進文字列][集合|]
+
+string.octdigits
+全[8進文字列][集合|]
+
+string.punctuation
+全[記号][集合|]
+
+string.printable
+全[印字文字][集合|]
+
+string.whitespace
+全[空白文字][集合|]
+
+s.capitalize()
+s(文字列)をキャピタライズする
+
+s.casefold()
+s(文字列)をケースフォルドする
+
+センタリングする=中央寄せする|センタリングする
+
+s.center(x)
+s(文字列)を/幅xでセンタリングする
+
+s.ljust(x)
+s(文字列)を/幅xで右寄せする
+
+s.rjust(x)
+s(文字列)を/幅xで左寄せする
+
+s.count(sub)
+s(文字列)内[の|に含まれる|に現れる]sub[の数|]をカウントする
+s(文字列)内のsubの出現回数
+
+s.encode()
+s(文字列)をバイト列に[変換|]する
+
+s.encode(enc)
+s(文字列)を/enc(文字コード)でバイト列に[変換|]する
+
+s.encode('shift-jis')
+s(文字列)を/SJIS[コード|]でバイト列に[変換|]する
+
+s.startswith(prefix)  @not @if @while
+s(文字列)がprefixで始まるかどうか
+s(文字列)の[接頭辞]がsuffix[である|]かどうか
+
+s.endswith(suffix)  @not @if @while
+s(文字列)がsuffixで終わるかどうか
+s(文字列)の[接尾辞]がsuffix[である|]かどうか
+
+タブ=タブ記号|TAB|タブ
+
+s.expandtabs()
+{s(文字列)のタブ}を/空白で置き換える
+
+s.expandtabs(n)
+{s(文字列)内のタブ}を/{n文字の空白}で置き換える
+
+
+s.find(sub) >= 0  @if @while
+{s(文字列)内に/subがある}かどうか
+{s(文字列)内で/subが見つかる}かどうか
+
+s.find(sub) == -1  @if @while
+{s(文字列)内に/subがない}かどうか
+{s(文字列)内で/subが見つからない}かどうか
+
+s.find(sub)
+sub(部分文字列)[の位置|]を/s(文字列)内で探す
+
+s.find(sub, start)
+sub(部分文字列)[の位置|]を/s(文字列)内で/startから探す
+
+s.find(sub, start)
+sub(部分文字列)[の位置|]を/s(文字列)内で/startからendまで探す
+
+s.rfind(sub)
+sub(部分文字列)[の位置|]を/s(文字列)内で/[後ろ|末尾|右]から探す
+
+s.rfind(sub, start)
+sub(部分文字列)[の位置|]を/s(文字列)内で/[後ろ|末尾|右]からstartまで探す
+
+s.rfind(sub, start, end)
+sub(部分文字列)[の位置|]を/s(文字列)内で/endからstartまで探す
+
+s.index(sub)
+{s(文字列)内で/subが[最初に|]見つかった}位置
+
+s.rindex(sub)
+{s(文字列)内で/subが最後に見つかった}位置
+
+フォーマットする = 整形する|フォーマットする
+テンプレ=書式|テンプレート|テンプレ
+
+fmt.format(x)
+fmt(テンプレを/xでフォーマットする
+
+fmt.format(x, y)
+fmt(テンプレ)を/{xとy}でフォーマットする
+
+fmt.format(x, y, z)
+fmt(テンプレ)を/{x, y, z}でフォーマットする
+
+アルファベット = アルファベット|英字
+
+s.isalnum()    @not @if
+s(文字列)が[英数字]かどうか
+
+s.isalpha()    @not @if
+s(文字列)が[アルファベット]かどうか
+
+s.isascii()    @not @if
+s(文字列)が[ASCII文字]かどうか
+
+s.isdecimal()    @not @if
+s(文字列)が数字かどうか
+
+s.isdigit()    @not @if
+s(文字列)が数字かどうか
+
+s.isidentifier()    @not @if
+s(文字列)が[識別子文字]かどうか
+
+s.islower()    @not @if
+s(文字列)が[英小文字]かどうか
+
+s.isnumeric()    @not @if
+s(文字列)が[数字]かどうか
+
+s.isprintable()    @not @if
+s(文字列)が印字[可能|できる]かどうか
+
+s.isspace()    @not @if
+s(文字列)が空白かどうか
+
+s.istitle()    @not @if
+s(文字列)がタイトルケース文字列かどうか
+
+s.isupper()    @not @if
+s(文字列)が英大文字かどうか
+
+s.join(a)
+{a(リスト)の[それぞれ|各要素]}を/s(文字列)でジョインする
+
+s.join(str(x) for x in a)
+a(リスト)の[それぞれ|各要素]を文字列に変換し、s(文字列)でジョインする
+
+''.join(x)
+a(リスト)の[それぞれ|各要素]を文字列に変換し、ジョインする
+
+s.lower()
+s(文字列)を[英小文字]化する
+
+s.upper()
+s(文字列)を[英大文字]化する
+
+除去する = 取り除く|除去する|削除する|消す
+リプレースする = 置き換える|置換する|リプレースする
+パーティションする = 区切る|分割する|パーティションする
+ジョインする = 結合する@3|連結する@3|ジョインする
+
+余分な=不要な|@5
+先頭=前
+末尾=後ろ
+
+s.lstrip()
+s(文字列)の先頭から/[余分な]空白を除去する
+
+s.lstrip(chars)
+s(文字列)の先頭から/charsを除去する
+
+s.rstrip()
+s(文字列)の末尾から/空白を除去する
+
+s.rstrip(chars)
+s(文字列)の末尾から/charsを除去する
+
+s.strip()
+s(文字列)の先頭と末尾から/[余分な]空白を除去する
+s(文字列)から/[余分な]空白を除去する
+
+s.strip(chars)
+s(文字列)の先頭と末尾から/charsを除去する
+
+s.partition(sep)
+s(文字列)を/sepでパーティションする
+
+s.removeprefix(prefix)
+s(文字列)から接頭辞prefixを除去する
+s(文字列)の先頭からprefix(文字列)を除去する
+
+s.removesuffix(suffix)
+s(文字列)から接尾辞suffixを除去する
+s(文字列)の末尾からsuffixを除去する
+
+s.replace(sub, s2)
+s(文字列)[内]のsubを[全て|]/s2にリプレースする
+
+s.replace(sub, '')
+s(文字列)[内]のsubを/[全て|]除去する
+
+スプリットする = 分割する|分ける|区切る|スプリットする
+右スプリットする = 右分割する|右から分ける|右から区切る|右スプリットする
+
+s.split()
+s(文字列)を/空白でスプリットする
+s(文字列)を/{空白で区切って}リストにする
+
+s.split(sep)
+s(文字列)を/sep(セパレータ)でスプリットする
+s(文字列)を/{sepで区切って}リストにする
+
+s.rsplit(sep)
+s(文字列)を/sep(セパレータ)で右スプリットする
+
+s.split()[0]
+s(文字列)を空白で区切った最初の[文字列|部分]
+
+s.split()[-1]
+s(文字列)を空白で区切った最後の[文字列|部分]
+
+s.split(sep)[0]
+s(文字列)をsep(セパレータ)で区切った最初の[文字列|部分]
+
+s.split(sep)[-1]
+s(文字列)をsep(セパレータ)で区切った最後の[文字列|部分]
+
+maxsplit = x　　@option
+最大分割回数はxとする
+
+翻訳する=変換する@3|変換する
+
+s.translate(ct)
+s(文字列)[の文字|]を/ct(変換表)で翻訳する
+
+s.zfill(x)  
+s(文字列)の[長さ|大きさ|サイズ]をxにする
+s(文字列)を/{[幅|長さ]xになる}ように'0'文字で埋める
+
+
+## 乱数
+
+整数乱数=ランダムな整数|ランダム整数
+サンプリングする = サンプルを選ぶ|サンプリングする
+乱数シード = 乱数生成|乱数シード
+
+random.random()
+乱数[を生成する]
+
+random.choice(list)
+list(リスト)から[ひとつ]ランダムに選ぶ
+
+random.shuffle(list)
+list(リスト)を/[ランダムに|]シャッフルする
+
+random.sample(list)
+list(リスト)からサンプリングする
+
+random.sample(list, n)
+list(リスト)からn個、サンプリングする
+list(リスト)からn個、ランダムに選ぶ
+
+random.randrange(x)
+0からx[未満]までの整数乱数
+
+random.randrange(x, y)
+xからy[未満|]までの整数乱数
+
+random.randint(x, y)
+xからyまでの整数乱数
+
+random.seed()
+乱数シードを初期化する
+
+random.seed(x)
+乱数シードをxで初期化する
+
+# math
+
+math.ceil(x)
+xの切り上げ整数値
+
+math.comb(x)
+xのコンビネーション
+
+math.copysign(x, y)
+xの符号をyと同じにする
+
+math.fabs(x)
+浮動小数点数xの絶対値
+
+math.factorial(x)
+xの階乗
+
+math.floor(x)
+xの切り捨て整数値
+
+math.frexp(x)[0]
+xの仮数部
+
+math.frexp(x)[1]
+xの指数部
+
+math.gcd(x, y)
+xとyの最大公約数
+
+math.lcm(x, y)
+xとyの最小公倍数
+
+math.isclose(x, y)  @not @if @while
+xとyが[近い|十分に近い|近似できる|ほぼ等しい|等しいとみなせる]かどうか
+xがyに[近い|十分に近い|近似できる|ほぼ等しい|等しいとみなせる]かどうか
+
+math.isfinite(x)  @not @if @while
+xが有限かどうか
+
+math.isinf(x)   @not @if @while
+xが無限大かどうか
+
+非数=NaN|非数
+
+math.isnan(x)  @not @if @while
+xが非数かどうか
+
+math.modf(x)
+xの小数部と整数部
+
+math.modf(x)[0]
+xの小数部
+
+math.modf(x)[1]
+xの整数部
+
+math.remainder(x, y)   @calc
+xをyで割った[剰余|余り]
+
+math.exp(x)  @calc
+eのx乗
+
+math.log(x)  @calc
+xの自然対数
+
+math.log(x, y)  @calc
+{yを底とする}xの対数
+
+math.log2(x)   @calc
+{2を底とする}xの対数
+
+math.log10(x)  @calc
+xの常用対数
+
+math.sqrt(x)  @calc
+xの平方根
+
+math.cos(x)  @calc
+xの[余弦|コサイン]
+
+math.dist(x)  @calc
+xのユークリッド距離
+
+math.hypot(x, y)   @calc
+xとyのノルム
+
+math.sin(x)  @calc
+xの[正弦|サイン]
+
+math.tan(x)   @calc
+xの[正接|タンジェント]
+
+math.degrees(x)   @calc
+xの角度
+
+math.radians(x)   @calc
+xのラジアン
+
+math.acosh(x)   @calc
+xの逆双曲線余弦
+
+math.asinh(x)  @calc
+xの逆双曲線正弦
+
+math.atanh(x)   @calc
+xの逆双曲線正接
+
+math.cosh(x)   @calc
+xの双曲線余弦
+
+math.sinh(x)  @calc
+xの双曲線正弦
+
+math.tanh(x)   @calc
+xの双曲線正接
+
+math.gamma(x)  @calc
+xのガンマ関数
+
+math.lgamma(x)  @calc
+xのガンマ関数の絶対値の自然対数
+
+math.pi
+円周率|π
+
+math.e
+ネイピア数|自然対数の底
+
+math.inf  @calc
+無限大|∞
+
+math.nan
+NaN|非数|数でない
+
+# 正規表現
+
+re.search(x, y)
+{y(文字列)にx(正規表現)がマッチする}最初の位置
+
+re.match(x, y)    @not @if
+y(文字列)に/x(正規表現)がマッチするかどうか
+
+re.fullmatch(x, y)  @not @if
+x(正規表現)が/y(文字列)全体にマッチするかどうか
+
+re.split(x, y)
+y(文字列)に[対し|おいて|ついて]、x(正規表現)でスプリットする
+x(正規表現)でy(文字列)をスプリットする
+
+箇所=部分|部分文字列|箇所
+
+re.sub(x, y, z)
+y(文字列)に[対し|おいて|ついて]、x(正規表現)でマッチした[箇所]をzにリプレースする
+x(正規表現)でy(文字列)のマッチした[箇所]をzにリプレースする
+{x(正規表現)にマッチした}{yの[箇所]}をzにリプレースする
+
+re.subn(x, y, z)
+y(文字列)に[対し|おいて|ついて]、x(正規表現)にマッチした[箇所]をzにリプレースする
+{x(正規表現)でマッチした}{yの[箇所]}をzにリプレースする
+
+re.findall(x, y)
+y(文字列)に[対し|おいて|ついて]、x(正規表現)でマッチした[箇所]を[リストにする|抽出する]
+{x(正規表現)にマッチした}{yの[箇所]}を[リストにする|抽出する]
+
+re.compile(x)
+x(正規表現)をコンパイルする
+
+# sys
+
+sys.exit()
+プログラムを/[正しく|正常に|適切に]終了する
+
+
+sys.exit(0)
+プログラムを正常終了する
+
+sys.exit(1) 
+プログラムを異常終了する
+
+sys.setrecursionlimit(1000000)
+再帰の上限を1000000にする
+再帰エラーを防ぎたい
+再帰の上限を上げる
+
+sys.argv[0]
+スクリプト名
+
+sys.argv[1]
+コマンドの第一引数
+
+sys.argv[1:]
+コマンド引数のリスト
+
+sys.path.append('/path/to/whatever')
+Pythonパスに'/path/to/whatever'を追加する
+
+#sys.path.append(os.path.join(os.path.dirname(__file__), 'subdir'))
+
+sys.stdin.read(1)
+標準入力から1文字[だけ|]読む
+
+sys.stdout
+標準出力
+
+sys.stdout.flush() 
+標準出力をフラッシュする
+
+sys.version  @check
+Pythonのバージョン
+
+sys.float_info.max
+浮動小数点数の最大値
+
+sys.float_info.min
+浮動小数点数の最小値
+
+sys.float_info.epsilon
+計算機イプシロン
+
+## os
+
+プラットホーム依存なしに=安全に|プラットホーム依存なしに|プラットホーム依存せずに|
+
+新規に=新しく|新たに|新規に
+ディレクトリ=ディレクトリ|フォルダ
+ファイルパス=ファイルパス|パス
+
+os.mkdir('dir/')
+[新規に]/{'dir/'のディレクトリ}を作る
+
+os.makedirs('dir/', exist_ok=True)
+'dir/'のディレクトリを[再帰的に|階層的に]作る
+
+os.listdir('dir/')
+'dir/'(ファイルパス)のファイル一覧
+
+os.path.exists(p)       @not @if
+p(ファイルパス)が[存在する]かどうか
+
+os.path.isdir(p)        @not @if
+p(ファイルパス)がディレクトリかどうか
+
+os.path.isfile(p)       @not @if
+p(ファイルパス)がファイルかどうか
+
+os.path.getsize('file.txt')
+'file.txt'(ファイル名)の[ファイルサイズ|バイト数|大きさ]
+
+os.path.join(p, p2)
+{p(ファイルパス)とp2}を/[プラットホーム依存なしに]結合する
+
+# #root, ext = os.path.splitext(f)
+
+# os.path.basename(p) for p in glob.glob('temp/**', recursive=True)
+
+# print(glob.glob('temp/**/', recursive=True))
+# print(os.path.join('temp', '**' + os.sep))
+# print(glob.glob(os.path.join('temp', '**' + os.sep), recursive=True))
+# os.path.basename(p.rstrip(os.sep)) 
+# glob.glob(os.path.join('temp', '**' + os.sep), recursive=True)
+
+# basename = os.path.basename(root)
+# os.chdir('data')
+# print(os.getcwd())
+# os.environ['LANG']
+# os.environ['NEW_KEY'] = 'test'
+# dirpath_with_sep = './data/temp/dir/'
+# print(os.path.isfile(dirpath_with_sep))
+# print(os.path.isdir(dirpath_with_sep))
+# import os
+# print(os.path.getsize('data/src/lena_square.png'))
+# os.remove(p)
+# os.rmdir('temp/dir_not_empty/')
+# os.stat('data/temp/test.txt')
+# print(os.path.getatime('data/temp/test.txt'))
+# print(os.path.getmtime('data/temp/test.txt'))
+# print(os.path.getctime('data/temp/test.txt'))
