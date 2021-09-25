@@ -186,14 +186,17 @@ def emit_check(code, docs, results, options):
     for doc in docs:
         mcode, doc = check_modified_code(code, doc)
         vpos, _, _ = detect_vpos(doc)
+        # print('@@vpos', vpos)
         if vpos == 'NA':
             results.append((doc+'を'+alt('表示する|確認する|調べる|見る'),mcode))
     return True
 
 # @let
 
-def emit_let(code, docs, results, options):
-    name = 'newname' if options[0] == '' else options[0]
+def emit_let(code, docs, results, options, name=None):
+    # print('@@', options)
+    if name == None:
+        name = 'newname' if options[0] == '' else options[0]
     for doc in docs:
         mcode, doc = check_modified_code(code, doc)
         vpos, base, prefix = verb.detect_last_vpos(doc)
@@ -210,8 +213,8 @@ def emit_let(code, docs, results, options):
     return False
 
 def emit_let_self(code, docs, results, options):
-    # emit_let(code, docs, results, options)
     name = code.split('.')[0]
+    emit_let(code, docs, results, options, name)
     for doc in docs:
         mcode, doc = check_modified_code(code, doc)
         vpos, base, prefix = verb.detect_last_vpos(doc)

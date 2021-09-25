@@ -58,11 +58,11 @@ flush = False   @option
 flush = True    @option
 フラッシュを行う
 
-byteorder = "big"  @option
+byteorder = 'big'  @option
 バイトオーダーはビックエンディアンとする
 ビックエンディアンを用いる
 
-byteorder = "little"   @option
+byteorder = 'little'   @option
 バイトオーダーはリトルエンディアンとする
 リトルエンディアンを用いる
 
