@@ -208,7 +208,7 @@ df(データフレーム)の[データの性質|データの詳細]
 df.describe()  @check @it:その
 df(データフレーム)の[統計情報|要約統計量]
 
-df.describe(include="O")  @check @it:その
+df.describe(include='O')  @check @it:その
 df(データフレーム)の[オブジェクトデータ|数値データ以外]の[要約統計量|統計情報]
 
 df['age'].describe()     @check @it:その
