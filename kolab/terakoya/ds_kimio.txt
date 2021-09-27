@@ -1,0 +1,183 @@
+
+pd.read_csv('arashi.csv')   @let:df
+'arashi.csv'(CSVファイル)を読む
+
+pd.read_csv('arashi.csv', encoding='s-jis')  @let:df
+'arashi.csv'(CSVファイル)を文字化けしないように読む
+
+df['名前']  @get
+df(データフレーム)の'名前'(カラム)のデータ[列|]
+
+for name in data['名前']:
+df(データフレーム)の'名前'(カラム)のデータ[列|]を[ひとつずつ|]繰り返す
+
+df['性別'] = ['男性'] * len(df)
+df(データフレーム)の'名前'(カラム)を全て'男性'(文字列)にする
+
+df.iloc[0]  @get
+df(データフレーム)の0行目
+
+df['出身'][0]　@get
+df(データフレーム)の'出身'(カラム)の0行目
+
+df.iloc[0]['出身']  @get
+df(データフレーム)の0行目の'出身'(カラム)
+
+df.to_csv('arashi2.csv')
+df(データフレーム)を/'arashi2.csv'(ファイル名)に保存する
+
+保存する=保存する|書き出す
+
+df.to_csv('arashi2.csv')
+df(データフレーム)を/'arashi2.csv'(ファイル名)としてCSVに保存する
+df(データフレーム)を/'arashi2.csv'(ファイル名)に保存する
+
+df.to_csv('arashi2.csv', encoding='utf_8_sig')
+df(データフレーム)を/'arashi2.csv'(ファイル名)に/BOM付きで保存する
+df(データフレーム)を/'arashi2.csv'(ファイル名)に文字化けしないように保存する
+
+df.to_csv('arashi2.csv', index=False)
+df(データフレーム)を/インデックスなしで/'arashi2.csv'(ファイル名)に保存する
+
+index=False @option
+インデックスは[出力しない|付けない]
+
+encoding='utf_8_sig' @option
+エンコーディングは、'utf_8_sig'を用いる
+文字化けしなくする
+
+df[df['身長'] >= 170]  @calc
+df(データフレーム)の'身長'(カラム)が170以上のデータ
+
+
+
+穴埋めする=穴埋めする|補完する
+
+df.isnull().sum()  @check
+df(データフレーム)の欠損値
+
+df.fillna(df.mean()) 
+df(データフレーム)の欠損値を平均値で穴埋めする
+
+df.fillna(df.mean(), inplace=True)
+df(データフレーム)の欠損値を平均値で穴埋めして置き換える
+インプレースによってdf(データフレーム)の欠損値を平均値で穴埋めする
+
+inplace=True @option
+この操作は、インプレースで行う
+
+df['体重'].fillna(50.0)  
+df(データフレーム)の'体重'(カラム)の欠損値を50.0で穴埋めする
+(df['体重'])(データ列)の欠損値を50.0で穴埋めする
+
+df['体重'].fillna(df['体重'].mean())
+df(データフレーム)の'体重'(カラム)の欠損値を'体重'(カラム)の平均値で穴埋めする
+(df['体重'])(データ列)の欠損値をその平均値で穴埋めする
+
+df['体重'].fillna(df['体重'].median())
+df(データフレーム)の'体重'(カラム)の欠損値を'体重'(カラム)の中央値で穴埋めする
+(df['体重'])(データ列)の欠損値をその中央値で穴埋めする
+
+df['体重'].fillna(df['体重'].mode())
+df(データフレーム)の'体重'(カラム)の欠損値を'体重'(カラム)の最頻値で穴埋めする
+(df['体重'])(データ列)の欠損値をその最頻値で穴埋めする
+
+sklearn.decomposition.PCA((n_components=2)　@let:model
+2次元に圧縮する[PCA]モデルを用意する
+
+pca.fit(X)
+pca(モデル)を学習させる
+
+pca.transform(X)
+pca(モデル)でXを変換する 
+
+for i, df in enumerate(data.groupby('label')):
+データフレーム(data)を'label'(カラム)[毎]に[グループ化し|]繰り返し
+データフレーム(data)をグループ[毎]に繰り返し
+
+df.plot(kind='scatter', x='pc1', y='pc2')
+データフレーム(df)の'pc1'(カラム)を[横軸]、'pc2'(カラム)を[縦軸]として、散布図を[作成する|プロットする]
+
+用意する=用意する|初期化する|新たに使えるようにする|準備する
+
+sklearn.neural_network.MLPClassifier()  @let:model
+[多層パーセプトロン|パーセプトロン|MLP][モデル|]を用意する
+
+hidden_layer_sizes=(x,)  @option
+隠れ層はx層を用いる
+
+hidden_layer_sizes=(x,y)  @option
+隠れ層はx,y層を用いる
+
+activation='logistic'  @option
+活性化[関数|]は、ロジスティック関数を用いる
+
+activation='identity'  @option
+活性化[関数|]は、恒等関数を用いる
+
+activation='tanh'  @option
+活性化[関数|]は、[双曲線正接関数|tanh]を用いる
+
+activation='relu' @option
+活性化[関数|]は、[ランプ関数|relu]を用いる
+
+solver='sgd'  @option
+最適化手法は[SDG|確率的勾配降下法|勾配降下法]を用いる
+
+solver='adam' @option
+最適化手法は'adam'を用いる
+確率的勾配降下法にモーメントをつける
+
+random_state=0   @option
+[乱数状態|ランダムステート]は0とする
+乱数を0に固定する
+
+max_iter=20
+最大[繰り返し|反復|エポック][数|]は20にする
+[繰り返し|反復|エポック]は20までにする
+
+pd.pd.DataFrame(y, columns=['label'])  @let:df
+y(リスト)を(['label'])を[カラム]名として[データフレーム]に[変換|]する
+y(配列)を[データフレーム]に[変換|]する
+y(配列)から新しい[データフレーム]を作る
+
+pd.DataFrame(y, columns=['label', 'label2'])  @let:df
+y(2次元配列)を[データフレーム]に[変換|]する
+y(2次元配列)を(['label', 'label2'])を[カラム]名としてデータフレームに[変換|]する
+y(2次元配列)から新しい[データフレーム]を作る
+
+pd.concat([df, df2], axis=1)  @let:data
+df(データフレーム)とdf2を横方向に連結する
+
+df.sort_values(by="文字数")  @let:df
+df(データフレーム)を"文字数"(カラム)で並べ直す
+
+pd.DataFrame({"words":words}).value_counts() @check
+{[データフレーム]を使って|}words(リスト)の頻出度
+words(単語リスト)の出現頻度
+
+pd.DataFrame({"words":words})  @let:df
+words(リスト)を"words"(カラム)として、新しいデータフレームを作成する
+新しい[データフレーム]を/words(リスト)から作成する
+
+pd.DataFrame({"キーワード": words, "満足度": scores})
+words(リスト)を"キーワード"(カラム)、scores(リスト)を"満足度"カラムとして、新しい[データフレーム]を作る
+
+df.groupby('キーワード').agg({'満足度': np.mean, '出現数': sum}).sort_values(by='出現数')
+df(データフレーム)を'キーワード'でグループ化し、'満足度'(カラム)と'出現数'(カラム')で集約し、'出現数'(カラム)で並べ直す
+
+df['出現数'] = [0]*len(df)
+df(データフレーム)において、全ての要素が0のカラムを作り、[名前を|]'出現数'とする
+新しい[カラム]をdf(データフレーム)に追加し、[名前を|]'出現数'とする
+
+df['わかち書き'] = df['コメント'].map(f)　@FIXME
+df(データフレーム)の'コメント'(カラム)にf(関数)を適用して、[新しく|]'わかち書き'(コラム)にする
+(df['コメント'])(データフレーム列)にf(関数)を適用して、'わかち書き'(コラム)とする
+
+sns.set(font="IPAexGothic")
+[グラフで|]日本語フォント[を|が]使えるようにする
+
+
+
+
+

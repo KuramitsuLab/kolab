@@ -1,0 +1,75 @@
+
+# http://matplotlib.org/examples/color/colormaps_reference.html
+
+colormap='Accent' @option
+カラーマップはアクセントを用いる
+
+# https://note.nkmk.me/python-pandas-plot/
+
+グラフ種類=グラフ|種類|グラフの種類
+
+折れ線グラフ=折れ線グラフ|線グラフ
+
+kind='line' @option
+グラフ種類は、折れ線グラフを用いる
+折れ線グラフを用いる
+
+垂直棒グラフ=棒グラフ|縦棒グラフ|縦方向の棒グラフ|垂直棒グラフ
+
+kind='bar' @option
+グラフ種類は、垂直棒グラフを用いる
+垂直棒グラフを用いる
+
+水平棒グラフ=水平棒グラフ|横方向の棒グラフ|横棒グラフ
+
+kind='barh'  @option
+グラフ種類は、水平棒グラフを用いる
+水平棒グラフを用いる
+
+箱ひげ図=箱ひげ図@10|箱髭図|ボックスチャート
+
+kind='box' @option
+グラフ種類は、箱ひげ図を用いる
+箱ひげ図を用いる
+
+ヒストグラム=ヒストグラム@5|柱状図|柱状グラフ|度数分布図@3
+
+kind='hist' @option
+グラフ種類はヒストグラムを用いる
+ヒストグラムを用いる
+
+kind='kde' @option 
+グラフ種類はカーネル密度推定[図|]を用いる
+カーネル密度推定[図|]を用いる
+
+kind='density' @option
+グラフ種類は密度推定[図|]を用いる
+
+kind='hexbin' @option
+グラフ種類は六角ビニング[図|]を用いる
+六角ビニング[図|]を用いる
+
+kind='area' @option
+グラフ種類は面グラフを用いる
+面グラフを用いる
+
+kind='scatter' @option
+グラフ種類は散布図を用いる
+散布図を用いる
+
+kind='pie' @option
+グラフ種類は円グラフを用いる
+円グラフを用いる
+
+stacked=True @option
+グラフ種類は積み上げを用いる
+積み上げグラフを用いる
+
+水平方向=水平|水平方向
+
+orientation='horizontal' @option
+方向は水平方向を用いる
+
+alpha=0.5 @option
+透過率は0.5にする
+半分、透過させる

@@ -22,3 +22,7 @@ nrows=2    @option
 na_values='-'   @option
 '-'(文字列)は[追加の|]欠損値とする
 '-'(文字列)も欠損値として[扱う|用いる]
+
+activation='logistic'  @option
+活性化[関数|]は、ロジスティック関数を用いる
+
