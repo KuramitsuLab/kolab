@@ -149,19 +149,19 @@ y(2次元配列)から新しい[データフレーム]を作る
 pd.concat([df, df2], axis=1)  @let:data
 df(データフレーム)とdf2を横方向に連結する
 
-df.sort_values(by="文字数")  @let:df
-df(データフレーム)を"文字数"(カラム)で並べ直す
+df.sort_values(by='文字数')  @let:df
+df(データフレーム)を'文字数'(カラム)で並べ直す
 
-pd.DataFrame({"words":words}).value_counts() @check
+pd.DataFrame({'words':words}).value_counts() @check
 {[データフレーム]を使って|}words(リスト)の頻出度
 words(単語リスト)の出現頻度
 
-pd.DataFrame({"words":words})  @let:df
-words(リスト)を"words"(カラム)として、新しいデータフレームを作成する
+pd.DataFrame({'words':words})  @let:df
+words(リスト)を'words'(カラム)として、新しいデータフレームを作成する
 新しい[データフレーム]を/words(リスト)から作成する
 
-pd.DataFrame({"キーワード": words, "満足度": scores})
-words(リスト)を"キーワード"(カラム)、scores(リスト)を"満足度"カラムとして、新しい[データフレーム]を作る
+pd.DataFrame({'キーワード': words, '満足度': scores})
+words(リスト)を'キーワード'(カラム)、scores(リスト)を'満足度'カラムとして、新しい[データフレーム]を作る
 
 df.groupby('キーワード').agg({'満足度': np.mean, '出現数': sum}).sort_values(by='出現数')
 df(データフレーム)を'キーワード'でグループ化し、'満足度'(カラム)と'出現数'(カラム')で集約し、'出現数'(カラム)で並べ直す
@@ -174,7 +174,7 @@ df['わかち書き'] = df['コメント'].map(f)　@FIXME
 df(データフレーム)の'コメント'(カラム)にf(関数)を適用して、[新しく|]'わかち書き'(コラム)にする
 (df['コメント'])(データフレーム列)にf(関数)を適用して、'わかち書き'(コラム)とする
 
-sns.set(font="IPAexGothic")
+sns.set(font='IPAexGothic')
 [グラフで|]日本語フォント[を|が]使えるようにする
 
 
