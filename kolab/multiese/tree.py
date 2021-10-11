@@ -1,7 +1,6 @@
 
 
 class ノード(object):  # 抽象的なクラス
-    pass
 
     def emit(self, out):
         pass
