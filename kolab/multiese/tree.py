@@ -64,3 +64,5 @@ def parse(s: str):
 
 s = parse('偶数の')
 print(s.stringfy())
+
+# 吾輩を猫とする
