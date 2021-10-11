@@ -87,24 +87,34 @@ def parse(s: str):
 
 
     # 文節区切りでリストにする(格助詞が来たら文節区切り)
-    work = [[] for i in range(len(token))]
+    work = [[] for i in range(len(token))]  #一応トークンの数だけ空のリストを用意しておく
     p = 0
     for tok in token:
-        # print(tok)
-        if tok.part_of_speech.startswith('名詞'):
-            work[p].append(tok.surface) #後からtokのみにする
-            # 名詞(tok.surface)
-        elif tok.part_of_speech.startswith('助詞'):
-            work[p].append(tok.surface)
-            # 助詞(tok.surface)
-        elif tok.part_of_speech.startswith('動詞'):
-            work[p].append(tok.surface)
-            # 動詞(tok.surface)
-        else:
-            work[p].append(tok.surface)
-            # その他(tok.surface)
-        if tok.part_of_speech.split(',')[1] == "格助詞":
+        work[p].append(tok.surface)
+        if tok.part_of_speech.split(',')[1] == "格助詞": #格助詞が来たら次のリストに移動する
             p += 1
+
+    
+    #   --------メモ---------
+    # work = [[] for i in range(len(token))]
+    # p = 0
+    # for tok in token:
+    #     # print(tok)
+    #     if tok.part_of_speech.startswith('名詞'):
+    #         work[p].append(tok.surface) #後からtokのみにする
+    #         # 名詞(tok.surface)
+    #     elif tok.part_of_speech.startswith('助詞'):
+    #         work[p].append(tok.surface)
+    #         # 助詞(tok.surface)
+    #     elif tok.part_of_speech.startswith('動詞'):
+    #         work[p].append(tok.surface)
+    #         # 動詞(tok.surface)
+    #     else:
+    #         work[p].append(tok.surface)
+    #         # その他(tok.surface)
+    #     if tok.part_of_speech.split(',')[1] == "格助詞":
+    #         p += 1
+    #   --------メモ---------
     
     print(work) 
     # Step1：   [['吾輩', 'を'], ['猫', 'と'], ['する'], [], []]
@@ -112,13 +122,22 @@ def parse(s: str):
 
     q = 0
     while len(work[q]) > 0:
-        # print('nyanyanya')
         文節(work[q])
-        q += 1
+        #q += 1
     # Step2：   [文節(['吾輩', 'を']), 文節(['猫', 'と']), 文節(['する']), [], []]
     # Step3：   [文節([名詞('我輩'), 助詞('を')]), 文節([名詞('猫'), 助詞('と']), 文節([動詞('する')]), [], []]
 
-
+        for word in work[q]: #TODO：文節の出力からリストの中身は持ってこなければ...
+            print(word)
+            if tok.part_of_speech.startswith('名詞'):
+                名詞(tok.surface)
+            elif tok.part_of_speech.startswith('助詞'):
+                助詞(tok.surface)
+            elif tok.part_of_speech.startswith('動詞'):
+                動詞(tok.surface)
+            else:
+                その他(tok.surface)
+        q += 1
     return work
 
 s = parse('吾輩を猫とする')
