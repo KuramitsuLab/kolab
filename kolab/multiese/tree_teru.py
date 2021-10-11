@@ -90,7 +90,8 @@ def parse(s: str):
     work = [[] for i in range(len(token))]  #一応トークンの数だけ空のリストを用意しておく
     p = 0
     for tok in token:
-        work[p].append(tok.surface)
+        work[p].append(tok)
+        # work[p].append(tok.surface)     #tok.surfaceよりも、ここはtokを入れておくと読めないけど後々の処理が楽なのでしょうか...?
         if tok.part_of_speech.split(',')[1] == "格助詞": #格助詞が来たら次のリストに移動する
             p += 1
     #print(work)
@@ -129,16 +130,16 @@ def parse(s: str):
     # Step3：   [文節([名詞('我輩'), 助詞('を')]), 文節([名詞('猫'), 助詞('と']), 文節([動詞('する')]), [], []]
 
         #  文節クラスから得た出力結果を品詞分解する
-        for word in work[q]: #FIXME：文節の出力からリストの中身は持ってこなければ...
+        for word in work[q]: #FIXME：文節の出力からリストの中身は持ってくる
             print(word)
-            if tok.part_of_speech.startswith('名詞'):
-                名詞(tok.surface)
-            elif tok.part_of_speech.startswith('助詞'):
-                助詞(tok.surface)
-            elif tok.part_of_speech.startswith('動詞'):
-                動詞(tok.surface)
+            if word.part_of_speech.startswith('名詞'):
+                名詞(word.surface)
+            elif word.part_of_speech.startswith('助詞'):
+                助詞(word.surface)
+            elif word.part_of_speech.startswith('動詞'):
+                動詞(word.surface)
             else:
-                その他(tok.surface)
+                その他(word.surface)
         q += 1  #次のリストを処理する
     return s #ここ何返していいか分からないです
 
