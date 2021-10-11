@@ -93,7 +93,10 @@ def parse(s: str):
         work[p].append(tok.surface)
         if tok.part_of_speech.split(',')[1] == "格助詞": #格助詞が来たら次のリストに移動する
             p += 1
+    #print(work)
 
+    # Step1：   [['吾輩', 'を'], ['猫', 'と'], ['する'], [], []]
+    # Step2：   [文節(['吾輩', 'を']), 文節(['猫', 'と']), 文節(['する']), [], []]
     
     #   --------メモ---------
     # work = [[] for i in range(len(token))]
@@ -116,10 +119,8 @@ def parse(s: str):
     #         p += 1
     #   --------メモ---------
     
-    print(work) 
-    # Step1：   [['吾輩', 'を'], ['猫', 'と'], ['する'], [], []]
-    # Step2：   [文節(['吾輩', 'を']), 文節(['猫', 'と']), 文節(['する']), [], []]
 
+    # 文節クラスに文節リストを順に入れる
     q = 0
     while len(work[q]) > 0:
         文節(work[q])
@@ -127,7 +128,8 @@ def parse(s: str):
     # Step2：   [文節(['吾輩', 'を']), 文節(['猫', 'と']), 文節(['する']), [], []]
     # Step3：   [文節([名詞('我輩'), 助詞('を')]), 文節([名詞('猫'), 助詞('と']), 文節([動詞('する')]), [], []]
 
-        for word in work[q]: #TODO：文節の出力からリストの中身は持ってこなければ...
+        #  文節クラスから得た出力結果を品詞分解する
+        for word in work[q]: #FIXME：文節の出力からリストの中身は持ってこなければ...
             print(word)
             if tok.part_of_speech.startswith('名詞'):
                 名詞(tok.surface)
@@ -137,8 +139,10 @@ def parse(s: str):
                 動詞(tok.surface)
             else:
                 その他(tok.surface)
-        q += 1
-    return work
+        q += 1  #次のリストを処理する
+    return s #ここ何返していいか分からないです
+
+
 
 s = parse('吾輩を猫とする')
 print(s)
