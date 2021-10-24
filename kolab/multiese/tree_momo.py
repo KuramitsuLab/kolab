@@ -6,7 +6,7 @@ janome = Tokenizer()
 OPTION = {
       '--random': True,
 #     '--single': False, # ひとつしか選ばない (DAはオフ)
-#      '--order': True, # 順序も入れ替える
+      '--order': True, # 順序も入れ替える
       '--short': False, # 短い類義語を選ぶ
 #     '--pyfirst': False, #Pythonを先に出力する (yk使用)
 #     '--change-subject': 0.0, # 助詞の「が」をランダムに「は」に変える
@@ -22,13 +22,24 @@ class ノード(object):  # 抽象的なクラス
     def stringfy(self):
         out = []
         self.emit(out)
-        return ''.join(out)
-
-    # def stringfy2(self):
-    #     out = []
-    #     self.emit(out)
-    #     x = ''.join(out)
-    #     return x.split('-')
+        if OPTION['--order']:
+            print(''.join(out))
+            s = ''.join(out)
+            s_li=str(s).split('/')
+            while '_' in s_li:
+                symbol_ind = s_li.index('_')
+                before_ind = symbol_ind-1
+                after_ind = symbol_ind+1
+                z = [s_li[before_ind], s_li[after_ind]]
+                random.shuffle(z)
+                s_li[before_ind] = z[0]
+                s_li[after_ind] = z[1]
+                #print(z)
+                del s_li[symbol_ind]
+                #print(s_li[1:])
+            return ''.join(s_li[1:])
+        else:
+            return ''.join(out)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}> " + self.stringfy()
@@ -82,6 +93,15 @@ class 動詞(ノード):
     def emit(self, out):
         out.append(self.w)
 
+class order(ノード):
+    w: str
+
+    def __init__(self, w):
+        self.w = w
+    
+    def emit(self, out):
+        out.append(self.w)    
+
 class 未定義(ノード):
     w: str
 
@@ -106,6 +126,7 @@ def choice_synonym(s:str): #類義語を選択
     if OPTION['--random']:
         ind = random_choice(len(word_list))
     return(word_list[ind])
+
 
 def parse(s: str):
     '''
@@ -134,7 +155,13 @@ def parse(s: str):
     # print('@@pos3  ', pos3)
 
     for idx in range(len(wakati)):
-        if pos[idx] == '名詞':
+        if wakati[idx] == '_':
+            x = order(wakati[idx])
+            buf_pos.append(x)
+            x = 文節(*buf_pos)
+            buf_phrase.append(x)
+            buf_pos = []
+        elif pos[idx] == '名詞':
             x = 名詞(wakati[idx])
             buf_pos.append(x)
         elif pos[idx] == '動詞':
@@ -157,11 +184,11 @@ def parse(s: str):
 
     s = 文(*buf_phrase)
 
+
     return s
 
-s = parse('データフレームdfを[逆順に|大きい順に][sortする|ソートする|並べる]')
-s2 = parse('データフレームdfを逆順にソートして、df2とする')
+s = parse('データフレームdfを_[逆順に|大きい順に][sortする|ソートする|並べる]')
+#s2 = parse('データフレームdfを逆順にソートして、df2とする')
 
 print(s.stringfy())
-# print(s.stringfy2())
-print(s2.stringfy())
+#print(s2.stringfy())
