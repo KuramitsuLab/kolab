@@ -22,6 +22,7 @@ class ノード(object):  # 抽象的なクラス
     def stringfy(self):
         out = []
         self.emit(out)
+        
         if OPTION['--order']:
             print(''.join(out))
             s = ''.join(out)
@@ -37,7 +38,7 @@ class ノード(object):  # 抽象的なクラス
                 #print(z)
                 del s_li[symbol_ind]
                 #print(s_li[1:])
-            return ''.join(s_li[1:])
+            return '/'.join(s_li[1:])
         else:
             return ''.join(out)
 
@@ -127,7 +128,6 @@ def choice_synonym(s:str): #類義語を選択
         ind = random_choice(len(word_list))
     return(word_list[ind])
 
-
 def parse(s: str):
     '''
     janome で解析した結果から、文オブジェクトを返す
@@ -136,11 +136,12 @@ def parse(s: str):
     buf_pos = []
     buf_phrase = []
     
-    while '[' and '|' and ']' in s: #類義語の処理
-        first = s[:s.find('[')]
-        word = str(choice_synonym(s[s.find('['):s.find(']')+1]))
-        second = s[s.find(']')+1:]
-        s = first + word + second
+    if OPTION['--short'] or OPTION['--random']:
+        while '[' and '|' and ']' in s: #類義語の処理
+            first = s[:s.find('[')]
+            word = str(choice_synonym(s[s.find('['):s.find(']')+1]))
+            second = s[s.find(']')+1:]
+            s = first + word + second
     
     # wakati = [token.surface for token in janome.tokenize(s)]   # 分かち書きのリスト
     wakati = [token.base_form for token in janome.tokenize(s)]   # 基本形 (標準形) のリスト
@@ -155,7 +156,7 @@ def parse(s: str):
     # print('@@pos3  ', pos3)
 
     for idx in range(len(wakati)):
-        if wakati[idx] == '_':
+        if wakati[idx] == '_': #'_'：語順入れ替え可能な文節間に挿入された記号
             x = order(wakati[idx])
             buf_pos.append(x)
             x = 文節(*buf_pos)
@@ -187,7 +188,7 @@ def parse(s: str):
 
     return s
 
-s = parse('データフレームdfを_[逆順に|大きい順に][sortする|ソートする|並べる]')
+s = parse('データフレームdfを_[逆順に|大きい順に][sortする|ソートする|並べる]')# 語順入れ替え可能な文節間に'_'を挿入
 #s2 = parse('データフレームdfを逆順にソートして、df2とする')
 
 print(s.stringfy())
