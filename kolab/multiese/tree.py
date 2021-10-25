@@ -1,12 +1,12 @@
 from janome.tokenizer import Tokenizer
-
+import random
 janome = Tokenizer()
 
 OPTION = {
-#     '--random': True,
+     '--random': True,
 #     '--single': False, # ひとつしか選ばない (DAはオフ)
-#     '--order': False, # 順序も入れ替える
-#     '--short': False, # 短い類義語を選ぶ
+     '--order': True, # 順序も入れ替える
+     '--short': False, # 短い類義語を選ぶ
 #     '--pyfirst': False, #Pythonを先に出力する (yk使用)
 #     '--change-subject': 0.0, # 助詞の「が」をランダムに「は」に変える
 #     '--drop': 0.0, # パラメータをドロップする
@@ -21,7 +21,25 @@ class ノード(object):  # 抽象的なクラス
     def stringfy(self):
         out = []
         self.emit(out)
-        return ''.join(out)
+        
+        if OPTION['--order']:
+            print(''.join(out))
+            s = ''.join(out)
+            s_li=str(s).split('/')
+            while '_' in s_li:
+                symbol_ind = s_li.index('_')
+                before_ind = symbol_ind-1
+                after_ind = symbol_ind+1
+                z = [s_li[before_ind], s_li[after_ind]]
+                random.shuffle(z)
+                s_li[before_ind] = z[0]
+                s_li[after_ind] = z[1]
+                #print(z)
+                del s_li[symbol_ind]
+                #print(s_li[1:])
+            return '/'.join(s_li[1:])
+        else:
+            return ''.join(out)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}> " + self.stringfy()
@@ -75,6 +93,15 @@ class 動詞(ノード):
     def emit(self, out):
         out.append(self.w)
 
+class order(ノード):#'_'
+    w: str
+
+    def __init__(self, w):
+        self.w = w
+    
+    def emit(self, out):
+        out.append(self.w)
+
 class 未定義(ノード):
     w: str
 
@@ -84,6 +111,22 @@ class 未定義(ノード):
     def emit(self, out):
         out.append(f'@{self.w}')
 
+def synonyms_split(word): #'[sort|ソート]' -> ['sort', 'ソート']
+    word = word[1:-1].split('|')
+    return word
+
+def random_choice(length: int): #indexをランダムに選択
+    return random.randint(0, length-1)
+
+def choice_synonym(s:str): #類義語を選択
+    word_list = sorted(synonyms_split(s), key=lambda x: len(x))
+    if OPTION['--short']:
+        ind = 0
+    if OPTION['--random']:
+        ind = random_choice(len(word_list))
+    return(word_list[ind])
+
+
 def parse(s: str):
     '''
     janome で解析した結果から、文オブジェクトを返す
@@ -92,6 +135,13 @@ def parse(s: str):
     buf_pos = []
     buf_phrase = []
 
+    if OPTION['--short'] or OPTION['--random']:
+        while '[' and '|' and ']' in s: #類義語の処理
+            first = s[:s.find('[')]
+            word = str(choice_synonym(s[s.find('['):s.find(']')+1]))
+            second = s[s.find(']')+1:]
+            s = first + word + second
+    
 
     # wakati = [token.surface for token in janome.tokenize(s)]   # 分かち書きのリスト
     wakati = [token.base_form for token in janome.tokenize(s)]   # 基本形 (標準形) のリスト
@@ -104,9 +154,14 @@ def parse(s: str):
     print('@@pos   ', pos)
     print('@@pos2  ', pos2)
     # print('@@pos3  ', pos3)
-
     for idx in range(len(wakati)):
-        if pos[idx] == '名詞':
+        if wakati[idx] == '_': #'_'：語順入れ替え可能な文節間に挿入された記号
+            x = order(wakati[idx])
+            buf_pos.append(x)
+            x = 文節(*buf_pos)
+            buf_phrase.append(x)
+            buf_pos = []
+        elif pos[idx] == '名詞':
             x = 名詞(wakati[idx])
             buf_pos.append(x)
         elif pos[idx] == '動詞':
@@ -131,8 +186,10 @@ def parse(s: str):
 
     return s
 
-s = parse('データフレームdfを逆順にソートする')
-s2 = parse('データフレームdfを逆順にソートして、df2とする')
+#s = parse('データフレームdfを逆順にソートする')
+#s2 = parse('データフレームdfを逆順にソートして、df2とする')
+s3 = parse('データフレームdfを_[逆順に|大きい順に][sortする|ソートする|並べる]')# 語順入れ替え可能な文節間に'_'を挿入
 
-print(s.stringfy())
-print(s2.stringfy())
+#print(s.stringfy())
+#print(s2.stringfy())
+print(s3.stringfy())
