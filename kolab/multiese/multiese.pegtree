@@ -1,0 +1,90 @@
+// Multiese
+// tokibi
+
+Chunk = Term {^ Term+ #Seq }?
+
+Term = 
+  / Block
+  / Choice
+  / Code
+  / Annotation
+  / Number
+  / Name
+  / Token
+  / Symbol
+
+// 
+
+Block = { "{" Chunk  {^ ("|" Chunk)+ #Choice }? "}" #Block }
+
+Choice = 
+  { "[" ChoiceChunk ("|" ChoiceChunk?)* "]" #Choice }
+
+ChoiceChunk = ChoiceTerm {^ ChoiceTerm+ #Seq }?
+
+ChoiceTerm =
+  / Choice
+  / { (![\[\]|] .)+ #Chunk }
+
+Code = 
+  / { Expression #Expression }
+  / "`" { { (!'`' . )* } #Expression } "`" _
+
+Token = { W+ #Chunk } TEN?
+Symbol = { (!W !SP .)+ #Symbol } TEN?
+
+TEN = [ 、，]
+SP = [\[{}|@]
+
+Annotation = {
+  '@' Name
+  "("
+  AnnotationContent ("," AnnotationContent)*
+  ")"
+  #Annotation
+} 
+
+AnnotationContent = AnnotationTerm {^ AnnotationTerm+ #Seq }?
+
+AnnotationTerm =
+  / Block
+  / Choice
+  / Code
+  / Annotation
+  / Name
+  / Number
+  / Token
+
+example Chunk 望遠鏡で{子犬が泳ぐ}様子を見たら、math.pi+1を実行する
+example Chunk @var(df, データフレーム)を[降順に|]ソートする
+
+W = HIRA/KATA/KANJI
+
+HIRA = [ぁ-ん]
+KATA = [ァ-ヶー・]
+KANJI = [㐀-䶵一-龠々〇〻]
+
+Expression =
+  Primary {^ OP Primary #Binary }*
+
+OP = "+" / "-" / "*" / "/" / "%"
+
+Primary =
+  / Name _Postfix*
+  / String
+  / Number
+  
+_Postfix =
+  / {^ "(" Expression? ("," Expression )* ")" #App}
+  / {^ "[" Expression? (":" Expression )* "]" #Index}
+
+Name = 
+  { [A-Za-z_] [A-Za-z_.0-9]* #Name } _
+
+Number = 
+  / { [0-9]+ ('.' [0-9]*) #Number } _
+  / { '.' [0-9]+ #Number } _
+
+String =
+  / '"' { (!'"' .) #String } '"' _
+  / "'" { (!"'" .) #String } "'" _
