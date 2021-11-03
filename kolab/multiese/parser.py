@@ -74,6 +74,6 @@ test_for_nobu('データフレームdfを降順にソートする')
 test_for_nobu('望遠鏡で泳ぐ子犬を見た')
 test_for_nobu('望遠鏡で{泳ぐ子犬}を見た')
 test_for_nobu('望遠鏡で[子犬|とうきび]を見た')
-test_for_nobu('@type(df, データフレーム)において、望遠鏡で子犬を見た')
-test_for_nobu('@type(df)の先頭を見る')
+test_for_nobu('@type(df, データフレーム)について、望遠鏡で子犬を見てない')  # 否 見た 80%
+test_for_nobu('@type(df)の先頭を見る')  # Keyword
 # test_for_nobu('望遠鏡で{子犬が泳ぐ}様子を見たら、math.pi+1を実行する')
