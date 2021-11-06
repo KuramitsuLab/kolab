@@ -316,7 +316,8 @@ def read_txt(input_filename):
     with open(input_filename) as f:
         for line in f.readlines():
             s = parse(line.strip())
-            print(s.stringfy())
+            print(repr(s))
+            print()
 
 def read_str():
     s = parse('隣の客はよく柿食う客だ')
