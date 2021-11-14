@@ -1,19 +1,39 @@
 from janome.tokenizer import Tokenizer
+import argparse
 import sys
 
 janome = Tokenizer()
 
-OPTION = {
+# OPTION = {
     #     '--random': True,
     #     '--single': False, # ひとつしか選ばない (DAはオフ)
-    '--order': False,  # 順序も入れ替える
+    #     '--order': False,  # 順序も入れ替える
     #     '--short': False, # 短い類義語を選ぶ
     #     '--pyfirst': False, #Pythonを先に出力する (yk使用)
     #     '--change-subject': 0.0, # 助詞の「が」をランダムに「は」に変える
     #     '--drop': 0.0, # パラメータをドロップする
     #     '--partial': False, #不完全なコードでも出力する
-}
+# }
 
+parser = argparse.ArgumentParser(description='Multiese')
+
+parser.add_argument('--order', action='store_true')
+parser.add_argument('--files', nargs='*')
+
+args = parser.parse_args()
+
+"""
+[memo] args 使い方
+オプションを足したい場合は、上記のようにadd_argument で追加
+(引数の詳細はQiita を参照 : 
+https://qiita.com/kzkadc/items/e4fc7bc9c003de1eb6d0)
+
+args.[オプション名]でT/Fを判定したり、値をもらったりできるようになります
+
+実行例)
+python3 tree.py --order
+python3 tree.py --files a.txt b.txt
+"""
 
 class ノード(object):  # 抽象的なトップクラス
 
@@ -31,7 +51,7 @@ class ノード(object):  # 抽象的なトップクラス
         ns.append(self)
         return ns
 
-    def simplify(self):
+    def simplify(self):    # TODO: なんでしたっけ...?
         """シンプルにしてノードを返す
         """
         return self
@@ -200,11 +220,9 @@ class コード(字句):
 class 記号(字句):
     pass
 
-
 class 未定義(ノード):
     def emit(self, out):
         out.append(f'@{self.w}')
-
 
 def parse(s: str) -> ノード:
     '''
@@ -212,38 +230,36 @@ def parse(s: str) -> ノード:
     https://note.nkmk.me/python-janome-tutorial/
     '''
     buf_pos = []
-    buf_phrase = []
+    noun = []
 
     wakati = [token.surface for token in janome.tokenize(s)]   # 分かち書きのリスト
     # wakati = [token.base_form for token in janome.tokenize(s)]   # 基本形 (標準形) のリスト
 
-    pos = [token.part_of_speech.split(',')[0]
-           for token in janome.tokenize(s)]   # 品詞のリスト
+    pos = [token.part_of_speech.split(',')[0] for token in janome.tokenize(s)]   # 品詞のリスト
     pos2 = [token.part_of_speech.split(',')[1] for token in janome.tokenize(s)]
     # pos3 = [token.part_of_speech.split(',')[2] for token in janome.tokenize(s)]
 
-    # print('@@wakati', wakati)
-    # print('@@pos   ', pos)
-    # print('@@pos2  ', pos2)
-    # print('@@pos3  ', pos3)
-
     for idx in range(len(wakati)):
         if pos[idx] == '名詞' or pos[idx] == '接頭詞':
-            x = 名詞(wakati[idx])
+            if idx == 0 or (pos[idx-1] != '名詞' and pos[idx-1] != '接頭詞'):
+                noun.append(wakati[idx])
+
+            try:
+                if pos[idx+1] == '名詞' or pos[idx+1] == '接頭詞':
+                    noun.append(wakati[idx+1])
+                    continue
+            except:
+                pass
+
+            x = 名詞(''.join(noun))
             buf_pos.append(x)
-            if OPTION['--order']:
+            noun = []
+            if args.order:
                 print('@@option_test')
 
         elif pos[idx] == '動詞':
             x = 動詞(wakati[idx])
             buf_pos.append(x)
-            try:
-                if pos[idx+1] == '名詞':
-                    x = 文節(*buf_pos)
-                    buf_phrase.append(x)
-                    buf_pos = []
-            except:
-                pass
 
         elif pos[idx] == '助動詞':
             x = 助動詞(wakati[idx])
@@ -251,9 +267,6 @@ def parse(s: str) -> ノード:
         elif pos[idx] == '助詞':   # TODO: おそらく動詞+助詞をちゃんと処理しないと
             x = 助詞(wakati[idx])
             buf_pos.append(x)
-            x = 文節(*buf_pos)
-            buf_phrase.append(x)
-            buf_pos = []
 
         elif pos[idx] == '副詞':   # 動詞を修飾
             x = 副詞(wakati[idx])
@@ -268,9 +281,6 @@ def parse(s: str) -> ノード:
         elif pos[idx] == '接続詞':
             x = 接続詞(wakati[idx])
             buf_pos.append(x)
-            x = 文節(*buf_pos)
-            buf_phrase.append(x)
-            buf_pos = []
 
         elif pos[idx] == '記号':
             if pos2[idx] == '空白' or pos2[idx] == '句点':
@@ -284,9 +294,6 @@ def parse(s: str) -> ノード:
                 else:
                     x = 記号(wakati[idx])
                     buf_pos.append(x)
-                    x = 文節(*buf_pos)
-                    buf_phrase.append(x)
-                    buf_pos = []
             else:
                 x = 未定義(wakati[idx])
                 buf_pos.append(x)
@@ -296,11 +303,7 @@ def parse(s: str) -> ノード:
             buf_pos.append(x)
             print('@@', wakati[idx], pos[idx], pos2[idx])
 
-    if buf_pos != []:
-        x = 文節(*buf_pos)
-        buf_phrase.append(x)
-
-    s = 文(*buf_phrase)
+    s = 系列(*buf_pos)
 
     return s
 
@@ -313,35 +316,26 @@ def read_txt(input_filename):
     with open(input_filename) as f:
         for line in f.readlines():
             s = parse(line.strip())
-            print(s.stringfy())
+            print(repr(s))
+            print()
 
+def read_str():
+    s = parse('隣の客はよく柿食う客だ')
+    print(repr(s), s.stringfy())
+
+    s = parse('その写真は美しい')
+    s2 = parse('美しい写真を眺める').simplify()
+    s2 = parse('データフレームdfの先頭を表示する').simplify()
+
+    # s = parse('データフレームdfを逆順にソートする')
+    # s2 = parse('データフレームdfを逆順にソートして、df2とする')
+
+    print(repr(s), s.stringfy())
+    print(repr(s2), s2.stringfy())
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        for filename in sys.argv[1:]:
-            if filename.startswith('-'):
-                if '=' not in filename:
-                    filename += '=True'
-                key, value = filename.split('=')
-                OPTION[key] = int(
-                    value) if value.isdigit() else value == 'True'
-                continue
-
-            try:
-                read_txt(filename)
-            except:
-                pass
+    if args.files != None:
+        for filename in args.files:
+            read_txt(filename)
     else:
-        # s = parse('データフレームdfを逆順にソートする')
-        # s2 = parse('データフレームdfを逆順にソートして、df2とする')
-
-        s = parse('隣の客はよく柿食う客だ')
-        print(repr(s), s.stringfy())
-
-        s = parse('その写真は美しい')
-        s2 = parse('美しい写真を眺める').simplify()
-
-        s = parse('大きな犬').simplify()
-
-        print(repr(s), s.stringfy())
-        print(repr(s2), s2.stringfy())
+        read_str()
