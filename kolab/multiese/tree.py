@@ -15,26 +15,6 @@ janome = Tokenizer()
     #     '--partial': False, #不完全なコードでも出力する
 # }
 
-parser = argparse.ArgumentParser(description='Multiese')
-
-parser.add_argument('--order', action='store_true')
-parser.add_argument('--files', nargs='*')
-
-args = parser.parse_args()
-
-"""
-[memo] args 使い方
-オプションを足したい場合は、上記のようにadd_argument で追加
-(引数の詳細はQiita を参照 : 
-https://qiita.com/kzkadc/items/e4fc7bc9c003de1eb6d0)
-
-args.[オプション名]でT/Fを判定したり、値をもらったりできるようになります
-
-実行例)
-python3 tree.py --order
-python3 tree.py --files a.txt b.txt
-"""
-
 class ノード(object):  # 抽象的なトップクラス
 
     def emit(self, out):
@@ -342,6 +322,25 @@ def read_str():
     print(repr(s2), s2.stringfy())
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Multiese')
+    parser.add_argument('--order', action='store_true')
+    parser.add_argument('--files', nargs='*')
+
+    args = parser.parse_args()
+
+    """
+    [memo] args 使い方
+    オプションを足したい場合は、上記のようにadd_argument で追加
+    (引数の詳細はQiita を参照 : 
+    https://qiita.com/kzkadc/items/e4fc7bc9c003de1eb6d0)
+
+    args.[オプション名]でT/Fを判定したり、値をもらったりできるようになります
+
+    実行例)
+    python3 tree.py --order
+    python3 tree.py --files a.txt b.txt
+    """
+
     if args.files != None:
         for filename in args.files:
             read_txt(filename)
