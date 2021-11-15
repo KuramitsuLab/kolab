@@ -224,9 +224,17 @@ class 未定義(ノード):
     def emit(self, out):
         out.append(f'@{self.w}')
 
-def parse(s: str) -> ノード:
+
+## post_processing
+
+def post_processing(series: 系列):
+    return series
+
+
+
+def parse(s: str, post_processing=post_processing) -> 系列:
     '''
-    janome で解析した結果から、文オブジェクトを返す
+    janome で解析した結果から、系列を返す
     https://note.nkmk.me/python-janome-tutorial/
     '''
     buf_pos = []
@@ -305,7 +313,7 @@ def parse(s: str) -> ノード:
 
     s = 系列(*buf_pos)
 
-    return s
+    return post_processing(s)
 
 
 def read_txt(input_filename):
