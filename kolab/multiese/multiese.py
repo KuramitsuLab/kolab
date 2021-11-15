@@ -1,7 +1,8 @@
 import sys
-#from parser import multiese_parser
+import argparse
+from parser import multiese_parser
 
-def read_multiese_file(filenname: str, pairs: list = None):
+def read_multiese_file(filename: str, pairs: list = None):
     if pairs is None:
         pairs = []  # [('日本語', 'コード') .. ] こういう順番で入ります
     with open(filename) as f:
@@ -33,35 +34,30 @@ def read_multiese_file(filenname: str, pairs: list = None):
     return pairs
 
 def write_multiese_tsv(pairs, file=sys.stdout):
-    for sentense, code in pairs:
-        ss = multiese_parser(sentense)
-        sentense = ss.emit()
-        # if tokibi.OPTION['--pyfirst']:
-        #     for doc,code in buffers:
-        #         print(f'{code}\t{doc}', file=file)
-        # else:
-        #     for doc,code in buffers:
-        #         print(f'{doc}\t{code}', file=file)
-        print(sentense, code, sep='\n', file=file)
-
+    for sentence, code in pairs:
+        ss = multiese_parser(sentence)
+        sentence = ss
+        # sentence = ss.emit()
+        if args.pyfirst:
+            print(code, sentence, sep='\t', file=file)
+        else:
+            print(sentence, code, sep='\t', file=file)
 
 if __name__ == '__main__':
-    import argparse
     parser = argparse.ArgumentParser(description='Multiese')
-    parser.add_argument('--order', action='store_true')
+    parser.add_argument('--pyfirst', action='store_true')
     parser.add_argument('--files', nargs='*')
 
     args = parser.parse_args()
-    print(type(args))
-
-    if len(sys.argv) > 1:
-        # dataset=[]
-        # synonyms = {}
-        for filename in sys.argv[1:]:
+    
+    if args.files != None:
+        for filename in args.files:
             pairs = []
             read_multiese_file(filename, pairs)
-        #pairs = do_data_augmentation(pairs)
         write_multiese_tsv(pairs)
+    else:
+        pass
+
 
 
 
