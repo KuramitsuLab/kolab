@@ -63,6 +63,8 @@ class MultieseParser(ParseTreeVisitor):
 
 mult = MultieseParser()
 
+def multiese_parser(s: str):
+    return mult.parse(s)
 
 def test_for_nobu(s):
     print(s)
