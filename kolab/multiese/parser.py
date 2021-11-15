@@ -7,7 +7,6 @@ import pprint
 peg = pg.grammar('multiese.pegtree')
 parser = pg.generate(peg)
 
-
 def fix(tree):
     a = [tree.epos_]
     for t in tree:
@@ -17,7 +16,6 @@ def fix(tree):
         a.append(fix(tree.get(key)).epos_)
     tree.epos_ = max(a)
     return tree
-
 
 class MultieseParser(ParseTreeVisitor):
     def __init__(self):
@@ -60,7 +58,6 @@ class MultieseParser(ParseTreeVisitor):
         ns = [self.visit(t) for t in tree[1:]]
         return ntree.annotation(name, ns)
 
-
 mult = MultieseParser()
 
 def multiese_parser(s: str):
@@ -71,11 +68,11 @@ def test_for_nobu(s):
     print('=>', repr(mult.parse(s)))
     print()
 
-
-test_for_nobu('データフレームdfを降順にソートする')
-test_for_nobu('望遠鏡で泳ぐ子犬を見た')
-test_for_nobu('望遠鏡で{泳ぐ子犬}を見た')
-test_for_nobu('望遠鏡で[子犬|とうきび]を見た')
-test_for_nobu('@type(df, データフレーム)について、望遠鏡で子犬を見てない')  # 否 見た 80%
-test_for_nobu('@type(df)の先頭を見る')  # Keyword
-# test_for_nobu('望遠鏡で{子犬が泳ぐ}様子を見たら、math.pi+1を実行する')
+if __name__ == '__main__':
+    test_for_nobu('データフレームdfを降順にソートする')
+    test_for_nobu('望遠鏡で泳ぐ子犬を見た')
+    test_for_nobu('望遠鏡で{泳ぐ子犬}を見た')
+    test_for_nobu('望遠鏡で[子犬|とうきび]を見た')
+    test_for_nobu('@type(df, データフレーム)について、望遠鏡で子犬を見てない')  # 否 見た 80%
+    test_for_nobu('@type(df)の先頭を見る')  # Keyword
+    test_for_nobu('望遠鏡で{子犬が泳ぐ}様子を見たら、math.pi+1を実行する')

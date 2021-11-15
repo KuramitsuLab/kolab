@@ -31,7 +31,7 @@ class ノード(object):  # 抽象的なトップクラス
         ns.append(self)
         return ns
 
-    def simplify(self):    # TODO: なんでしたっけ...?
+    def simplify(self):
         """シンプルにしてノードを返す
         """
         return self
@@ -200,10 +200,8 @@ class コード(字句):
 class 記号(字句):
     pass
 
-class 未定義(ノード):
-    def emit(self, out):
-        out.append(f'@{self.w}')
-
+class 未定義(字句):
+    pass
 
 ## post_processing
 
@@ -242,8 +240,6 @@ def parse(s: str, post_processing=post_processing) -> 系列:
             x = 名詞(''.join(noun))
             buf_pos.append(x)
             noun = []
-            if args.order:
-                print('@@option_test')
 
         elif pos[idx] == '動詞':
             x = 動詞(wakati[idx])
@@ -285,11 +281,11 @@ def parse(s: str, post_processing=post_processing) -> 系列:
             else:
                 x = 未定義(wakati[idx])
                 buf_pos.append(x)
-                print('@@', wakati[idx], pos[idx], pos2[idx])
+                print('@@未定義', wakati[idx], pos[idx], pos2[idx])
         else:
             x = 未定義(wakati[idx])
             buf_pos.append(x)
-            print('@@', wakati[idx], pos[idx], pos2[idx])
+            print('@@未定義', wakati[idx], pos[idx], pos2[idx])
 
     s = 系列(*buf_pos)
 
@@ -322,24 +318,10 @@ def read_str():
     print(repr(s2), s2.stringfy())
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Multiese')
-    parser.add_argument('--order', action='store_true')
+    parser = argparse.ArgumentParser(description='tree for Multiese')
     parser.add_argument('--files', nargs='*')
 
     args = parser.parse_args()
-
-    """
-    [memo] args 使い方
-    オプションを足したい場合は、上記のようにadd_argument で追加
-    (引数の詳細はQiita を参照 : 
-    https://qiita.com/kzkadc/items/e4fc7bc9c003de1eb6d0)
-
-    args.[オプション名]でT/Fを判定したり、値をもらったりできるようになります
-
-    実行例)
-    python3 tree.py --order
-    python3 tree.py --files a.txt b.txt
-    """
 
     if args.files != None:
         for filename in args.files:
