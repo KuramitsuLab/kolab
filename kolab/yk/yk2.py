@@ -15,13 +15,14 @@ parser = argparse.ArgumentParser(description='yk for Parameter Handling')
 parser.add_argument('--notConv', action='store_true')   # Python　のトークナイズのみ
 parser.add_argument('--diff', action='store_true')      # 変数名 (name) とリテラル (val) に異なるものを付与
 parser.add_argument('--shuffle', action='store_true')   # 特殊トークンをランダムに付与 (順序を考慮しない)
+parser.add_argument('--both', action='store_true')      # shuffle ありとなしを両方追加
 parser.add_argument('--files', nargs='*')               # 入力ファイルを与える
 
 args = parser.parse_args()
 
 token_idx = list(range(1, 10))
 
-def replace_as_special_parameter(s, mapped, tag=None):   # mapped => {'df': '<A>'}
+def replace_as_special_parameter(s, mapped, token_idx=token_idx, tag=None):   # mapped => {'df': '<A>'}
     if s in mapped:
         return mapped[s]
 
@@ -36,13 +37,13 @@ def replace_as_special_parameter(s, mapped, tag=None):   # mapped => {'df': '<A>
 
     return x
 
-def convert_nothing(tok, doc, mapped, diff):
+def convert_nothing(tok, doc, mapped, token_idx, diff):
     s = str(tok)
     if s == ';':  # ; だけはセミコロンに変える
         return '<sep>'
     return s
 
-def convert_all(tok, doc, mapped, diff):
+def convert_all(tok, doc, mapped, token_idx, diff):
     tag = tok.getTag()
     s = str(tok)
 
@@ -61,40 +62,40 @@ def convert_all(tok, doc, mapped, diff):
                 if len(in_idx) == flag:
                     return s
                 else:
-                    return replace_as_special_parameter(s, mapped, tag='Name')
+                    return replace_as_special_parameter(s, mapped, token_idx, tag='Name')
             else:
                 if s.startswith('.'):
                     s = '. ' + s[1:]
                 return s
         if tag == 'Value':
             if s in doc:
-                return replace_as_special_parameter(s, mapped, tag='Value')
+                return replace_as_special_parameter(s, mapped, token_idx, tag='Value')
             s_q1 = f"'{s[1:-1]}'"
             if s_q1 in doc:
-                return replace_as_special_parameter(s_q1, mapped, tag='Value')
+                return replace_as_special_parameter(s_q1, mapped, token_idx, tag='Value')
             s_q2 = f'"{s[1:-1]}"'
             if s_q2 in doc:
-                return replace_as_special_parameter(s_q2, mapped, tag='Value')
+                return replace_as_special_parameter(s_q2, mapped, token_idx, tag='Value')
     else:
         if tag == 'Name':
             if s in doc:
-                return replace_as_special_parameter(s, mapped)
+                return replace_as_special_parameter(s, mapped, token_idx)
             else:
                 if s.startswith('.'):
                     s = '. ' + s[1:]
                 return s
         if tag == 'Value':
             if s in doc:
-                return replace_as_special_parameter(s, mapped)
+                return replace_as_special_parameter(s, mapped, token_idx)
             s_q1 = f"'{s[1:-1]}'"
             if s_q1 in doc:
-                return replace_as_special_parameter(s_q1, mapped)
+                return replace_as_special_parameter(s_q1, mapped, token_idx)
             s_q2 = f'"{s[1:-1]}"'
             if s_q2 in doc:
-                return replace_as_special_parameter(s_q2, mapped)
-    return convert_nothing(tok, doc, mapped, diff)
+                return replace_as_special_parameter(s_q2, mapped, token_idx)
+    return convert_nothing(tok, doc, mapped, token_idx, diff)
 
-def make(code, doc0, convert=convert_all, diff=False):
+def make(code, doc0, convert=convert_all, token_idx=token_idx, diff=False):
     mapped = {}
     doc = []
     for tok in parse(doc0):
@@ -110,7 +111,7 @@ def make(code, doc0, convert=convert_all, diff=False):
                 continue
         doc.append(s)
 
-    ws = [convert(tok, doc, mapped, diff) for tok in parse(code)]
+    ws = [convert(tok, doc, mapped, token_idx, diff) for tok in parse(code)]
     code = ' '.join(ws)
 
     ws = []
@@ -137,17 +138,27 @@ def read_tsv(input_filename, output_filename=None):
             writer = csv.writer(output_filename, delimiter='\t')
 
         for row in reader:
-            if args.shuffle:
+            code0 = None
+            if args.both:
+                token_idx0 = list(range(1, 10))
+                code0, doc0 = make(row[0], row[1], convert=convert_all , token_idx=token_idx0, diff=args.diff)
+
+            if args.shuffle or args.both:
                 random.shuffle(token_idx)
+
             if args.notConv:
-                code, doc = make(row[0], row[1], convert=convert_nothing , diff=args.diff)
+                code, doc = make(row[0], row[1], convert=convert_nothing , token_idx=token_idx, diff=args.diff)
             else:
-                code, doc = make(row[0], row[1], convert=convert_all, diff=args.diff)
+                code, doc = make(row[0], row[1], convert=convert_all, token_idx=token_idx, diff=args.diff)
             
             if output_filename == None:
                 print(code, doc)
+                if code0 != None and code0 != code:
+                    print(code0, doc0)
             else:
                 writer.writerow([code, doc])
+                if code0 != None and code0 != code:
+                    writer.writerow([code0, doc0])
 
 if __name__ == '__main__':
     if args.files != None:
