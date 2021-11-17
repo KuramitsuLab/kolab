@@ -29,8 +29,16 @@ def update_dic(ss):
         if s == '':
             continue
         if s not in 類義語辞書:
-            類義語辞書[s] = ''
-        類義語辞書[s] += choice
+            類義語辞書[s] = choice
+        else:
+            類義語辞書[s] = 類義語辞書[s] + '|' + choice
+
+
+def multiese_synonym_dictionary(d=None):
+    global 類義語辞書
+    if d is not None:
+        類義語辞書 = d
+    return 類義語辞書
 
 
 class MultieseParser(ParseTreeVisitor):
