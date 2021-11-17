@@ -2,18 +2,30 @@ from janome.tokenizer import Tokenizer
 import argparse
 import sys
 
+# オプション
+
+
+class Option(object):
+    def __init__(self, random_seed=0):
+        self.randon_seed = random_seed
+
+    def choice(self, ss: list):
+        return ss[self.random_seed % len(ss)]
+
+
 janome = Tokenizer()
 
 # OPTION = {
-    #     '--random': True,
-    #     '--single': False, # ひとつしか選ばない (DAはオフ)
-    #     '--order': False,  # 順序も入れ替える
-    #     '--short': False, # 短い類義語を選ぶ
-    #     '--pyfirst': False, #Pythonを先に出力する (yk使用)
-    #     '--change-subject': 0.0, # 助詞の「が」をランダムに「は」に変える
-    #     '--drop': 0.0, # パラメータをドロップする
-    #     '--partial': False, #不完全なコードでも出力する
+#     '--random': True,
+#     '--single': False, # ひとつしか選ばない (DAはオフ)
+#     '--order': False,  # 順序も入れ替える
+#     '--short': False, # 短い類義語を選ぶ
+#     '--pyfirst': False, #Pythonを先に出力する (yk使用)
+#     '--change-subject': 0.0, # 助詞の「が」をランダムに「は」に変える
+#     '--drop': 0.0, # パラメータをドロップする
+#     '--partial': False, #不完全なコードでも出力する
 # }
+
 
 class ノード(object):  # 抽象的なトップクラス
 
@@ -200,14 +212,15 @@ class コード(字句):
 class 記号(字句):
     pass
 
+
 class 未定義(字句):
     pass
 
-## post_processing
+# post_processing
+
 
 def post_processing(series: 系列):
     return series
-
 
 
 def parse(s: str, post_processing=post_processing) -> 系列:
@@ -221,7 +234,8 @@ def parse(s: str, post_processing=post_processing) -> 系列:
     wakati = [token.surface for token in janome.tokenize(s)]   # 分かち書きのリスト
     # wakati = [token.base_form for token in janome.tokenize(s)]   # 基本形 (標準形) のリスト
 
-    pos = [token.part_of_speech.split(',')[0] for token in janome.tokenize(s)]   # 品詞のリスト
+    pos = [token.part_of_speech.split(',')[0]
+           for token in janome.tokenize(s)]   # 品詞のリスト
     pos2 = [token.part_of_speech.split(',')[1] for token in janome.tokenize(s)]
     # pos3 = [token.part_of_speech.split(',')[2] for token in janome.tokenize(s)]
 
@@ -303,6 +317,7 @@ def read_txt(input_filename):
             print(repr(s))
             print()
 
+
 def read_str():
     s = parse('隣の客はよく柿食う客だ')
     print(repr(s), s.stringfy())
@@ -316,6 +331,7 @@ def read_str():
 
     print(repr(s), s.stringfy())
     print(repr(s2), s2.stringfy())
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tree for Multiese')
