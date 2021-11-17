@@ -7,6 +7,7 @@ import pprint
 peg = pg.grammar('multiese.pegtree')
 parser = pg.generate(peg)
 
+
 def fix(tree):
     a = [tree.epos_]
     for t in tree:
@@ -16,6 +17,7 @@ def fix(tree):
         a.append(fix(tree.get(key)).epos_)
     tree.epos_ = max(a)
     return tree
+
 
 class MultieseParser(ParseTreeVisitor):
     def __init__(self):
@@ -53,20 +55,28 @@ class MultieseParser(ParseTreeVisitor):
         s = str(fix(tree))
         return ntree.コード(s)
 
+    def acceptSymbol(self, tree: ParseTree):
+        s = str(fix(tree))
+        return ntree.コード(s)
+
     def acceptAnnotation(self, tree: ParseTree):
         name = str(tree[0])  # アノテーション種類
         ns = [self.visit(t) for t in tree[1:]]
         return ntree.annotation(name, ns)
 
+
 mult = MultieseParser()
+
 
 def multiese_parser(s: str):
     return mult.parse(s)
+
 
 def test_for_nobu(s):
     print(s)
     print('=>', repr(mult.parse(s)))
     print()
+
 
 if __name__ == '__main__':
     test_for_nobu('データフレームdfを降順にソートする')

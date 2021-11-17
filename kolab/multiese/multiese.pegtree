@@ -64,27 +64,43 @@ HIRA = [ぁ-ん]
 KATA = [ァ-ヶー・]
 KANJI = [㐀-䶵一-龠々〇〻]
 
-Expression =
-  Primary {^ OP Primary #Binary }*
+/* Expression */
 
-OP = "+" / "-" / "*" / "/" / "%"
+Expression = Suffix {^ OP Suffix #Binary }*
 
-Primary =
-  / Name _Postfix*
-  / String
-  / Number
-  
+OP =
+  / "==" / "!=" / "<=" / ">=" / "<>"
+  / "**" / "//" / ">>" / "<<<" / ">>"
+  / "+" / "-" / "*" / "/" / "%" / "="
+
+Suffix = Primary _Postfix*
+
 _Postfix =
   / {^ "(" Expression? ("," Expression )* ")" #App}
   / {^ "[" Expression? (":" Expression )* "]" #Index}
+
+Primary =
+  / Group
+  / Name
+  / String
+  / Number
+
+Group = 
+  / "(" Expression ")"
+  / { "[" Expression? ("," Expression)* ","? "]"  #List }
+  / { "(" Expression? ("," Expression)* ","? ")"  #Tuple }
+
 
 Name = 
   { [A-Za-z_] [A-Za-z_.0-9]* #Name } _
 
 Number = 
-  / { [0-9]+ ('.' [0-9]*) #Number } _
+  / { [0-9]+ ('.' [0-9]*)? #Number } _
   / { '.' [0-9]+ #Number } _
 
 String =
   / '"' { (!'"' .) #String } '"' _
   / "'" { (!"'" .) #String } "'" _
+
+example Expression a+1.2
+example Expression (1,2)
