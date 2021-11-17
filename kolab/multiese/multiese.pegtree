@@ -18,9 +18,11 @@ Term =
 Block = { "{" Chunk  {^ ("|" Chunk)+ #Choice }? "}" #Block }
 
 Choice = 
-  { "[" ChoiceChunk ("|" ChoiceChunk?)* "]" #Choice }
+  { "[" ChoiceChunk ("|" ChoiceChunk)* ("|" ChoiceEmpty)? "]" #Choice }
 
 ChoiceChunk = ChoiceTerm {^ ChoiceTerm+ #Seq }?
+
+ChoiceEmpty = { &"]" #Chunk }
 
 ChoiceTerm =
   / Choice
