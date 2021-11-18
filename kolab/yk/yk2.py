@@ -9,7 +9,6 @@ from pegtree.optimizer import optimize
 
 peg = pg.grammar('yk.tpeg')
 parse = pg.generate(peg)
-
 parser = argparse.ArgumentParser(description='yk for Parameter Handling')
 
 parser.add_argument('--notConv', action='store_true')   # Python　のトークナイズのみ
@@ -20,7 +19,7 @@ parser.add_argument('--files', nargs='*')               # 入力ファイルを�
 
 args = parser.parse_args()
 
-token_idx = list(range(1, 10))
+token_idx = list(range(1, 7))
 
 def replace_as_special_parameter(s, mapped, token_idx=token_idx, tag=None):   # mapped => {'df': '<A>'}
     if s in mapped:
@@ -140,7 +139,7 @@ def read_tsv(input_filename, output_filename=None):
         for row in reader:
             code0 = None
             if args.both:
-                token_idx0 = list(range(1, 10))
+                token_idx0 = list(range(1, 7))
                 code0, doc0 = make(row[0], row[1], convert=convert_all , token_idx=token_idx0, diff=args.diff)
 
             if args.shuffle or args.both:
