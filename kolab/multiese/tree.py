@@ -12,9 +12,6 @@ class Option(object):
     def choice(self, ss: list):
         return ss[self.random_seed % len(ss)]
 
-
-janome = Tokenizer()
-
 # OPTION = {
 #     '--random': True,
 #     '--single': False, # ひとつしか選ばない (DAはオフ)
@@ -25,7 +22,6 @@ janome = Tokenizer()
 #     '--drop': 0.0, # パラメータをドロップする
 #     '--partial': False, #不完全なコードでも出力する
 # }
-
 
 class ノード(object):  # 抽象的なトップクラス
 
@@ -222,6 +218,37 @@ class 未定義(字句):
 def post_processing(series: 系列):
     return series
 
+def join_s_verb(wakati, pos):
+    '''
+    名詞 (サ変接続) の後ろに動詞があった場合、
+    ひとまとめにして動詞句として返す
+    '''
+    s_verb = None
+    if len(pos) > 1:
+        if pos[1] == '動詞':
+            s_verb = ''.join(wakati[0:2])
+    return s_verb
+
+def join_verb_attached(wakati, pos, pos2, s_verb=None):
+    '''
+    動詞の後ろに助動詞や接続助詞があった場合、
+    ひとまとめにして動詞句として返す
+    '''
+    flag_idx = len(pos)
+    for idx in range(1, len(pos)):
+        if pos[idx] == '助動詞' or pos2[idx] == '接続助詞':
+            pass
+        else:
+            flag_idx = idx
+            break
+    if s_verb != None:
+        wakati[0] = s_verb
+    verb_attached = ''.join(wakati[0:flag_idx])
+    skipped = flag_idx - 1    # join した助詞/助動詞の数
+
+    return verb_attached, skipped
+
+janome = Tokenizer()
 
 def parse(s: str, post_processing=post_processing) -> 系列:
     '''
@@ -232,15 +259,22 @@ def parse(s: str, post_processing=post_processing) -> 系列:
     noun = []
 
     wakati = [token.surface for token in janome.tokenize(s)]   # 分かち書きのリスト
-    # wakati = [token.base_form for token in janome.tokenize(s)]   # 基本形 (標準形) のリスト
+    # base = [token.base_form for token in janome.tokenize(s)]   # 基本形 (標準形) のリスト
 
-    pos = [token.part_of_speech.split(',')[0]
-           for token in janome.tokenize(s)]   # 品詞のリスト
+    pos = [token.part_of_speech.split(',')[0] for token in janome.tokenize(s)]   # 品詞のリスト
     pos2 = [token.part_of_speech.split(',')[1] for token in janome.tokenize(s)]
     # pos3 = [token.part_of_speech.split(',')[2] for token in janome.tokenize(s)]
 
+    s_verb = None
+    skipped = 0
+
     for idx in range(len(wakati)):
         if pos[idx] == '名詞' or pos[idx] == '接頭詞':
+            if pos2[idx] == 'サ変接続':
+                s_verb = join_s_verb(wakati[idx:], pos[idx:])
+                if s_verb is not None:
+                    continue
+
             if idx == 0 or (pos[idx-1] != '名詞' and pos[idx-1] != '接頭詞'):
                 noun.append(wakati[idx])
 
@@ -256,15 +290,33 @@ def parse(s: str, post_processing=post_processing) -> 系列:
             noun = []
 
         elif pos[idx] == '動詞':
-            x = 動詞(wakati[idx])
+            if s_verb is not None:
+                if len(wakati) != idx+1 and (pos[idx+1] == '助動詞' or pos2[idx+1] == '接続助詞'):
+                    verb_attached, skipped = join_verb_attached(wakati[idx:], pos[idx:], pos2[idx:], s_verb)
+                    x = 動詞(verb_attached)
+                else:
+                    x = 動詞(s_verb)
+                s_verb = None
+            elif len(wakati) != idx+1 and (pos[idx+1] == '助動詞' or pos2[idx+1] == '接続助詞'):
+                verb_attached, skipped = join_verb_attached(wakati[idx:], pos[idx:], pos2[idx:])
+                x = 動詞(verb_attached)
+            else:
+                x = 動詞(wakati[idx])
             buf_pos.append(x)
 
         elif pos[idx] == '助動詞':
-            x = 助動詞(wakati[idx])
-            buf_pos.append(x)
-        elif pos[idx] == '助詞':   # TODO: おそらく動詞+助詞をちゃんと処理しないと
-            x = 助詞(wakati[idx])
-            buf_pos.append(x)
+            if skipped == 0:
+                x = 助動詞(wakati[idx])
+                buf_pos.append(x)
+            else:
+                skipped -= 1
+
+        elif pos[idx] == '助詞':
+            if skipped == 0:
+                x = 助詞(wakati[idx])
+                buf_pos.append(x)
+            else:
+                skipped -= 1
 
         elif pos[idx] == '副詞':   # 動詞を修飾
             x = 副詞(wakati[idx])
@@ -283,15 +335,9 @@ def parse(s: str, post_processing=post_processing) -> 系列:
         elif pos[idx] == '記号':
             if pos2[idx] == '空白' or pos2[idx] == '句点':
                 pass
-            elif pos2[idx] == '一般':   # 名詞で扱った方が良いかも？
+            elif pos2[idx] == '一般' or '読点':   # 名詞で扱った方が良いかも？
                 x = 記号(wakati[idx])
                 buf_pos.append(x)
-            elif pos2[idx] == '読点':
-                if len(buf_pos) == 0:
-                    pass
-                else:
-                    x = 記号(wakati[idx])
-                    buf_pos.append(x)
             else:
                 x = 未定義(wakati[idx])
                 buf_pos.append(x)
