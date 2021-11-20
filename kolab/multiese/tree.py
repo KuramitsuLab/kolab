@@ -318,13 +318,13 @@ def parse(s: str, post_processing=post_processing) -> 系列:
             else:
                 skipped -= 1
 
-        elif pos[idx] == '副詞':   # 動詞を修飾
+        elif pos[idx] == '副詞':
             x = 副詞(wakati[idx])
             buf_pos.append(x)
-        elif pos[idx] == '連体詞':   # 名詞を修飾 (TODO: 「その」「あの」など...「大きな」などとの区別)
+        elif pos[idx] == '連体詞':
             x = 連体詞(wakati[idx])
             buf_pos.append(x)
-        elif pos[idx] == '形容詞':   # 副詞と連体詞は活用なし、形容詞は活用あり
+        elif pos[idx] == '形容詞':
             x = 形容詞(wakati[idx])
             buf_pos.append(x)
 
@@ -342,10 +342,23 @@ def parse(s: str, post_processing=post_processing) -> 系列:
                 x = 未定義(wakati[idx])
                 buf_pos.append(x)
                 print('@@未定義', wakati[idx], pos[idx], pos2[idx])
+
+        # ad hoc な実装
+        # e.g.: A と B を表示する
+        elif pos[idx] == 'フィラー':
+            if wakati[idx] == 'と':
+                x = 助詞(wakati[idx])
+                buf_pos.append(x)
+
+        elif pos[idx] == '感動詞':
+            if wakati[idx] == 'こんにちは':
+                x = 名詞(wakati[idx])
+                buf_pos.append(x)
+
         else:
             x = 未定義(wakati[idx])
             buf_pos.append(x)
-            print('@@未定義', wakati[idx], pos[idx], pos2[idx])
+            # print('@@未定義', wakati[idx], pos[idx], pos2[idx])
 
     s = 系列(*buf_pos)
 
