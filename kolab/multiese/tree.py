@@ -1,3 +1,4 @@
+import itertools
 from janome.tokenizer import Tokenizer
 import argparse
 import sys
@@ -5,32 +6,14 @@ import sys
 # オプション
 
 
-class Option(object):
-    def __init__(self, random_seed=0):
-        self.randon_seed = random_seed
-
-    def choice(self, ss: list):
-        return ss[self.random_seed % len(ss)]
-
-# OPTION = {
-#     '--random': True,
-#     '--single': False, # ひとつしか選ばない (DAはオフ)
-#     '--order': False,  # 順序も入れ替える
-#     '--short': False, # 短い類義語を選ぶ
-#     '--pyfirst': False, #Pythonを先に出力する (yk使用)
-#     '--change-subject': 0.0, # 助詞の「が」をランダムに「は」に変える
-#     '--drop': 0.0, # パラメータをドロップする
-#     '--partial': False, #不完全なコードでも出力する
-# }
-
 class ノード(object):  # 抽象的なトップクラス
 
-    def emit(self, out):
+    def emit(self, out, option):
         pass
 
     def stringfy(self):
         out = []
-        self.emit(out)
+        self.emit(out, {})
         return ''.join(out)
 
     def flatten(self, ns=None):
@@ -51,7 +34,7 @@ class 字句(ノード):  # 抽象的な字句
     def __init__(self, w):
         self.w = w
 
-    def emit(self, out):
+    def emit(self, out, option):
         # 類義語に置き換える処理を書けばよい
         out.append(self.w)
 
@@ -65,9 +48,21 @@ class 系列(ノード):  # 系列
     def __init__(self, *ws):
         self.ws = ws
 
-    def emit(self, out):
+    def emit(self, out, option):
         for w in self.ws:
-            w.emit(out)
+            w.emit(out, option)
+
+    def stringfy(self):
+        ss = [w.stringfy() for w in self.ws]
+        if sum(1 for s in ss if isChoiceString(s)) == 0:
+            return ''.join(ss)
+        # Choice が含まれる場合は展開する
+        prod = [toChoiceTuple(s) for s in ss]
+        sss = []
+        for t in itertools.product(*prod):
+            print(t)
+            sss.append(''.join(t))
+        return '[' + '|'.join(sss)+']'
 
     def flatten(self, ns=None):
         if ns is None:
@@ -92,11 +87,46 @@ class グループ(ノード):  # 外からみると、字句として扱える�
     def __init__(self, node):
         self.node = node
 
-    def emit(self, out):
-        self.node.emit(out)
+    def emit(self, out, option):
+        self.node.emit(out, option)
 
     def __repr__(self):  # repr
         return f"[{self.__class__.__name__} {repr(self.node)}]"
+
+# Choice
+
+
+def isChoiceString(s):
+    return s.startswith('[') and s.endswith(']')
+
+
+def deChoiceString(s):
+    if isChoiceString(s):
+        return s[1:-1]
+    return s
+
+
+def toChoiceTuple(s):
+    if isChoiceString(s):
+        return tuple(s[1:-1].split('|'))
+    return (s,)
+
+
+ChoiceDic = {}
+
+
+def update_choice_dic(choice):
+    if isChoiceString(choice):
+        choice = choice[1:-1]
+        ss = choice.split('|')
+        # print('@', ss, choice)
+        for s in ss:
+            if s == '':
+                continue
+            if s not in ChoiceDic:
+                ChoiceDic[s] = choice
+            else:
+                ChoiceDic[s] = ChoiceDic[s] + '|' + choice
 
 
 class Choice(ノード):  # 系列が入っている字句として扱えるが、中には系列が入っている
@@ -105,9 +135,13 @@ class Choice(ノード):  # 系列が入っている字句として扱えるが�
     def __init__(self, nodes):
         self.nodes = nodes
 
-    def emit(self, out):
-        pass  # がんばれ
+    def emit(self, out, option):
         # nodes のどれかを選べばよい
+        pass  # がんばれ
+
+    def stringfy(self):
+        ss = [deChoiceString(node.stringfy()) for node in self.nodes]
+        return '[' + '|'.join(ss) + ']'
 
     def __repr__(self):  # repr
         s = ' '.join(map(repr, self.nodes))
@@ -125,7 +159,7 @@ class Annotation(ノード):  # 本来ならアノテーションごとに作っ
         self.name = name
         self.nodes = nodes
 
-    def emit(self, out):
+    def emit(self, out, option):
         pass  # がんばれ
 
     def __repr__(self):  # repr
@@ -141,7 +175,7 @@ class 型情報(ノード):  # 本来ならアノテーションごとに作っ�
         self.name = name
         self.desc = desc
 
-    def emit(self, out):
+    def emit(self, out, option):
         pass  # がんばれ
 
     def __repr__(self):  # repr
@@ -157,10 +191,10 @@ def annotation(name: str, nodes):
 
 
 class 文(系列):
-    def emit(self, out):
+    def emit(self, out, option):
         # 変更するところだけ定義する
         for w in self.ws:
-            w.emit(out)
+            w.emit(out, option)
 
 
 class 文節(系列):
@@ -218,6 +252,7 @@ class 未定義(字句):
 def post_processing(series: 系列):
     return series
 
+
 def join_s_verb(wakati, pos):
     '''
     名詞 (サ変接続) の後ろに動詞があった場合、
@@ -228,6 +263,7 @@ def join_s_verb(wakati, pos):
         if pos[1] == '動詞':
             s_verb = ''.join(wakati[0:2])
     return s_verb
+
 
 def join_verb_attached(wakati, pos, pos2, s_verb=None):
     '''
@@ -248,7 +284,9 @@ def join_verb_attached(wakati, pos, pos2, s_verb=None):
 
     return verb_attached, skipped
 
+
 janome = Tokenizer()
+
 
 def parse(s: str, post_processing=post_processing) -> 系列:
     '''
@@ -261,7 +299,8 @@ def parse(s: str, post_processing=post_processing) -> 系列:
     wakati = [token.surface for token in janome.tokenize(s)]   # 分かち書きのリスト
     # base = [token.base_form for token in janome.tokenize(s)]   # 基本形 (標準形) のリスト
 
-    pos = [token.part_of_speech.split(',')[0] for token in janome.tokenize(s)]   # 品詞のリスト
+    pos = [token.part_of_speech.split(',')[0]
+           for token in janome.tokenize(s)]   # 品詞のリスト
     pos2 = [token.part_of_speech.split(',')[1] for token in janome.tokenize(s)]
     # pos3 = [token.part_of_speech.split(',')[2] for token in janome.tokenize(s)]
 
@@ -292,13 +331,15 @@ def parse(s: str, post_processing=post_processing) -> 系列:
         elif pos[idx] == '動詞':
             if s_verb is not None:
                 if len(wakati) != idx+1 and (pos[idx+1] == '助動詞' or pos2[idx+1] == '接続助詞'):
-                    verb_attached, skipped = join_verb_attached(wakati[idx:], pos[idx:], pos2[idx:], s_verb)
+                    verb_attached, skipped = join_verb_attached(
+                        wakati[idx:], pos[idx:], pos2[idx:], s_verb)
                     x = 動詞(verb_attached)
                 else:
                     x = 動詞(s_verb)
                 s_verb = None
             elif len(wakati) != idx+1 and (pos[idx+1] == '助動詞' or pos2[idx+1] == '接続助詞'):
-                verb_attached, skipped = join_verb_attached(wakati[idx:], pos[idx:], pos2[idx:])
+                verb_attached, skipped = join_verb_attached(
+                    wakati[idx:], pos[idx:], pos2[idx:])
                 x = 動詞(verb_attached)
             else:
                 x = 動詞(wakati[idx])

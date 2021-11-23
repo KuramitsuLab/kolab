@@ -2,11 +2,12 @@ import sys
 import argparse
 from parser import multiese_parser
 
+
 def read_multiese_file(filename: str, pairs: list = None):
     if pairs is None:
         pairs = []  # [('日本語', 'コード') .. ] こういう順番で入ります
     with open(filename) as f:
-        code = None # コード
+        code = None  # コード
         sentences = []  # 自然言語文
         for line in f.readlines():
             line = line.strip()
@@ -33,6 +34,7 @@ def read_multiese_file(filename: str, pairs: list = None):
                 pairs.append((sentence, code))
     return pairs
 
+
 def write_multiese_tsv(pairs, file=sys.stdout):
     for sentence, code in pairs:
         ss = multiese_parser(sentence)
@@ -43,22 +45,19 @@ def write_multiese_tsv(pairs, file=sys.stdout):
         else:
             print(sentence, code, sep='\t', file=file)
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Multiese')
+    parser.add_argument('files', nargs='+', help='files')
     parser.add_argument('--pyfirst', action='store_true')
-    parser.add_argument('--files', nargs='*')
-
+    #parser.add_argument('--files', nargs='*')
     args = parser.parse_args()
-    
-    if args.files != None:
-        for filename in args.files:
-            pairs = []
-            read_multiese_file(filename, pairs)
-        write_multiese_tsv(pairs)
-    else:
-        pass
-
-
+    options = vars(args)
+    print(options)
+    for filename in args.files:
+        pairs = []
+        read_multiese_file(filename, pairs)
+    write_multiese_tsv(pairs)
 
 
 '''

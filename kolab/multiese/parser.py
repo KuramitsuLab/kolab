@@ -19,28 +19,6 @@ def fix(tree):
     return tree
 
 
-類義語辞書 = {}
-
-
-def update_synonym(ss):
-    choice = '|'.join(ss)
-    #print('@', ss, choice)
-    for s in ss:
-        if s == '':
-            continue
-        if s not in 類義語辞書:
-            類義語辞書[s] = choice
-        else:
-            類義語辞書[s] = 類義語辞書[s] + '|' + choice
-
-
-def multiese_synonym_dictionary(d=None):
-    global 類義語辞書
-    if d is not None:
-        類義語辞書 = d
-    return 類義語辞書
-
-
 class MultieseParser(ParseTreeVisitor):
     def __init__(self):
         ParseTreeVisitor.__init__(self)
@@ -71,8 +49,9 @@ class MultieseParser(ParseTreeVisitor):
         ns = []
         for t in tree:
             ns.append(self.visit(t))
-        update_synonym([node.stringfy() for node in ns])  # 類義語辞書を更新する
-        return ntree.Choice(ns)
+        node = ntree.Choice(ns)
+        ntree.update_choice_dic(node.stringfy())  # 類義語辞書を更新する
+        return node
 
     def acceptExpression(self, tree: ParseTree):
         s = str(fix(tree))
