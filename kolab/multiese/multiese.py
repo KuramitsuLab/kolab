@@ -62,11 +62,12 @@ def generate_multiese(pairs, option={}):
     return generated_pairs
 
 
-def write_multiese_tsv(pairs, file=sys.stdout):
-    for sentence, code in pairs:
-        if args.pyfirst:
+def write_multiese_tsv(pairs, option, file=sys.stdout):
+    if option.get('pyfirst', True):
+        for sentence, code in pairs:
             print(code, sentence, sep='\t', file=file)
-        else:
+    else:
+        for sentence, code in pairs:
             print(sentence, code, sep='\t', file=file)
 
 
@@ -74,6 +75,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Multiese')
     parser.add_argument('files', nargs='+', help='files')
     parser.add_argument('--pyfirst', action='store_true')
+    parser.add_argument('--out')
     #parser.add_argument('--files', nargs='*')
     args = parser.parse_args()
     option = vars(args)
@@ -82,7 +84,11 @@ if __name__ == '__main__':
         pairs = []
         read_multiese_file(filename, pairs)
     pairs = generate_multiese(pairs, option)
-    write_multiese_tsv(pairs)
+    if args.out is not None:
+        with open(args.out, 'w') as f:
+            write_multiese_tsv(pairs, option, file=f)
+    else:
+        write_multiese_tsv(pairs, option, file=sys.stdout)
 
 
 '''
