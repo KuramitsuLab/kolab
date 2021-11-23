@@ -1,6 +1,8 @@
 import sys
 import argparse
+import random
 from parser import multiese_parser
+from action import perform_filter
 
 
 def read_multiese_file(filename: str, pairs: list = None):
@@ -35,11 +37,33 @@ def read_multiese_file(filename: str, pairs: list = None):
     return pairs
 
 
+def generate_node(node, code, max, option):
+    ss = [node.generate(0.0, option)]
+    for _ in range(max*3):
+        if len(ss) >= max:
+            break
+        s = node.generate(random.random(), option)
+        if s not in ss:
+            ss.append(s)
+    return [(s, code) for s in ss]
+
+
+def generate_multiese(pairs, option={}):
+    generated_pairs = []
+    for sentence, code in pairs:
+        actions = code.split('@@')
+        code = actions[0]
+        actions[0] = ''
+        node = multiese_parser(sentence)
+        for action in actions:
+            generated = generate_node(node, code, option.get('max', 3), option)
+            generated = perform_filter(action, generated, option)
+            generated_pairs.extend(generated)
+    return generated_pairs
+
+
 def write_multiese_tsv(pairs, file=sys.stdout):
     for sentence, code in pairs:
-        ss = multiese_parser(sentence)
-        sentence = ss
-        # sentence = ss.emit()
         if args.pyfirst:
             print(code, sentence, sep='\t', file=file)
         else:
@@ -52,11 +76,12 @@ if __name__ == '__main__':
     parser.add_argument('--pyfirst', action='store_true')
     #parser.add_argument('--files', nargs='*')
     args = parser.parse_args()
-    options = vars(args)
-    print(options)
+    option = vars(args)
+    print(option)
     for filename in args.files:
         pairs = []
         read_multiese_file(filename, pairs)
+    pairs = generate_multiese(pairs, option)
     write_multiese_tsv(pairs)
 
 

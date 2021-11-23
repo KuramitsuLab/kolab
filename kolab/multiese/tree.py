@@ -16,6 +16,12 @@ class ノード(object):  # 抽象的なトップクラス
         self.emit(out, {})
         return ''.join(out)
 
+    def generate(self, random=0.0, option={}):
+        out = []
+        option['random'] = random
+        self.emit(out, {})
+        return ''.join(out)
+
     def flatten(self, ns=None):
         if ns is None:
             ns = []
@@ -60,7 +66,6 @@ class 系列(ノード):  # 系列
         prod = [toChoiceTuple(s) for s in ss]
         sss = []
         for t in itertools.product(*prod):
-            print(t)
             sss.append(''.join(t))
         return '[' + '|'.join(sss)+']'
 
