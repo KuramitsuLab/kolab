@@ -53,6 +53,7 @@ def generate_multiese(pairs, option={}):
     for sentence, code in pairs:
         actions = code.split('@@')   # e.g.: @@if
         code = actions[0]
+        code = code.strip()
         actions[0] = ''
         node = multiese_parser(sentence)
         # print('@@', repr(node))
