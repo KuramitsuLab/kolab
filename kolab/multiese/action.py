@@ -115,7 +115,7 @@ def perform_calc(pairs, option):
     return pairs_calc
 
 def perform_filter(actions, pairs, option):
-    actions = actions.split('.')   # @@if.not みたいなやつの処理をするために...
+    actions = actions.split('.')   # e.g.: if.not
     for action in actions:
         f = f'perform_{action}'
         if f in Functions:
