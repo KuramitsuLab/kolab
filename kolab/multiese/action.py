@@ -28,9 +28,9 @@ def transform_not(code):
 
 def perform_not(pairs, option):
     pairs_not = []
-    for pair in pairs:
-        code_not = transform_not(pair[1])
-        sentence, whether = remove_whether(pair[0])
+    for sentence, code in pairs:
+        code_not = transform_not(code)
+        sentence, whether = remove_whether(sentence)
         if 'でない' in sentence:
             sentence_not = sentence.replace('でない', '') + whether
         else:
@@ -38,34 +38,28 @@ def perform_not(pairs, option):
         pairs_not.append((sentence_not, code_not))
     return pairs_not
 
-def perform_if(pairs, option):
-    pairs_if = []
-    for pair in pairs:
-        code_if = f'if {pair[1]}:'
-        sentence, _ = remove_whether(pair[0])
-        r = option.get('random', random.random())
-        if r < 0.5:
-            sentence_if = sentence
-        else:
-            sentence_if = 'もし' + sentence
-        
-        if r < 0.3:
-            sentence_if += 'ならば'
-        elif r < 0.5:
-            sentence_if += 'なら'
-        elif r < 0.7:
-            sentence_if += 'の場合'
-        else:
-            sentence_if += 'のとき'
+def optional_choice(option, s, seed=0):
+    choice = s.split('|') if isinstance(s, str) else s
+    r = option.get('random', random.random())
+    max = len(choice)
+    return choice[int(max * r + seed) % max]
 
+def perform_if(pairs, option):
+    ## pairs.extends(perform_not(pairs, option)) # @@not を加える
+    pairs_if = []
+    for sentence, code in pairs:
+        code_if = f'if {code} :'
+        sentence, _ = remove_whether(sentence)
+        sentence_if = optional_choice(option, 'もし|もし|') + sentence
+        sentence_if += optional_choice(option, 'ならば|なら|の場合|のとき')
         pairs_if.append((sentence_if, code_if))
     return pairs_if
 
 def perform_while(pairs, option):
     pairs_while = []
-    for pair in pairs:
-        code_while = f'while {pair[1]}:'
-        sentence, _ = remove_whether(pair[0])
+    for sentence, code in pairs:
+        code_while = f'while {code} :'
+        sentence, _ = remove_whether(sentence)
         sentence_while = sentence + 'の間'
         pairs_while.append((sentence_while, code_while))
     return pairs_while

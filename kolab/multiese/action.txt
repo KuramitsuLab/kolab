@@ -9,7 +9,7 @@ aが0かどうか
 a != 0   @@not
 aが0でないかどうか
 
-a < 100  @@if.while
+a < 100  @@if @@not.if @@while @@not.while
 aが100より小さいかどうか
 
 df['A']  @@check
