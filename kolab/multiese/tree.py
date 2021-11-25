@@ -1,6 +1,7 @@
 import itertools
 from janome.tokenizer import Tokenizer
 import argparse
+import random
 import sys
 
 # オプション
@@ -19,7 +20,7 @@ class ノード(object):  # 抽象的なトップクラス
     def generate(self, random=0.0, option={}):
         out = []
         option['random'] = random
-        self.emit(out, {})
+        self.emit(out, option)
         return ''.join(out)
 
     def flatten(self, ns=None):
@@ -133,6 +134,18 @@ def update_choice_dic(choice):
             else:
                 ChoiceDic[s] = ChoiceDic[s] + '|' + choice
 
+def choice_dic(w, option):
+    '''
+    ChoiceDic に登録されている候補を読んで
+    字句列を返す
+    '''
+    if w in ChoiceDic:
+        s_choice = ChoiceDic[w].split('|')
+        r = option.get('random', random.random())
+        idx = int(len(s_choice) * r)
+        return s_choice[idx]
+    else:
+        return w   # ChoiceDic に登録されていなければ、そのまま返す
 
 class Choice(ノード):  # 系列が入っている字句として扱えるが、中には系列が入っている
     nodes: list
@@ -141,8 +154,11 @@ class Choice(ノード):  # 系列が入っている字句として扱えるが�
         self.nodes = nodes
 
     def emit(self, out, option):
-        # nodes のどれかを選べばよい
-        pass  # がんばれ
+        s = deChoiceString(self.stringfy())
+        s_choice = s.split('|')
+        r = option.get('random', random.random())
+        s_idx = int(len(s_choice) * r)
+        out.append(s_choice[s_idx % len(s_choice)])
 
     def stringfy(self):
         ss = [deChoiceString(node.stringfy()) for node in self.nodes]
@@ -151,7 +167,6 @@ class Choice(ノード):  # 系列が入っている字句として扱えるが�
     def __repr__(self):  # repr
         s = ' '.join(map(repr, self.nodes))
         return f"[{self.__class__.__name__} {s}]"
-
 
 # アノテーション
 
@@ -172,6 +187,13 @@ class Annotation(ノード):  # 本来ならアノテーションごとに作っ
         return f"[{self.__class__.__name__} {self.name} {s}]"
 
 
+TypeDic = {}
+
+
+def update_type_dic(name, desc):
+    if desc != '' and name not in TypeDic:
+        TypeDic[name] = desc
+
 class 型情報(ノード):  # 本来ならアノテーションごとに作った方がよい
     name: str  # 変数名
     desc: str  # 型情報
@@ -181,11 +203,21 @@ class 型情報(ノード):  # 本来ならアノテーションごとに作っ�
         self.desc = desc
 
     def emit(self, out, option):
-        pass  # がんばれ
+        type_choice = []
+        type_choice.append(f'{self.name}')
+        if self.desc != '':
+            update_type_dic(self.name, self.desc)
+            type_choice.append(f'{self.name}{self.desc}')
+            type_choice.append(f'{self.desc}{self.name}')
+        elif self.name in TypeDic:
+            type_choice.append(f'{self.name}{TypeDic[self.name]}')
+            type_choice.append(f'{TypeDic[self.name]}{self.name}')
+        r = int(option.get('random', random.random()) * 10)
+        idx = r % len(type_choice)
+        out.append(type_choice[idx])
 
     def __repr__(self):  # repr
         return f"[{self.__class__.__name__} {self.name} {self.desc}]"
-
 
 def annotation(name: str, nodes):
     if name == 'type':
@@ -193,7 +225,6 @@ def annotation(name: str, nodes):
             return 型情報(nodes[0].stringfy(), '')
         return 型情報(nodes[0].stringfy(), nodes[1].stringfy())
     return Annotation(name, nodes)
-
 
 class 文(系列):
     def emit(self, out, option):
@@ -209,7 +240,8 @@ class 文節(系列):
 # 末端(字句)
 
 class 名詞(字句):
-    pass
+    def emit(self, out, option):
+        out.append(choice_dic(self.w, option))
 
 
 class 助詞(字句):
@@ -237,8 +269,8 @@ class 接続詞(字句):
 
 
 class 動詞(字句):
-    pass
-
+    def emit(self, out, option):
+        out.append(choice_dic(self.w, option))
 
 class コード(字句):
     pass
@@ -387,7 +419,7 @@ def parse(s: str, post_processing=post_processing) -> 系列:
             else:
                 x = 未定義(wakati[idx])
                 buf_pos.append(x)
-                print('@@未定義', wakati[idx], pos[idx], pos2[idx])
+                # print('@@未定義', wakati[idx], pos[idx], pos2[idx])
 
         # ad hoc な実装
         # e.g.: A と B を表示する

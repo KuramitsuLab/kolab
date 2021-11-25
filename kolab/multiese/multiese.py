@@ -38,11 +38,11 @@ def read_multiese_file(filename: str, pairs: list = None):
 
 
 def generate_node(node, code, max, option):
-    ss = [node.generate(0.0, option)]
+    ss = [node.generate(0.0, option)]   # seed=0.0 がdefault
     for _ in range(max*3):
         if len(ss) >= max:
             break
-        s = node.generate(random.random(), option)
+        s = node.generate(random.random(), option)   # seed に乱数を与える
         if s not in ss:
             ss.append(s)
     return [(s, code) for s in ss]
@@ -51,12 +51,14 @@ def generate_node(node, code, max, option):
 def generate_multiese(pairs, option={}):
     generated_pairs = []
     for sentence, code in pairs:
-        actions = code.split('@@')
+        actions = code.split('@@')   # e.g.: @@if
         code = actions[0]
+        code = code.strip()
         actions[0] = ''
         node = multiese_parser(sentence)
+        # print('@@', repr(node))
         for action in actions:
-            generated = generate_node(node, code, option.get('max', 3), option)
+            generated = generate_node(node, code, option.get('max', 3), option)   # max 個 generate する
             generated = perform_filter(action, generated, option)
             generated_pairs.extend(generated)
     return generated_pairs
@@ -79,7 +81,7 @@ if __name__ == '__main__':
     parser.add_argument('--max', type=int, default=3)
     #parser.add_argument('--files', nargs='*')
     args = parser.parse_args()
-    option = vars(args)
+    option = vars(args)   # vars(args) => dict
     print(option)
     for filename in args.files:
         pairs = []
