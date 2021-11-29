@@ -42,7 +42,6 @@ class 字句(ノード):  # 抽象的な字句
         self.w = w
 
     def emit(self, out, option):
-        # 類義語に置き換える処理を書けばよい
         out.append(self.w)
 
     def __repr__(self):  # repr
@@ -205,7 +204,9 @@ class 型情報(ノード):  # 本来ならアノテーションごとに作っ�
     def emit(self, out, option):
         type_choice = []
         type_choice.append(f'{self.name}')
-        if self.desc != '':
+        if option.get('nontype', True):
+            pass
+        elif self.desc != '':
             update_type_dic(self.name, self.desc)
             type_choice.append(f'{self.name}{self.desc}')
             type_choice.append(f'{self.desc}{self.name}')
