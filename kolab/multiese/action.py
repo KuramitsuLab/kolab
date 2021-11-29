@@ -40,7 +40,15 @@ def perform_not(pairs, option):
 
 def perform_andor(pairs, option):
     pairs_andor = []
-    return pairs
+    for sentence, code in pairs:
+        sentence, _ = remove_whether(sentence)
+        sentence_and = sentence + '、かつ、'
+        sentence_or = sentence + optional_choice(option, '、または、|、もしくは、')
+        code_and = f'{code} and'
+        code_or = f'{code} or'
+        pairs_andor.append((sentence_and, code_and))
+        pairs_andor.append((sentence_or, code_or))
+    return pairs_andor
 
 def alt(s, random_seed):
     choice = s.split('|') if isinstance(s, str) else s
@@ -149,7 +157,7 @@ def perform_noun(pairs, option): # 名詞に変える
 def perform_let(pairs, option):  # 代入文に変える
     pairs_let = []
     for sentence, code in pairs:
-        code_let = f'X = {code}'
+        code_let = f'X = {code}'   # TODO: X ...?
         sentence_and_then = transform_verb_and_then(sentence, random_seed(option))
         if sentence_and_then:
             sentence_let = sentence_and_then + 'X' + optional_choice(option, 'にする|とする|に代入する')
