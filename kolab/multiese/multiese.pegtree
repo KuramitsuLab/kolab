@@ -58,7 +58,8 @@ AnnotationTerm =
   / Token
 
 example Chunk 望遠鏡で{子犬が泳ぐ}様子を見たら、math.pi+1を実行する
-example Chunk @var(df, データフレーム)を[降順に|]ソートする
+example Chunk @type(df, データフレーム)を[降順に|]ソートする
+example Chunk エクセルファイル'file.xlsx'の@type('sheet1', シート名)を読み込む
 
 W = HIRA/KATA/KANJI
 

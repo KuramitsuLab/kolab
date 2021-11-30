@@ -79,6 +79,7 @@ if __name__ == '__main__':
     parser.add_argument('--pyfirst', action='store_true')
     parser.add_argument('-o', '--out', default=None)
     parser.add_argument('--max', type=int, default=3)
+    parser.add_argument('--nontype', action='store_true')
     #parser.add_argument('--files', nargs='*')
     args = parser.parse_args()
     option = vars(args)   # vars(args) => dict

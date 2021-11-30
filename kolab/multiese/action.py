@@ -38,6 +38,18 @@ def perform_not(pairs, option):
         pairs_not.append((sentence_not, code_not))
     return pairs_not
 
+def perform_andor(pairs, option):
+    pairs_andor = []
+    for sentence, code in pairs:
+        sentence, _ = remove_whether(sentence)
+        sentence_and = sentence + '、かつ、'
+        sentence_or = sentence + optional_choice(option, '、または、|、もしくは、')
+        code_and = f'{code} and'
+        code_or = f'{code} or'
+        pairs_andor.append((sentence_and, code_and))
+        pairs_andor.append((sentence_or, code_or))
+    return pairs_andor
+
 def alt(s, random_seed):
     choice = s.split('|') if isinstance(s, str) else s
     return choice[random_seed % len(choice)]
@@ -59,6 +71,10 @@ def perform_if(pairs, option):
         sentence_if += optional_choice(option, 'ならば|なら|の場合|のとき')
         pairs_if.append((sentence_if, code_if))
     return pairs_if
+
+def perform_if_andor(pairs, option):
+    pairs_if_andor = []
+    return pairs
 
 def perform_while(pairs, option):
     pairs_while = []
@@ -141,7 +157,7 @@ def perform_noun(pairs, option): # 名詞に変える
 def perform_let(pairs, option):  # 代入文に変える
     pairs_let = []
     for sentence, code in pairs:
-        code_let = f'X = {code}'
+        code_let = f'X = {code}'   # TODO: X ...?
         sentence_and_then = transform_verb_and_then(sentence, random_seed(option))
         if sentence_and_then:
             sentence_let = sentence_and_then + 'X' + optional_choice(option, 'にする|とする|に代入する')
@@ -157,48 +173,44 @@ def perform_let(pairs, option):  # 代入文に変える
             pairs_let.append((sentence_let, code_let))
     return pairs_let
 
+def perform_let_self(pairs, option):
+    pairs_let_self = []
+    return pairs
+
+def perform_inplace(pairs, option):
+    pairs_inplace = []
+    return pairs
+
+def perform_dot(pairs, option):
+    pairs_dot = []
+    return pairs
+
+def perform_it(pairs, option):
+    pairs_it = []
+    return pairs
+
+def perform_option(pairs, option):
+    pairs_option = []
+    return pairs
 
 def perform_check(pairs, option):
     pairs_check = []
-    for pair in pairs:
-        code = pair[1]
-        r = option.get('random', random.random())
-        if r < 0.3:
-            sentence_check = pair[0] + 'を表示する'
-        elif r < 0.5:
-            sentence_check = pair[0] + 'を確認する'
-        elif r < 0.7:
-            sentence_check = pair[0] + 'を調べる'
-        else:
-            sentence_check = pair[0] + 'を見る'
+    for sentence, code in pairs:
+        sentence_check = sentence + optional_choice(option, 'を表示する|を確認する|を調べる|を見る')
         pairs_check.append((sentence_check, code))
     return pairs_check
 
 def perform_get(pairs, option):
     pairs_get = []
-    for pair in pairs:
-        code = pair[1]
-        r = option.get('random', random.random())
-        if r < 0.3:
-            sentence_get = pair[0] + 'を取得する'
-        elif r < 0.7:
-            sentence_get = pair[0] + 'を得る'
-        else:
-            sentence_get = pair[0] + 'を抽出する'
+    for sentence, code in pairs:
+        sentence_get = sentence + optional_choice(option, 'を取得する|を得る|を抽出する')
         pairs_get.append((sentence_get, code))
     return pairs_get
 
 def perform_calc(pairs, option):
     pairs_calc = []
-    for pair in pairs:
-        code = pair[1]
-        r = option.get('random', random.random())
-        if r < 0.3:
-            sentence_calc = pair[0] + 'を計算する'
-        elif r < 0.7:
-            sentence_calc = pair[0] + 'を求める'
-        else:
-            sentence_calc = pair[0] + 'を算出する'
+    for sentence, code in pairs:
+        sentence_calc = sentence + optional_choice(option, 'を計算する|を求める|を算出する')
         pairs_calc.append((sentence_calc, code))
     return pairs_calc
 
@@ -215,7 +227,7 @@ def perform_filter(actions, pairs, option):
             join = True
         else:
             join = False
-        f = f'perform_{action}'
+        f = f'perform_{action.strip()}'
         if f in Functions:
             new_pairs = Functions[f](pairs, option)
             if join:

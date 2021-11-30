@@ -50,7 +50,8 @@ class MultieseParser(ParseTreeVisitor):
         for t in tree:
             ns.append(self.visit(t))
         node = ntree.Choice(ns)
-        ntree.update_choice_dic(node.stringfy())  # 類義語辞書を更新する
+        if ns[0].__class__.__name__ != '助詞':
+            ntree.update_choice_dic(node.stringfy())  # 類義語辞書を更新する
         return node
 
     def acceptExpression(self, tree: ParseTree):

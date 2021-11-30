@@ -12,5 +12,5 @@ aが0でないかどうか
 a < 100  @@if @@not.if @@while @@not.while @@let
 aが100より小さいかどうか
 
-df['A']  @@check
+df['A']  @@check @@get
 @type(df, データフレーム)のカラム'A'
