@@ -1,2 +1,0 @@
-df['A']  @@check @@get
-@type(df, データフレーム)のカラム'A'

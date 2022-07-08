@@ -1,1 +1,0 @@
-print ( open ( 'file.txt' , encoding = 'sjis' , mode = 'r' , errors = 'strict' , errors = 'ignore' ) , end = 'a' ) 	 ファイル名 'file.txt' を 開いたファイル を 表示する。そこで、文字列 'a' を 改行の 代わりに 使う。 エラー処理は 厳密に する。 エラー処理は しない。 文字コード は 'sjis' に する。 読み込みモードを 使う。
